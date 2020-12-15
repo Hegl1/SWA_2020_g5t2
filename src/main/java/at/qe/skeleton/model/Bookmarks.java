@@ -23,7 +23,7 @@ public class Bookmarks implements Serializable, Persistable<Long> {
 	private User user;
 
 	@ManyToOne
-	private Media Media;
+	private Media media;
 
 	public Long getBookmarkID() {
 		return bookmarkID;
@@ -42,11 +42,11 @@ public class Bookmarks implements Serializable, Persistable<Long> {
 	}
 
 	public Media getMedia() {
-		return Media;
+		return media;
 	}
 
 	public void setMedia(final Media media) {
-		Media = media;
+		this.media = media;
 	}
 
 	@Override
