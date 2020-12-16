@@ -1,6 +1,7 @@
 package at.qe.skeleton.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CollectionTable;
@@ -13,6 +14,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 
 import org.springframework.data.domain.Persistable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * Entity representing users.
@@ -25,6 +28,26 @@ import org.springframework.data.domain.Persistable;
 public class User implements Persistable<String>, Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	public User(){
+
+	}
+
+	public User(String username, String password, String firstName, String lastName, Boolean enabled, Set<UserRole> role){
+
+		PasswordEncoder pwEncoder = new BCryptPasswordEncoder(9);
+
+		this.username = username;
+		this.password = pwEncoder.encode(password);
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.enabled = enabled;
+		if(role.size() == 1) {
+			this.roles = role;
+		} else {
+			// TODO: throw Exception, only 1 role allowed
+		}
+	}
 
 	@Id
 	@Column(length = 100)

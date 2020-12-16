@@ -49,6 +49,14 @@ public class UserDetailController implements Serializable {
     }
 
     /**
+     * Creates User.
+     */
+    public void doCreateUser(){
+        this.userService.createUser();
+        doReloadUser();
+    }
+
+    /**
      * Action to force a reload of the currently displayed user.
      */
     public void doReloadUser() {
@@ -66,7 +74,12 @@ public class UserDetailController implements Serializable {
      * Action to delete the currently displayed user.
      */
     public void doDeleteUser() {
-        this.userService.deleteUser(user);
+        try {
+            this.userService.deleteUser(user);
+        } catch (UserService.UnauthorizedActionException unauthorizedActionException) {
+            System.out.println(unauthorizedActionException.getMessage());
+        }
+
         user = null;
     }
 

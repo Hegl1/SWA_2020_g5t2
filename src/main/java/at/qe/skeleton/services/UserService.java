@@ -1,7 +1,10 @@
 package at.qe.skeleton.services;
 
+import java.sql.SQLOutput;
 import java.util.Collection;
+import java.util.Set;
 
+import at.qe.skeleton.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,7 +34,7 @@ public class UserService {
 	 *
 	 * @return
 	 */
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<User> getAllUsers() {
 		return userRepository.findAll();
 	}
@@ -42,7 +45,7 @@ public class UserService {
 	 * @param username the username to search for
 	 * @return the user with the given username
 	 */
-	@PreAuthorize("hasAuthority('ADMIN') or principal.username eq #username")
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN') or principal.username eq #username")
 	public User loadUser(final String username) {
 		return userRepository.findFirstByUsername(username);
 	}
@@ -56,9 +59,33 @@ public class UserService {
 	 * @param user the user to save
 	 * @return the updated user
 	 */
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public User saveUser(final User user) {
 		return userRepository.save(user);
+	}
+
+	/**
+	 * Creates a user.
+	 */
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+	public User createUser(String username, String password, String firstName, String lastName, Boolean enabled, Set<UserRole> role) throws UnauthorizedActionException {
+
+		if(this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN) &&
+				(role.contains(UserRole.LIBRARIAN) || role.contains(UserRole.ADMIN))) {
+			throw new UnauthorizedActionException("");
+		}
+
+		User createdUser = new User(username, password, firstName, lastName, enabled, role);
+
+		this.userRepository.save(createdUser);
+		return createdUser;
+	}
+
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+	public User createUser(){
+		User newUser = new User();
+		this.userRepository.save(newUser);
+		return newUser;
 	}
 
 	/**
@@ -66,16 +93,36 @@ public class UserService {
 	 *
 	 * @param user the user to delete
 	 */
-	@PreAuthorize("hasAuthority('ADMIN')")
-	public void deleteUser(final User user) {
-		userRepository.delete(user);
-		// :TODO: write some audit log stating who and when this user was permanently
-		// deleted.
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+	public void deleteUser(final User user) throws UnauthorizedActionException {
+
+		// TODO: potential issue, that an Admin has less rights if he has the Librarian-Role as well
+		// this problem should not occur, if only one Role is allowed in the Constructor and Setter of the User
+
+		if(this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN) &&
+				user.getRoles().contains(UserRole.ADMIN)) {
+			throw new UnauthorizedActionException("Librarian may not delete Administrators!");
+
+		} else if (this.getAuthenticatedUser().getId().equals(user.getId())) {
+
+			throw new UnauthorizedActionException("Users may not delete themself!");
+
+		} else {
+			userRepository.delete(user);
+		}
 	}
 
 	private User getAuthenticatedUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		return userRepository.findFirstByUsername(auth.getName());
+	}
+
+	public static class UnauthorizedActionException extends Exception {
+		private static final long serialVersionUID = 1L;
+
+		public UnauthorizedActionException(String message){
+			super(message);
+		}
 	}
 
 }
