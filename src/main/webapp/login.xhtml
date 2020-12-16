@@ -4,6 +4,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jstl/core"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
         <form id="login_form" action="#{request.contextPath}/login" method="post">
@@ -19,5 +20,10 @@
                 </button>
             </h:panelGrid>
         </form>
+        <c:if test="#{param.error!=null}">
+            <div class="ui-g-12 ui-md-3">
+                <p:staticMessage severity="warn" summary="" detail="The login data is incorrect!" />
+            </div>
+        </c:if>
     </ui:define>
 </ui:composition>
