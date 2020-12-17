@@ -50,14 +50,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasAnyAuthority("ADMIN")
                 //Permit access only for some roles
                 .antMatchers("/secured/**")
-                .hasAnyAuthority("ADMIN", "MANAGER", "EMPLOYEE")
+                .hasAnyAuthority("ADMIN", "LIBRARIAN", "CUSTOMER")
                 //If user doesn't have permission, forward him to login page
                 .and()
                 .formLogin()
                 .loginPage("/login.xhtml")
                 .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/secured/welcome.xhtml");
-        // :TODO: user failureUrl(/login.xhtml?error) and make sure that a corresponding message is displayed
+                .defaultSuccessUrl("/secured/welcome.xhtml")
+                .failureUrl("/login.xhtml?error");
 
         http.exceptionHandling().accessDeniedPage("/error/denied.xhtml");
 
@@ -75,7 +75,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public static PasswordEncoder passwordEncoder() {
-        // :TODO: use proper passwordEncoder and do not store passwords in plain text
         return new BCryptPasswordEncoder(9);
     }
 }
