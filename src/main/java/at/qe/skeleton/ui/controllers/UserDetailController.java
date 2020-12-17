@@ -1,8 +1,11 @@
 package at.qe.skeleton.ui.controllers;
 
 import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.UserService;
 import java.io.Serializable;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -51,8 +54,13 @@ public class UserDetailController implements Serializable {
     /**
      * Creates User.
      */
-    public void doCreateUser(){
-        this.userService.createUser();
+    public void doCreateUser(String username, String password, String firstName, String lastName, Boolean enabled, UserRole roles, String email) {
+        try {
+            this.userService.createUser(username, password, firstName, lastName, enabled, roles, email);
+        } catch (UserService.UnauthorizedActionException e) {
+            System.out.println(e.getMessage());
+            // TODO: Exception-Handling
+        }
         doReloadUser();
     }
 
@@ -78,8 +86,8 @@ public class UserDetailController implements Serializable {
             this.userService.deleteUser(user);
         } catch (UserService.UnauthorizedActionException unauthorizedActionException) {
             System.out.println(unauthorizedActionException.getMessage());
+            // TODO: Exception-Handling
         }
-
         user = null;
     }
 

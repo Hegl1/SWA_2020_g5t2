@@ -7,6 +7,7 @@ import java.util.Set;
 import at.qe.skeleton.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -68,24 +69,17 @@ public class UserService {
 	 * Creates a user.
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public User createUser(String username, String password, String firstName, String lastName, Boolean enabled, Set<UserRole> role) throws UnauthorizedActionException {
+	public User createUser(String username, String password, String firstName, String lastName, Boolean enabled, UserRole roles, String email) throws UnauthorizedActionException {
 
 		if(this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN) &&
-				(role.contains(UserRole.LIBRARIAN) || role.contains(UserRole.ADMIN))) {
-			throw new UnauthorizedActionException("");
+				(roles.equals(UserRole.LIBRARIAN) || roles.equals(UserRole.ADMIN))) {
+			throw new UnauthorizedActionException("Librarians may not create Admins!");
 		}
 
-		User createdUser = new User(username, password, firstName, lastName, enabled, role);
+		User createdUser = new User(username, password, firstName, lastName, enabled, roles, email);
 
 		this.userRepository.save(createdUser);
 		return createdUser;
-	}
-
-	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public User createUser(){
-		User newUser = new User();
-		this.userRepository.save(newUser);
-		return newUser;
 	}
 
 	/**
@@ -101,6 +95,7 @@ public class UserService {
 
 		if(this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN) &&
 				user.getRoles().contains(UserRole.ADMIN)) {
+
 			throw new UnauthorizedActionException("Librarian may not delete Administrators!");
 
 		} else if (this.getAuthenticatedUser().getId().equals(user.getId())) {
