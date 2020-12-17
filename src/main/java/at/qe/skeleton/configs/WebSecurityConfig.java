@@ -45,6 +45,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //Permit access for all to error pages
                 .antMatchers("/error/**")
                 .permitAll()
+                // Only access with customer
+                .antMatchers("/customer/**")
+                .hasAnyAuthority("CUSTOMER")
                 // Only access with admin role
                 .antMatchers("/admin/**")
                 .hasAnyAuthority("ADMIN")
@@ -56,7 +59,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginPage("/login.xhtml")
                 .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/secured/welcome.xhtml")
+                .defaultSuccessUrl("/media/list.xhtml")
                 .failureUrl("/login.xhtml?error=incorrect");
 
         http.exceptionHandling().accessDeniedPage("/error/denied.xhtml");
