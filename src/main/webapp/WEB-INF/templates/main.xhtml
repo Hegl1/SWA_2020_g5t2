@@ -7,22 +7,78 @@
       >
 
     <h:head>
-        <title>Skeleton</title>
+        <title>Library</title>
+        <link rel="icon" type="image/png" href="/assets/favicon.png" />
+
+        <style type="text/css">
+            html{
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                background: #222222;
+            }
+
+            body{
+                background: #fff;
+            }
+
+            html, body{
+                padding: 0;
+                margin: 0;
+            }
+
+            .inside{
+                width: 960px;
+                max-width: 100%;
+                margin: 0 auto;
+            }
+
+            #header{
+                background: #222222;
+                color: #fff;
+
+                -webkit-box-shadow: 0px 7px 10px 0px rgba(0,0,0,0.2);
+                -moz-box-shadow: 0px 7px 10px 0px rgba(0,0,0,0.2);
+                box-shadow: 0px 7px 10px 0px rgba(0,0,0,0.2);
+
+                position: sticky;
+                top: 0;
+            }
+
+            #content{
+                padding: 20px 10px 10px 10px;
+
+                -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
+                -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
+                box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.2);
+            }
+
+            #footer{
+                background: #222222;
+                color: #fff;
+            }
+
+            #footer .inside{
+                padding: 10px;
+            }
+        </style>
     </h:head>
 
-    <h:body style="margin:10px;">
+    <h:body>
         <div id="page">
 
-            <div id="header" style="margin-bottom: 10px;">
-                <ui:include src="/WEB-INF/includes/header.xhtml" />
+            <div id="header">
+                <div class="inside">
+                    <ui:include src="/WEB-INF/includes/header.xhtml" />
+                </div>
             </div>
 
-            <div id="content">
+            <div id="content" class="inside">
                 <ui:insert name="content">Content</ui:insert>
             </div>
 
-            <div id="footer" style="margin-top: 10px;">
-                <ui:include src="/WEB-INF/includes/footer.xhtml" />
+            <div id="footer">
+                <div class="inside">
+                    <ui:include src="/WEB-INF/includes/footer.xhtml" />
+                </div>
             </div>
 
         </div>
