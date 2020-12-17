@@ -19,6 +19,7 @@ public class CustomServletContextInitializer implements ServletContextInitialize
     public void onStartup(ServletContext sc) throws ServletException {
         sc.setInitParameter("javax.faces.DEFAULT_SUFFIX", ".xhtml");
         sc.setInitParameter("javax.faces.PROJECT_STAGE", "Development");
+        sc.setInitParameter("primefaces.THEME", "nova-light");
     }
 
 }

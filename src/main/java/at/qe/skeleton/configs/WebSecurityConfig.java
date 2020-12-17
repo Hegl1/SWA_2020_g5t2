@@ -57,11 +57,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage("/login.xhtml")
                 .loginProcessingUrl("/login")
                 .defaultSuccessUrl("/secured/welcome.xhtml")
-                .failureUrl("/login.xhtml?error");
+                .failureUrl("/login.xhtml?error=incorrect");
 
         http.exceptionHandling().accessDeniedPage("/error/denied.xhtml");
 
-        http.sessionManagement().invalidSessionUrl("/error/invalid_session.xhtml");
+        http.sessionManagement().invalidSessionUrl("/login.xhtml?error=invalid_session");
 
     }
 

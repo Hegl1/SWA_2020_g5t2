@@ -18,12 +18,14 @@
                 <button type="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
                     <span class="ui-button-text">Login</span>
                 </button>
+
+                <c:if test="#{param.error != null and param.error == 'incorrect'}">
+                    <p:staticMessage severity="error" summary="" detail="The login data is incorrect!" />
+                </c:if>
+                <c:if test="#{param.error != null and param.error == 'invalid_session'}">
+                    <p:staticMessage severity="warn" summary="" detail="Your session has expired." />
+                </c:if>
             </h:panelGrid>
         </form>
-        <c:if test="#{param.error!=null}">
-            <div class="ui-g-12 ui-md-3">
-                <p:staticMessage severity="warn" summary="" detail="The login data is incorrect!" />
-            </div>
-        </c:if>
     </ui:define>
 </ui:composition>
