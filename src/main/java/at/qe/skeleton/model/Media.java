@@ -34,6 +34,19 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	@Enumerated(EnumType.STRING)
 	private MediaType mediaType;
 
+	public Media(final String title, final Date publishingDate, final String language, final int totalAvail, final MediaType mediaType) {
+		this.title = title;
+		this.publishingDate = publishingDate;
+		this.language = language;
+		this.totalAvail = totalAvail;
+		this.curBorrowed = 0;
+		this.mediaType = mediaType;
+	}
+
+	public Media() {
+
+	}
+
 	public long getMediaID() {
 		return mediaID;
 	}

@@ -1,20 +1,18 @@
 package at.qe.skeleton.services;
 
-import java.sql.SQLOutput;
-import java.util.Collection;
-import java.util.Set;
-
+import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.repositories.UserRepository;
+import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Service for accessing and manipulating user data.
@@ -37,7 +35,7 @@ public class UserService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<User> getAllUsers() {
-		return userRepository.findAll();
+		return this.userRepository.findAll();
 	}
 
 	/**
@@ -48,7 +46,7 @@ public class UserService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN') or principal.username eq #username")
 	public User loadUser(final String username) {
-		return userRepository.findFirstByUsername(username);
+		return this.userRepository.findFirstByUsername(username);
 	}
 
 	/**
@@ -62,23 +60,33 @@ public class UserService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public User saveUser(final User user) {
-		return userRepository.save(user);
+		return this.userRepository.save(user);
 	}
 
 	/**
 	 * Creates a user.
 	 */
+
+	// TODO THOMAS: TEST THIS SHIT!
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public User createUser(String username, String password, String firstName, String lastName, Boolean enabled, UserRole roles, String email) throws UnauthorizedActionException {
+	public User createUser(final String username, final String password, final String firstName, final String lastName, final Boolean enabled, final UserRole roles, final String email) throws UnauthorizedActionException, UnallowedInputException {
 
 		if(this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN) &&
 				(roles.equals(UserRole.LIBRARIAN) || roles.equals(UserRole.ADMIN))) {
 			throw new UnauthorizedActionException("Librarians may not create Admins!");
 		}
 
+		String regex = "^(.+)@(.+)$";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(email);
+
+		if(!matcher.matches()) {
+			throw new UnallowedInputException("Unallowed input for Email!");
+		}
+
 		User createdUser = new User(username, password, firstName, lastName, enabled, roles, email);
 
-		this.userRepository.save(createdUser);
+		this.saveUser(createdUser);
 		return createdUser;
 	}
 
@@ -103,13 +111,13 @@ public class UserService {
 			throw new UnauthorizedActionException("Users may not delete themself!");
 
 		} else {
-			userRepository.delete(user);
+			this.userRepository.delete(user);
 		}
 	}
 
 	private User getAuthenticatedUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		return userRepository.findFirstByUsername(auth.getName());
+		return this.userRepository.findFirstByUsername(auth.getName());
 	}
 
 	public static class UnauthorizedActionException extends Exception {
@@ -120,4 +128,11 @@ public class UserService {
 		}
 	}
 
+	public static class UnallowedInputException extends Exception {
+		private static final long serialVersionUID = 1L;
+
+		public UnallowedInputException(String message) {
+			super(message);
+		}
+	}
 }
