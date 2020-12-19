@@ -60,6 +60,10 @@ public class User implements Persistable<String>, Serializable {
 	@CollectionTable(name = "User_UserRole")
 	@Enumerated(EnumType.STRING)
 	private Set<UserRole> roles;
+	
+	public User() {
+		
+	}
 
 	public User(String username, String password, String firstName, String lastName, Boolean enabled, UserRole roles,
 			String email) {
