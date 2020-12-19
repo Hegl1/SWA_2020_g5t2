@@ -2,6 +2,7 @@ package at.qe.skeleton.services;
 
 import java.sql.SQLOutput;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -74,6 +75,26 @@ public class UserService {
 	public User saveUser(final User user) {
 		return userRepository.save(user);
 	}
+	
+    /**
+     * Changes the set of roles a user possesses.
+     * @param user The user whose roles should be changed
+     * @param newRoles Set of new roles
+     * @return if the change was succesful.
+     */
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public boolean changeUserRoles(User user, UserRole newRoles)
+    {
+    	try
+    	{
+    		user.setRoles(newRoles);
+    	}
+    	catch(Exception e)
+    	{
+    		return false;
+    	}
+    	return true;
+    }
 
 	/**
 	 * Creates a user.
