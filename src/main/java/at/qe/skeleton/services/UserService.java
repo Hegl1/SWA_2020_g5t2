@@ -66,7 +66,6 @@ public class UserService {
 	/**
 	 * Creates a user.
 	 */
-
 	// TODO THOMAS: TEST THIS SHIT!
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public User createUser(final String username, final String password, final String firstName, final String lastName, final Boolean enabled, final UserRole roles, final String email) throws UnauthorizedActionException, UnallowedInputException {
@@ -76,7 +75,7 @@ public class UserService {
 			throw new UnauthorizedActionException("Librarians may not create Admins!");
 		}
 
-		String regex = "^(.+)@(.+)$";
+		String regex = "^(.*)@(.+)$";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(email);
 
@@ -123,7 +122,7 @@ public class UserService {
 	public static class UnauthorizedActionException extends Exception {
 		private static final long serialVersionUID = 1L;
 
-		public UnauthorizedActionException(String message){
+		public UnauthorizedActionException(final String message){
 			super(message);
 		}
 	}
@@ -131,7 +130,7 @@ public class UserService {
 	public static class UnallowedInputException extends Exception {
 		private static final long serialVersionUID = 1L;
 
-		public UnallowedInputException(String message) {
+		public UnallowedInputException(final String message) {
 			super(message);
 		}
 	}

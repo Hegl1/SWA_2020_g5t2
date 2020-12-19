@@ -20,7 +20,7 @@ public class Video extends Media {
 	}
 
 	public int getLength() {
-		return length;
+		return this.length;
 	}
 
 	public void setLength(final int length) {

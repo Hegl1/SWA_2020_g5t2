@@ -22,7 +22,7 @@ public class Book extends Media {
 	}
 
 	public String getAuthor() {
-		return author;
+		return this.author;
 	}
 
 	public void setAuthor(final String author) {
@@ -30,11 +30,11 @@ public class Book extends Media {
 	}
 
 	public String getISBN() {
-		return ISBN;
+		return this.ISBN;
 	}
 
 	public void setISBN(final String iSBN) {
-		ISBN = iSBN;
+		this.ISBN = iSBN;
 	}
 
 }

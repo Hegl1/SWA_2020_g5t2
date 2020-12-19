@@ -39,7 +39,7 @@ public class UserDetailController implements Serializable {
      */
     public void setUser(final User user) {
         this.user = user;
-        doReloadUser();
+        this.doReloadUser();
     }
 
     /**
@@ -61,7 +61,7 @@ public class UserDetailController implements Serializable {
             System.out.println(e.getMessage());
             // TODO: Exception-Handling
         }
-        doReloadUser();
+        this.doReloadUser();
     }
 
     /**

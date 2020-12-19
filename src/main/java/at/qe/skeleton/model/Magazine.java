@@ -20,7 +20,7 @@ public class Magazine extends Media {
 	}
 
 	public String getSeries() {
-		return series;
+		return this.series;
 	}
 
 	public void setSeries(final String series) {

@@ -48,7 +48,7 @@ public class User implements Persistable<String>, Serializable {
 
 	}
 
-	public User(String username, String password, String firstName, String lastName, Boolean enabled, UserRole roles, String email) {
+	public User(final String username, final String password, final String firstName, final String lastName, final Boolean enabled, final UserRole roles, final String email) {
 
 		PasswordEncoder pwEncoder = new BCryptPasswordEncoder(9);
 
@@ -63,7 +63,7 @@ public class User implements Persistable<String>, Serializable {
 
 
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	public void setUsername(final String username) {
@@ -71,7 +71,7 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public String getPassword() {
-		return password;
+		return this.password;
 	}
 
 	public void setPassword(final String password) {
@@ -79,7 +79,7 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public String getFirstName() {
-		return firstName;
+		return this.firstName;
 	}
 
 	public void setFirstName(final String firstName) {
@@ -87,7 +87,7 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public String getLastName() {
-		return lastName;
+		return this.lastName;
 	}
 
 	public void setLastName(final String lastName) {
@@ -95,7 +95,7 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public boolean isEnabled() {
-		return enabled;
+		return this.enabled;
 	}
 
 	public void setEnabled(final boolean enabled) {
@@ -103,7 +103,7 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public Set<UserRole> getRoles() {
-		return roles;
+		return this.roles;
 	}
 
 	public void setRoles(final UserRole roles){
@@ -111,7 +111,7 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public String getEmail() {
-		return email;
+		return this.email;
 	}
 
 	public void setEmail(final String email) {
@@ -120,12 +120,12 @@ public class User implements Persistable<String>, Serializable {
 
 	@Override
 	public String getId() {
-		return username;
+		return this.username;
 	}
 
 	@Override
 	public boolean isNew() {
-		return (username == null);
+		return (this.username == null);
 	}
 
 }

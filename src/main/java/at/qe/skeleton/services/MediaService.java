@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 
 /**
@@ -39,19 +38,19 @@ public class MediaService {
         return this.mediaRepository.findAll();
     }
 
-    public List<AudioBook> getAllAudioBooks() {
+    public Collection<AudioBook> getAllAudioBooks() {
         return this.audioBookRepository.findAll();
     }
 
-    public List<Book> getAllBooks() {
+    public Collection<Book> getAllBooks() {
         return this.bookRepository.findAll();
     }
 
-    public List<Magazine> getAllMagazines() {
+    public Collection<Magazine> getAllMagazines() {
         return this.magazineRepository.findAll();
     }
 
-    public List<Video> getAllVideos() {
+    public Collection<Video> getAllVideos() {
         return this.videoRepository.findAll();
     }
 
@@ -60,7 +59,6 @@ public class MediaService {
 
 
     // loadMethods
-
 
 
 
@@ -164,7 +162,11 @@ public class MediaService {
     }
 
 
+
+
+
     // potentially some custom Exceptions
+
 
 
 

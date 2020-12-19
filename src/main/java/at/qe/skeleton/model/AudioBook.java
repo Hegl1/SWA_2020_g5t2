@@ -26,11 +26,11 @@ public class AudioBook extends Media {
 	}
 
 	public String getSpeaker() {
-		return speaker;
+		return this.speaker;
 	}
 
 	public String getAuthor() {
-		return author;
+		return this.author;
 	}
 
 	public void setAuthor(final String author) {
@@ -38,11 +38,11 @@ public class AudioBook extends Media {
 	}
 
 	public String getISBN() {
-		return ISBN;
+		return this.ISBN;
 	}
 
 	public void setISBN(final String iSBN) {
-		ISBN = iSBN;
+		this.ISBN = iSBN;
 	}
 
 	public void setSpeaker(final String speaker) {
@@ -50,7 +50,7 @@ public class AudioBook extends Media {
 	}
 
 	public long getLength() {
-		return length;
+		return this.length;
 	}
 
 	public void setLength(final int length) {

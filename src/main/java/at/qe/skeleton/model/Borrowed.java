@@ -32,7 +32,7 @@ public class Borrowed implements Serializable, Persistable<Long> {
 	private Date borrowDate;
 
 	public Long getBorrowID() {
-		return borrowID;
+		return this.borrowID;
 	}
 
 	public void setBorrowID(final Long borrowID) {
@@ -40,7 +40,7 @@ public class Borrowed implements Serializable, Persistable<Long> {
 	}
 
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 
 	public void setUser(final User user) {
@@ -48,7 +48,7 @@ public class Borrowed implements Serializable, Persistable<Long> {
 	}
 
 	public Media getMedia() {
-		return media;
+		return this.media;
 	}
 
 	public void setMedia(final Media media) {
@@ -56,7 +56,7 @@ public class Borrowed implements Serializable, Persistable<Long> {
 	}
 
 	public Date getBorrowDate() {
-		return borrowDate;
+		return this.borrowDate;
 	}
 
 	public void setBorrowDate(final Date borrowDate) {
@@ -65,11 +65,11 @@ public class Borrowed implements Serializable, Persistable<Long> {
 
 	@Override
 	public Long getId() {
-		return borrowID;
+		return this.borrowID;
 	}
 
 	@Override
 	public boolean isNew() {
-		return borrowID == null;
+		return this.borrowID == null;
 	}
 }

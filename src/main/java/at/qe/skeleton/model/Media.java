@@ -1,20 +1,10 @@
 package at.qe.skeleton.model;
 
+import org.springframework.data.domain.Persistable;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.springframework.data.domain.Persistable;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -48,7 +38,7 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	}
 
 	public long getMediaID() {
-		return mediaID;
+		return this.mediaID;
 	}
 
 	public void setMediaID(final long mediaID) {
@@ -56,7 +46,7 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	}
 
 	public String getTitle() {
-		return title;
+		return this.title;
 	}
 
 	public void setTitle(final String title) {
@@ -64,7 +54,7 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	}
 
 	public Date getPublishingDate() {
-		return publishingDate;
+		return this.publishingDate;
 	}
 
 	public void setPublishingDate(final Date publishingDate) {
@@ -72,7 +62,7 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	}
 
 	public String getLanguage() {
-		return language;
+		return this.language;
 	}
 
 	public void setLanguage(final String language) {
@@ -80,7 +70,7 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	}
 
 	public int getTotalAvail() {
-		return totalAvail;
+		return this.totalAvail;
 	}
 
 	public void setTotalAvail(final int totalAvail) {
@@ -88,7 +78,7 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	}
 
 	public MediaType getMediaType() {
-		return mediaType;
+		return this.mediaType;
 	}
 
 	public void setMediaType(final MediaType mediaType) {
@@ -96,7 +86,7 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	}
 
 	public int getCurBorrowed() {
-		return curBorrowed;
+		return this.curBorrowed;
 	}
 
 	public void setCurBorrowed(final int curBorrowed) {
