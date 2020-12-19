@@ -4,6 +4,7 @@ import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.UserService;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class UserDetailController implements Serializable {
      * Attribute to cache the currently displayed user
      */
     private User user;
+    
+    private List<String> newRolesString;
 
     /**
      * Sets the currently displayed user and reloads it form db. This user is
@@ -39,7 +42,7 @@ public class UserDetailController implements Serializable {
      */
     public void setUser(User user) {
         this.user = user;
-        doReloadUser();
+        //doReloadUser();
     }
 
     /**
@@ -50,11 +53,19 @@ public class UserDetailController implements Serializable {
     public User getUser() {
         return user;
     }
+    
+    public void setNewRolesString(List<String> roles){
+    	this.newRolesString = roles;
+    }
+    
+    public List<String> getNewRolesString(){
+    	return newRolesString;
+    }
 
     /**
      * Creates User.
      */
-    public void doCreateUser(String username, String password, String firstName, String lastName, Boolean enabled, UserRole roles, String email) {
+    /*public void doCreateUser(String username, String password, String firstName, String lastName, Boolean enabled, UserRole roles, String email) {
         try {
             this.userService.createUser(username, password, firstName, lastName, enabled, roles, email);
         } catch (UserService.UnauthorizedActionException e) {
@@ -62,7 +73,7 @@ public class UserDetailController implements Serializable {
             // TODO: Exception-Handling
         }
         doReloadUser();
-    }
+    }*/
 
     /**
      * Action to force a reload of the currently displayed user.
@@ -81,7 +92,12 @@ public class UserDetailController implements Serializable {
     /**
      * Action to delete the currently displayed user.
      */
+    
     public void doDeleteUser() {
+        this.userService.deleteUser(user);
+        user = null;
+    }
+    /*public void doDeleteUser() {
         try {
             this.userService.deleteUser(user);
         } catch (UserService.UnauthorizedActionException unauthorizedActionException) {
@@ -89,6 +105,10 @@ public class UserDetailController implements Serializable {
             // TODO: Exception-Handling
         }
         user = null;
+    }*/
+    
+    public void changeUserRoles(){
+    	userService.changeUserRoles(user, newRolesString);
     }
 
 }
