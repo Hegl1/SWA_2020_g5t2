@@ -51,8 +51,6 @@ public class CreateUserBean implements Serializable {
         user.setEnabled(true);
 
         setUserRoles();
-
-
             //save user
             userService.saveUser(user);
     }
@@ -62,7 +60,7 @@ public class CreateUserBean implements Serializable {
 
         for (String selected : selectedUserRoles) {
             switch (selected) {
-                case "member":
+                case "librarian":
                     userRole.add(UserRole.LIBRARIAN);
                     break;
                 case "admin":
@@ -73,7 +71,7 @@ public class CreateUserBean implements Serializable {
             }
         }
 
-//        user.setRoles(userRole);
+        user.setRoles(userRole);
     }
 
     public User getUser() {
