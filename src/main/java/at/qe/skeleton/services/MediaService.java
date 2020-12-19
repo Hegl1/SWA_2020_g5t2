@@ -33,23 +33,32 @@ public class MediaService {
 
 
 
-    // getAllMediaList returns a java.util.List the other getMethods only Lists?
+    /**
+     * Return collection of Media of desired type.
+     *
+     */
+
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Collection<Media> getAllMedia() {
         return this.mediaRepository.findAll();
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Collection<AudioBook> getAllAudioBooks() {
         return this.audioBookRepository.findAll();
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Collection<Book> getAllBooks() {
         return this.bookRepository.findAll();
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Collection<Magazine> getAllMagazines() {
         return this.magazineRepository.findAll();
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Collection<Video> getAllVideos() {
         return this.videoRepository.findAll();
     }
@@ -58,13 +67,41 @@ public class MediaService {
 
 
 
-    // loadMethods
+    /**
+     * Loads a single Media of desired type by its ID.
+     *
+     */
+    // TODO: correct usage of @PreAuthorize annotation
+
+    public Media loadMedia(final Long mediaId) {
+        return this.mediaRepository.findById(mediaId);
+    }
+
+    public Media loadAudioBook(final Long mediaId) {
+        return this.audioBookRepository.findById(mediaId);
+    }
+
+    public Media loadBook(final Long mediaId) {
+        return this.bookRepository.findById(mediaId);
+    }
+
+    public Media loadMagazine(final Long mediaId) {
+        return this.magazineRepository.findById(mediaId);
+    }
+
+    public Media loadVideo(final Long mediaId) {
+        return this.videoRepository.findById(mediaId);
+    }
 
 
 
 
 
-    // saveMethods
+    /**
+     * Save media in desired repository.
+     *
+     */
+
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media saveMedia(final Media media) {
         return this.mediaRepository.save(media);
@@ -94,7 +131,11 @@ public class MediaService {
 
 
 
-    // createMethods
+    /**
+     * Create Media of desired type.
+     *
+     */
+
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media createAudioBook(final String title, final Date publishingDate, final String language, final int totalAvail, final MediaType mediaType, final String speaker, final int length, final String author, final String ISBN) {
 
@@ -135,30 +176,47 @@ public class MediaService {
 
 
 
-    // deleteMethods
+    /**
+     * Delete Media of desired repository
+     *
+     */
+    // TODO: ensure that media gets deleted in every repository it occurs, maybe throw an Exception in default case
+
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public void deleteMedia(final Media media) {
         this.mediaRepository.delete(media);
+
+        switch (media.getMediaType()) {
+            case AUDIOBOOK: this.audioBookRepository.delete((AudioBook) media); break;
+            case BOOK:      this.bookRepository.delete((Book) media); break;
+            case MAGAZINE:  this.magazineRepository.delete((Magazine) media); break;
+            case VIDEO:     this.videoRepository.delete((Video) media); break;
+            default:        break;
+        }
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public void deleteAudioBook(final AudioBook audioBook) {
         this.audioBookRepository.delete(audioBook);
+        this.mediaRepository.delete(audioBook);
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public void deleteBook(final Book book) {
         this.bookRepository.delete(book);
+        this.mediaRepository.delete(book);
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public void deleteMagazine(final Magazine magazine) {
         this.magazineRepository.delete(magazine);
+        this.mediaRepository.delete(magazine);
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public void deleteVideo(final Video video) {
         this.videoRepository.delete(video);
+        this.mediaRepository.delete(video);
     }
 
 
