@@ -2,6 +2,7 @@ package at.qe.skeleton.services;
 
 import java.sql.SQLOutput;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import at.qe.skeleton.model.UserRole;
@@ -51,6 +52,15 @@ public class UserService {
 		return userRepository.findFirstByUsername(username);
 	}
 
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public List<User> loadUserByName(String fullName) {
+        return userRepository.findByWholeNameConcat(fullName);
+    }
+    
+    public User loadCurrentUser(){
+    	return loadUser(getAuthenticatedUser().getUsername());
+    }
+	
 	/**
 	 * Saves the user. This method will also set {@link User#createDate} for new
 	 * entities or {@link User#updateDate} for updated entities. The user requesting
