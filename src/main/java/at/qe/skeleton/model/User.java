@@ -14,6 +14,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -43,7 +45,7 @@ public class User implements Persistable<String>, Serializable {
 	private String lastName;
 	private String email;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = true)
 	private User createUser;
 
 	@Column(nullable = false)
@@ -53,6 +55,7 @@ public class User implements Persistable<String>, Serializable {
 	@ManyToOne(optional = true)
 	private User updateUser;
 
+	@Column(nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date updateDate;
 
@@ -207,6 +210,16 @@ public class User implements Persistable<String>, Serializable {
 	@Override
 	public boolean isNew() {
 		return (null == createDate);
+	}
+	
+	@PrePersist
+	void prePersist() {
+		this.createDate = this.updateDate = new Date();
+	}
+	
+	@PreUpdate
+	void preUpdate() {
+		this.updateDate = new Date();
 	}
 
 }
