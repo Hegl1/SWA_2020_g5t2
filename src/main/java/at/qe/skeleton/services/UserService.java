@@ -1,5 +1,6 @@
 package at.qe.skeleton.services;
 
+import at.qe.skeleton.model.User;
 import java.sql.SQLOutput;
 import java.util.Collection;
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,8 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.repositories.UserRepository;
+import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Service for accessing and manipulating user data.
@@ -40,9 +43,9 @@ public class UserService {
 	 *
 	 * @return
 	 */
-	// @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<User> getAllUsers() {
-		return userRepository.findAll();
+		return this.userRepository.findAll();
 	}
 
 	/**
@@ -53,7 +56,7 @@ public class UserService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN') or principal.username eq #username")
 	public User loadUser(final String username) {
-		return userRepository.findFirstByUsername(username);
+		return this.userRepository.findFirstByUsername(username);
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN')")
@@ -74,8 +77,9 @@ public class UserService {
 	 * @param user the user to save
 	 * @return the updated user
 	 */
+	// TODO: Move PasswordEncoder
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public User saveUser(User user) {
+	public User saveUser(final User user) {
 		if (user.isNew()) {
 			user.setCreateDate(new Date());
 			user.setCreateUser(getAuthenticatedUser());
@@ -98,7 +102,7 @@ public class UserService {
 
 	/**
 	 * Changes the set of roles a user possesses.
-	 * 
+	 *
 	 * @param user     The user whose roles should be changed
 	 * @param newRoles Set of new roles
 	 * @return if the change was succesful.
@@ -138,18 +142,29 @@ public class UserService {
 	/**
 	 * Creates a user.
 	 */
+	// TODO @THOMAS: needs testing
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public User createUser(String username, String password, String firstName, String lastName, Boolean enabled,
-			UserRole roles, String email) throws UnauthorizedActionException {
+	public User createUser(final String username, final String password, final String firstName,
+						   final String lastName, final Boolean enabled, final UserRole roles,
+						   final String email) throws UnauthorizedActionException, UnallowedInputException {
 
-		if (this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN)
-				&& (roles.equals(UserRole.LIBRARIAN) || roles.equals(UserRole.ADMIN))) {
+		if(this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN) &&
+				(roles.equals(UserRole.LIBRARIAN) || roles.equals(UserRole.ADMIN))) {
 			throw new UnauthorizedActionException("Librarians may not create Admins!");
+		}
+
+		// source of following monstrosity: https://stackoverflow.com/questions/201323/how-to-validate-an-email-address-using-a-regular-expression
+		String regex = "^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])$";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(email);
+
+		if(!matcher.matches()) {
+			throw new UnallowedInputException("Unallowed input for Email!");
 		}
 
 		User createdUser = new User(username, password, firstName, lastName, enabled, roles, email);
 
-		this.userRepository.save(createdUser);
+		this.saveUser(createdUser);
 		return createdUser;
 	}
 
@@ -158,23 +173,14 @@ public class UserService {
 	 *
 	 * @param user the user to delete
 	 */
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void deleteUser(User user) {
-        userRepository.delete(user);
-        // :TODO: write some audit log stating who and when this user was permanently
-        // deleted.
-    }
-/*	
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void deleteUser(final User user) throws UnauthorizedActionException {
 
-		// TODO: potential issue, that an Admin has less rights if he has the
-		// Librarian-Role as well
-		// this problem should not occur, if only one Role is allowed in the Constructor
-		// and Setter of the User
+		// TODO: potential issue, that an Admin has less rights if he has the Librarian-Role as wel
+		//  this problem should not occur, if only one Role is allowed in the Constructor and Setter of the User
 
-		if (this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN)
-				&& user.getRoles().contains(UserRole.ADMIN)) {
+		if(this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN) &&
+				user.getRoles().contains(UserRole.ADMIN)) {
 
 			throw new UnauthorizedActionException("Librarian may not delete Administrators!");
 
@@ -183,19 +189,32 @@ public class UserService {
 			throw new UnauthorizedActionException("Users may not delete themself!");
 
 		} else {
-			userRepository.delete(user);
+			this.userRepository.delete(user);
 		}
-	}*/
+	}
 
 	private User getAuthenticatedUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		return userRepository.findFirstByUsername(auth.getName());
+		return this.userRepository.findFirstByUsername(auth.getName());
 	}
+
+
+	/**
+	 * Custom Exceptions
+	 */
 
 	public static class UnauthorizedActionException extends Exception {
 		private static final long serialVersionUID = 1L;
 
-		public UnauthorizedActionException(String message) {
+		public UnauthorizedActionException(final String message){
+			super(message);
+		}
+	}
+
+	public static class UnallowedInputException extends Exception {
+		private static final long serialVersionUID = 1L;
+
+		public UnallowedInputException(final String message) {
 			super(message);
 		}
 	}

@@ -26,7 +26,7 @@ public class Bookmark implements Serializable, Persistable<Long> {
 	private Media media;
 
 	public Long getBookmarkID() {
-		return bookmarkID;
+		return this.bookmarkID;
 	}
 
 	public void setBookmarkID(final Long bookmarkID) {
@@ -34,7 +34,7 @@ public class Bookmark implements Serializable, Persistable<Long> {
 	}
 
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 
 	public void setUser(final User user) {
@@ -42,7 +42,7 @@ public class Bookmark implements Serializable, Persistable<Long> {
 	}
 
 	public Media getMedia() {
-		return media;
+		return this.media;
 	}
 
 	public void setMedia(final Media media) {
@@ -51,12 +51,12 @@ public class Bookmark implements Serializable, Persistable<Long> {
 
 	@Override
 	public Long getId() {
-		return bookmarkID;
+		return this.bookmarkID;
 	}
 
 	@Override
 	public boolean isNew() {
-		return bookmarkID == null;
+		return this.bookmarkID == null;
 	}
 
 }

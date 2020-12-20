@@ -32,7 +32,7 @@ public class Reserved implements Serializable, Persistable<Long> {
 	private Date reserveTime;
 
 	public Long getReservedID() {
-		return reservedID;
+		return this.reservedID;
 	}
 
 	public void setReservedID(final Long reservedID) {
@@ -40,7 +40,7 @@ public class Reserved implements Serializable, Persistable<Long> {
 	}
 
 	public User getUser() {
-		return user;
+		return this.user;
 	}
 
 	public void setUser(final User user) {
@@ -48,7 +48,7 @@ public class Reserved implements Serializable, Persistable<Long> {
 	}
 
 	public Media getMedia() {
-		return media;
+		return this.media;
 	}
 
 	public void setMedia(final Media media) {
@@ -56,7 +56,7 @@ public class Reserved implements Serializable, Persistable<Long> {
 	}
 
 	public Date getReserveTime() {
-		return reserveTime;
+		return this.reserveTime;
 	}
 
 	public void setReserveTime(final Date reserveTime) {
@@ -65,12 +65,12 @@ public class Reserved implements Serializable, Persistable<Long> {
 
 	@Override
 	public Long getId() {
-		return reservedID;
+		return this.reservedID;
 	}
 
 	@Override
 	public boolean isNew() {
-		return reservedID == null;
+		return this.reservedID == null;
 	}
 
 }

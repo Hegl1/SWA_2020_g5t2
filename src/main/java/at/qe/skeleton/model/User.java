@@ -63,13 +63,13 @@ public class User implements Persistable<String>, Serializable {
 	@CollectionTable(name = "User_UserRole")
 	@Enumerated(EnumType.STRING)
 	private Set<UserRole> roles;
-	
-	public User() {
-		
+
+	public User(){
+
 	}
 
-	public User(String username, String password, String firstName, String lastName, Boolean enabled, UserRole roles,
-			String email) {
+	public User(final String username, final String password, final String firstName, final String lastName,
+				final Boolean enabled, final UserRole roles, final String email) {
 
 		PasswordEncoder pwEncoder = new BCryptPasswordEncoder(9);
 
@@ -82,8 +82,9 @@ public class User implements Persistable<String>, Serializable {
 		this.email = email;
 	}
 
+
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	public void setUsername(final String username) {
@@ -91,17 +92,17 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public String getPassword() {
-		return password;
+		return this.password;
 	}
 
-	public void setPassword(String password) {
+	public void setPassword(final String password) {
 		if (password != null && password != "") {
 			this.password = password;
 		}
 	}
 
 	public String getFirstName() {
-		return firstName;
+		return this.firstName;
 	}
 
 	public void setFirstName(final String firstName) {
@@ -109,7 +110,7 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public String getLastName() {
-		return lastName;
+		return this.lastName;
 	}
 
 	public void setLastName(final String lastName) {
@@ -117,7 +118,7 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public boolean isEnabled() {
-		return enabled;
+		return this.enabled;
 	}
 
 	public void setEnabled(final boolean enabled) {
@@ -125,47 +126,47 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public Set<UserRole> getRoles() {
-		return roles;
+		return this.roles;
 	}
 
-	public void setRoles(Set<UserRole> roles) {
+	public void setRoles(final Set<UserRole> roles) {
 		this.roles = roles;
 	}
 
 	public User getCreateUser() {
-		return createUser;
+		return this.createUser;
 	}
 
-	public void setCreateUser(User createUser) {
+	public void setCreateUser(final User createUser) {
 		this.createUser = createUser;
 	}
 
 	public Date getCreateDate() {
-		return createDate;
+		return this.createDate;
 	}
 
-	public void setCreateDate(Date createDate) {
+	public void setCreateDate(final Date createDate) {
 		this.createDate = createDate;
 	}
 
 	public User getUpdateUser() {
-		return updateUser;
+		return this.updateUser;
 	}
 
-	public void setUpdateUser(User updateUser) {
+	public void setUpdateUser(final User updateUser) {
 		this.updateUser = updateUser;
 	}
 
 	public Date getUpdateDate() {
-		return updateDate;
+		return this.updateDate;
 	}
 
-	public void setUpdateDate(Date updateDate) {
+	public void setUpdateDate(final Date updateDate) {
 		this.updateDate = updateDate;
 	}
 
 	public String getEmail() {
-		return email;
+		return this.email;
 	}
 
 	public void setEmail(final String email) {
@@ -174,7 +175,7 @@ public class User implements Persistable<String>, Serializable {
 
 	@Override
 	public String getId() {
-		return username;
+		return this.username;
 	}
 
 	@Override
@@ -209,14 +210,14 @@ public class User implements Persistable<String>, Serializable {
 
 	@Override
 	public boolean isNew() {
-		return (null == createDate);
+		return (this.username == null);
 	}
-	
+
 	@PrePersist
 	void prePersist() {
 		this.createDate = this.updateDate = new Date();
 	}
-	
+
 	@PreUpdate
 	void preUpdate() {
 		this.updateDate = new Date();

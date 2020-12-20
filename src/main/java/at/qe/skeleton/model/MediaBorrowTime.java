@@ -20,7 +20,7 @@ public class MediaBorrowTime implements Serializable, Persistable<MediaType> {
 	private Integer allowedBorrowTime;
 
 	public MediaType getMediaType() {
-		return mediaType;
+		return this.mediaType;
 	}
 
 	public void setMediaType(final MediaType mediaType) {
@@ -28,7 +28,7 @@ public class MediaBorrowTime implements Serializable, Persistable<MediaType> {
 	}
 
 	public int getAllowedBorrowTime() {
-		return allowedBorrowTime;
+		return this.allowedBorrowTime;
 	}
 
 	public void setAllowedBorrowTime(final int allowedBorrowTime) {
@@ -37,12 +37,12 @@ public class MediaBorrowTime implements Serializable, Persistable<MediaType> {
 
 	@Override
 	public MediaType getId() {
-		return mediaType;
+		return this.mediaType;
 	}
 
 	@Override
 	public boolean isNew() {
-		return mediaType == null;
+		return this.mediaType == null;
 	}
 
 }

@@ -29,7 +29,7 @@ public class UserDetailController implements Serializable {
      * Attribute to cache the currently displayed user
      */
     private User user;
-    
+
     private List<String> newRolesString;
 
     /**
@@ -40,9 +40,9 @@ public class UserDetailController implements Serializable {
      *
      * @param user
      */
-    public void setUser(User user) {
+    public void setUser(final User user) {
         this.user = user;
-        //doReloadUser();
+        this.doReloadUser();
     }
 
     /**
@@ -51,62 +51,53 @@ public class UserDetailController implements Serializable {
      * @return
      */
     public User getUser() {
-        return user;
-    }
-    
-    public void setNewRolesString(List<String> roles){
-    	this.newRolesString = roles;
-    }
-    
-    public List<String> getNewRolesString(){
-    	return newRolesString;
+        return this.user;
     }
 
     /**
      * Creates User.
      */
-    /*public void doCreateUser(String username, String password, String firstName, String lastName, Boolean enabled, UserRole roles, String email) {
+    public void doCreateUser(final String username, final String password, final String firstName,
+                             final String lastName, final Boolean enabled, final UserRole roles, final String email) {
+
         try {
             this.userService.createUser(username, password, firstName, lastName, enabled, roles, email);
-        } catch (UserService.UnauthorizedActionException e) {
+        } catch (UserService.UnauthorizedActionException | UserService.UnallowedInputException e) {
             System.out.println(e.getMessage());
             // TODO: Exception-Handling
         }
-        doReloadUser();
-    }*/
+        this.doReloadUser();
+    }
+
 
     /**
      * Action to force a reload of the currently displayed user.
      */
     public void doReloadUser() {
-        user = userService.loadUser(user.getUsername());
+        this.user = this.userService.loadUser(this.user.getUsername());
     }
 
     /**
      * Action to save the currently displayed user.
      */
     public void doSaveUser() {
-        user = this.userService.saveUser(user);
+        this.user = this.userService.saveUser(this.user);
     }
 
     /**
      * Action to delete the currently displayed user.
      */
-    
     public void doDeleteUser() {
-        this.userService.deleteUser(user);
-        user = null;
-    }
-    /*public void doDeleteUser() {
         try {
-            this.userService.deleteUser(user);
+            this.userService.deleteUser(this.user);
         } catch (UserService.UnauthorizedActionException unauthorizedActionException) {
             System.out.println(unauthorizedActionException.getMessage());
             // TODO: Exception-Handling
         }
+        this.user = null;
         user = null;
-    }*/
-    
+    }
+
     public void changeUserRoles(){
     	userService.changeUserRoles(user, newRolesString);
     }

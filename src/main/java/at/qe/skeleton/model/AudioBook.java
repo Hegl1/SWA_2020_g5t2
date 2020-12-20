@@ -1,6 +1,7 @@
 package at.qe.skeleton.model;
 
 import javax.persistence.Entity;
+import java.util.Date;
 
 @Entity
 public class AudioBook extends Media {
@@ -12,12 +13,27 @@ public class AudioBook extends Media {
 	private String author;
 	private String ISBN;
 
+	public AudioBook(final String title, final Date publishingDate, final String language,
+					 final int totalAvail, final MediaType mediaType, final String speaker,
+					 final int length, final String author, final String ISBN) {
+
+		super(title, publishingDate, language, totalAvail, mediaType);
+		this.speaker = speaker;
+		this.length = length;
+		this.author = author;
+		this.ISBN = ISBN;
+	}
+
+	public AudioBook() {
+
+	}
+
 	public String getSpeaker() {
-		return speaker;
+		return this.speaker;
 	}
 
 	public String getAuthor() {
-		return author;
+		return this.author;
 	}
 
 	public void setAuthor(final String author) {
@@ -25,11 +41,11 @@ public class AudioBook extends Media {
 	}
 
 	public String getISBN() {
-		return ISBN;
+		return this.ISBN;
 	}
 
 	public void setISBN(final String iSBN) {
-		ISBN = iSBN;
+		this.ISBN = iSBN;
 	}
 
 	public void setSpeaker(final String speaker) {
@@ -37,7 +53,7 @@ public class AudioBook extends Media {
 	}
 
 	public long getLength() {
-		return length;
+		return this.length;
 	}
 
 	public void setLength(final int length) {
