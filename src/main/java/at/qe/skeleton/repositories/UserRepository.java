@@ -15,7 +15,7 @@ import at.qe.skeleton.model.UserRole;
  * courses "Software Architecture" and "Software Engineering" offered by the
  * University of Innsbruck.
  */
-public interface UserRepository extends AbstractRepository<User, String> {
+public interface UserRepository extends AbstractRepository<User, Long> {
 
 	User findFirstByUsername(String username);
 

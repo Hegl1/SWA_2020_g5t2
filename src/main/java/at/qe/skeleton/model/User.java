@@ -1,6 +1,7 @@
 package at.qe.skeleton.model;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,6 +13,11 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import io.micrometer.core.instrument.util.JsonUtils;
 import org.springframework.data.domain.Persistable;
@@ -39,11 +45,24 @@ public class User implements Persistable<String>, Serializable {
 	private String lastName;
 	private String email;
 
+	@ManyToOne(optional = true)
+	private User createUser;
+
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date createDate;
+
+	@ManyToOne(optional = true)
+	private User updateUser;
+
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date updateDate;
+
 	@ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
 	@CollectionTable(name = "User_UserRole")
 	@Enumerated(EnumType.STRING)
 	private Set<UserRole> roles;
-
 
 	public User(){
 
@@ -77,7 +96,9 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public void setPassword(final String password) {
-		this.password = password;
+		if (password != null && password != "") {
+			this.password = password;
+		}
 	}
 
 	public String getFirstName() {
@@ -108,8 +129,40 @@ public class User implements Persistable<String>, Serializable {
 		return this.roles;
 	}
 
-	public void setRoles(final UserRole roles){
-		this.roles.add(roles);
+	public void setRoles(final Set<UserRole> roles) {
+		this.roles = roles;
+	}
+
+	public User getCreateUser() {
+		return this.createUser;
+	}
+
+	public void setCreateUser(final User createUser) {
+		this.createUser = createUser;
+	}
+
+	public Date getCreateDate() {
+		return this.createDate;
+	}
+
+	public void setCreateDate(final Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public User getUpdateUser() {
+		return this.updateUser;
+	}
+
+	public void setUpdateUser(final User updateUser) {
+		this.updateUser = updateUser;
+	}
+
+	public Date getUpdateDate() {
+		return this.updateDate;
+	}
+
+	public void setUpdateDate(final Date updateDate) {
+		this.updateDate = updateDate;
 	}
 
 	public String getEmail() {
@@ -126,8 +179,49 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "at.qe.sepm.skeleton.model.User[ id=" + username + " ]";
+	}
+
+	@Override
 	public boolean isNew() {
 		return (this.username == null);
+		return (null == createDate);
+	}
+
+	@PrePersist
+	void prePersist() {
+		this.createDate = this.updateDate = new Date();
+	}
+
+	@PreUpdate
+	void preUpdate() {
+		this.updateDate = new Date();
 	}
 
 }

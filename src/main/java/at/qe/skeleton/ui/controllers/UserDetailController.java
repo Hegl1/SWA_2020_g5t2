@@ -4,6 +4,7 @@ import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.UserService;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class UserDetailController implements Serializable {
      * Attribute to cache the currently displayed user
      */
     private User user;
+
+    private List<String> newRolesString;
 
     /**
      * Sets the currently displayed user and reloads it form db. This user is
@@ -92,6 +95,11 @@ public class UserDetailController implements Serializable {
             // TODO: Exception-Handling
         }
         this.user = null;
+        user = null;
+    }
+
+    public void changeUserRoles(){
+    	userService.changeUserRoles(user, newRolesString);
     }
 
 }

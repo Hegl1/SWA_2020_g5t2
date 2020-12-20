@@ -1,13 +1,23 @@
 package at.qe.skeleton.services;
 
 import at.qe.skeleton.model.User;
+import java.sql.SQLOutput;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
@@ -49,6 +59,15 @@ public class UserService {
 		return this.userRepository.findFirstByUsername(username);
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public List<User> loadUserByName(String fullName) {
+		return userRepository.findByWholeNameConcat(fullName);
+	}
+
+	public User loadCurrentUser() {
+		return loadUser(getAuthenticatedUser().getUsername());
+	}
+
 	/**
 	 * Saves the user. This method will also set {@link User#createDate} for new
 	 * entities or {@link User#updateDate} for updated entities. The user requesting
@@ -58,9 +77,66 @@ public class UserService {
 	 * @param user the user to save
 	 * @return the updated user
 	 */
+	// TODO: Move PasswordEncoder
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public User saveUser(final User user) {
-		return this.userRepository.save(user);
+		if (user.isNew()) {
+			user.setCreateDate(new Date());
+			user.setCreateUser(getAuthenticatedUser());
+		} else {
+			user.setUpdateDate(new Date());
+			user.setUpdateUser(getAuthenticatedUser());
+			// if password was changed, then encrypt it again
+			Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2a?\\$\\d\\d\\$[./0-9A-Za-z]{53}");
+			if (BCRYPT_PATTERN.matcher(user.getPassword()).matches()) {
+				// stringToCheck is an encoded bcrypt password.
+			} else {
+				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+				String newencodedPassword = passwordEncoder.encode(user.getPassword());
+				user.setPassword(newencodedPassword);
+			}
+
+		}
+		return userRepository.save(user);
+	}
+
+	/**
+	 * Changes the set of roles a user possesses.
+	 *
+	 * @param user     The user whose roles should be changed
+	 * @param newRoles Set of new roles
+	 * @return if the change was succesful.
+	 */
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public boolean changeUserRoles(User user, Set<UserRole> newRoles) {
+		try {
+			user.setRoles(newRoles);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean changeUserRoles(User user, List<String> newRolesString) {
+		Set<UserRole> newRolesSet = new HashSet<>();
+
+		for (String selected : newRolesString) {
+			switch (selected.toLowerCase()) {
+			case "librarian":
+				newRolesSet.add(UserRole.LIBRARIAN);
+				break;
+			case "admin":
+				newRolesSet.add(UserRole.ADMIN);
+				break;
+			default:
+				System.err.println(
+						"[Warning] UserService - changeUserRoles: Role \"" + selected + "\" not supported yet!");
+				return false;
+			}
+		}
+		user.setRoles(newRolesSet);
+
+		return true;
 	}
 
 	/**
@@ -92,7 +168,6 @@ public class UserService {
 		return createdUser;
 	}
 
-
 	/**
 	 * Deletes the user.
 	 *
@@ -101,8 +176,8 @@ public class UserService {
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void deleteUser(final User user) throws UnauthorizedActionException {
 
-		// TODO: potential issue, that an Admin has less rights if he has the Librarian-Role as well
-		// this problem should not occur, if only one Role is allowed in the Constructor and Setter of the User
+		// TODO: potential issue, that an Admin has less rights if he has the Librarian-Role as wel
+		//  this problem should not occur, if only one Role is allowed in the Constructor and Setter of the User
 
 		if(this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN) &&
 				user.getRoles().contains(UserRole.ADMIN)) {
@@ -143,4 +218,5 @@ public class UserService {
 			super(message);
 		}
 	}
+
 }

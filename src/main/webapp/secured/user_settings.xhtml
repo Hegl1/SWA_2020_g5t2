@@ -1,11 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
-        User settings
+    	<h:form id="userDataForm"> 
+            <p:dataTable id="userTable" var="user" value="#{sessionInfoBean.currentUser}"> 
+                <p:column headerText="Benutzername">
+                    <h:outputText value="#{user.username}"/>
+                </p:column>
+                <p:column headerText="Vorname">
+                    <h:outputText value="#{user.firstName}"/>
+                </p:column>
+                <p:column headerText="Nachname">
+                    <h:outputText value="#{user.lastName}"/>
+                </p:column>
+                <p:column headerText="E-Mail">
+                    <h:outputText value="#{user.email}"/>
+                </p:column>
+            </p:dataTable>
+            
+			<p:dataTable id="userTables" var="user" value="#{sessionInfoBean.currentUser}">
+			<p:column style="width:100px;text-align: center">
+                    <p:commandButton update=":userDataForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="ui-icon-pencil" title="Stammdaten bearbeiten" value="Persönliche Daten bearbeiten">
+                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
+                    </p:commandButton>
+            </p:column>
+            <p:column style="width:100px;text-align: center">
+                    <p:commandButton update=":userDataForm:passwordEditDialog" oncomplete="PF('passwordEditDialog').show()" icon="ui-icon-key" title="Passwort ändern" value="Passwort ändern">
+                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
+                    </p:commandButton>
+            </p:column>
+            </p:dataTable> 
+            
+            <p:dialog header="Persönliche Daten bearbeiten" id="userEditDialog" widgetVar="userEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="userEditData" rendered="#{not empty userDetailController.user}">
+                    <h:panelGrid columns="2">
+                    	<p:outputLabel for="username" value="Benutzername: " />
+                        <p:inputText id="username" value="#{userDetailController.user.username}" disabled="true"/>
+                        <p:outputLabel for="firstName" value="Vorname: " />
+                        <p:inputText id="firstName" value="#{userDetailController.user.firstName}"/>
+                        <p:outputLabel for="firstName" value="Nachname: " />
+                        <p:inputText id="lastName" value="#{userDetailController.user.lastName}"/>
+                        <p:outputLabel for="email" value="E-Mail: " />
+                        <p:inputText id="email" value="#{userDetailController.user.email}"/>
+                    </h:panelGrid>
+                    <p:separator />
+                    <h:panelGrid columns="2">
+                        <p:commandButton value="Speichern" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update=":userDataForm:userTable"/>
+                        <p:commandButton value="Abbrechen" onclick="PF('userEditDialog').hide()"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+                    
+            <p:dialog header="Passwort ändern" id="passwordEditDialog" widgetVar="passwordEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="passwordEditData" rendered="#{not empty userDetailController.user}">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="username1" value="Benutzername: " />
+                        <p:inputText id="username1" value="#{userDetailController.user.username}" disabled="true"/>
+                        <p:outputLabel for="password1" value="Neues Passwort: " />
+                        <p:password id="password1" value="#{userDetailController.user.password}" disabled="false"/>
+                    </h:panelGrid>
+					<p:separator />
+                    <h:panelGrid columns="2">
+                    	<p:commandButton value="Neues Passwort setzen" action="#{userDetailController.doSaveUser()}" oncomplete="PF('passwordEditDialog').hide()" update=":userDataForm:userTable"/>
+                        <p:commandButton value="Abbrechen" onclick="PF('passwordEditDialog').hide()"/>
+                    </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
     </ui:define>
 </ui:composition>
