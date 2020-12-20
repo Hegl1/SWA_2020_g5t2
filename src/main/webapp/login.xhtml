@@ -4,6 +4,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jstl/core"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
         <form id="login_form" action="#{request.contextPath}/login" method="post">
@@ -17,6 +18,13 @@
                 <button type="submit" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
                     <span class="ui-button-text">Login</span>
                 </button>
+
+                <c:if test="#{param.error != null and param.error == 'incorrect'}">
+                    <p:staticMessage severity="error" summary="" detail="The login data is incorrect!" />
+                </c:if>
+                <c:if test="#{param.error != null and param.error == 'invalid_session'}">
+                    <p:staticMessage severity="warn" summary="" detail="Your session has expired." />
+                </c:if>
             </h:panelGrid>
         </form>
     </ui:define>

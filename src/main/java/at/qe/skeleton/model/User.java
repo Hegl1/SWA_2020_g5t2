@@ -2,8 +2,9 @@ package at.qe.skeleton.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
+
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -13,9 +14,15 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import io.micrometer.core.instrument.util.JsonUtils;
 import org.springframework.data.domain.Persistable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * Entity representing users.
@@ -27,171 +34,193 @@ import org.springframework.data.domain.Persistable;
 @Entity
 public class User implements Persistable<String>, Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Id
-    @Column(length = 100)
-    private String username;
+	@Id
+	@Column(length = 100)
+	private String username;
+	private boolean enabled;
+	private String password;
+	private String firstName;
+	private String lastName;
+	private String email;
 
-    @ManyToOne(optional = false)
-    private User createUser;
-    @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createDate;
-    @ManyToOne(optional = true)
-    private User updateUser;
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updateDate;
+	@ManyToOne(optional = true)
+	private User createUser;
 
-    private String password;
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date createDate;
 
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String phone;
+	@ManyToOne(optional = true)
+	private User updateUser;
 
-    boolean enabled;
+	@Column(nullable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date updateDate;
 
-    @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "User_UserRole")
-    @Enumerated(EnumType.STRING)
-    private Set<UserRole> roles;
+	@ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
+	@CollectionTable(name = "User_UserRole")
+	@Enumerated(EnumType.STRING)
+	private Set<UserRole> roles;
 
-    public String getUsername() {
-        return username;
-    }
+	public User(){
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public User(final String username, final String password, final String firstName, final String lastName,
+				final Boolean enabled, final UserRole roles, final String email) {
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+		PasswordEncoder pwEncoder = new BCryptPasswordEncoder(9);
 
-    public String getFirstName() {
-        return firstName;
-    }
+		this.username = username;
+		this.password = pwEncoder.encode(password);
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.enabled = enabled;
+		this.roles.add(roles);
+		this.email = email;
+	}
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
 
-    public String getLastName() {
-        return lastName;
-    }
+	public String getUsername() {
+		return this.username;
+	}
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+	public void setUsername(final String username) {
+		this.username = username;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public String getPassword() {
+		return this.password;
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public void setPassword(final String password) {
+		if (password != null && password != "") {
+			this.password = password;
+		}
+	}
 
-    public String getPhone() {
-        return phone;
-    }
+	public String getFirstName() {
+		return this.firstName;
+	}
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+	public void setFirstName(final String firstName) {
+		this.firstName = firstName;
+	}
 
-    public boolean isEnabled() {
-        return enabled;
-    }
+	public String getLastName() {
+		return this.lastName;
+	}
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+	public void setLastName(final String lastName) {
+		this.lastName = lastName;
+	}
 
-    public Set<UserRole> getRoles() {
-        return roles;
-    }
+	public boolean isEnabled() {
+		return this.enabled;
+	}
 
-    public void setRoles(Set<UserRole> roles) {
-        this.roles = roles;
-    }
+	public void setEnabled(final boolean enabled) {
+		this.enabled = enabled;
+	}
 
-    public User getCreateUser() {
-        return createUser;
-    }
+	public Set<UserRole> getRoles() {
+		return this.roles;
+	}
 
-    public void setCreateUser(User createUser) {
-        this.createUser = createUser;
-    }
+	public void setRoles(final Set<UserRole> roles) {
+		this.roles = roles;
+	}
 
-    public Date getCreateDate() {
-        return createDate;
-    }
+	public User getCreateUser() {
+		return this.createUser;
+	}
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
+	public void setCreateUser(final User createUser) {
+		this.createUser = createUser;
+	}
 
-    public User getUpdateUser() {
-        return updateUser;
-    }
+	public Date getCreateDate() {
+		return this.createDate;
+	}
 
-    public void setUpdateUser(User updateUser) {
-        this.updateUser = updateUser;
-    }
+	public void setCreateDate(final Date createDate) {
+		this.createDate = createDate;
+	}
 
-    public Date getUpdateDate() {
-        return updateDate;
-    }
+	public User getUpdateUser() {
+		return this.updateUser;
+	}
 
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
-    }
+	public void setUpdateUser(final User updateUser) {
+		this.updateUser = updateUser;
+	}
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 59 * hash + Objects.hashCode(this.username);
-        return hash;
-    }
+	public Date getUpdateDate() {
+		return this.updateDate;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof User)) {
-            return false;
-        }
-        final User other = (User) obj;
-        if (!Objects.equals(this.username, other.username)) {
-            return false;
-        }
-        return true;
-    }
+	public void setUpdateDate(final Date updateDate) {
+		this.updateDate = updateDate;
+	}
 
-    @Override
-    public String toString() {
-        return "at.qe.skeleton.model.User[ id=" + username + " ]";
-    }
+	public String getEmail() {
+		return this.email;
+	}
 
-    @Override
-    public String getId() {
-        return getUsername();
-    }
+	public void setEmail(final String email) {
+		this.email = email;
+	}
 
-    public void setId(String id) {
-        setUsername(id);
-    }
+	@Override
+	public String getId() {
+		return this.username;
+	}
 
-    @Override
-    public boolean isNew() {
-        return (null == createDate);
-    }
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "at.qe.sepm.skeleton.model.User[ id=" + username + " ]";
+	}
+
+	@Override
+	public boolean isNew() {
+		return (this.username == null);
+	}
+
+	@PrePersist
+	void prePersist() {
+		this.createDate = this.updateDate = new Date();
+	}
+
+	@PreUpdate
+	void preUpdate() {
+		this.updateDate = new Date();
+	}
 
 }

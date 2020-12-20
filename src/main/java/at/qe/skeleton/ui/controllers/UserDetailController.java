@@ -1,8 +1,12 @@
 package at.qe.skeleton.ui.controllers;
 
 import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.UserService;
 import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -26,6 +30,8 @@ public class UserDetailController implements Serializable {
      */
     private User user;
 
+    private List<String> newRolesString;
+
     /**
      * Sets the currently displayed user and reloads it form db. This user is
      * targeted by any further calls of
@@ -34,9 +40,9 @@ public class UserDetailController implements Serializable {
      *
      * @param user
      */
-    public void setUser(User user) {
+    public void setUser(final User user) {
         this.user = user;
-        doReloadUser();
+        this.doReloadUser();
     }
 
     /**
@@ -45,29 +51,55 @@ public class UserDetailController implements Serializable {
      * @return
      */
     public User getUser() {
-        return user;
+        return this.user;
     }
+
+    /**
+     * Creates User.
+     */
+    public void doCreateUser(final String username, final String password, final String firstName,
+                             final String lastName, final Boolean enabled, final UserRole roles, final String email) {
+
+        try {
+            this.userService.createUser(username, password, firstName, lastName, enabled, roles, email);
+        } catch (UserService.UnauthorizedActionException | UserService.UnallowedInputException e) {
+            System.out.println(e.getMessage());
+            // TODO: Exception-Handling
+        }
+        this.doReloadUser();
+    }
+
 
     /**
      * Action to force a reload of the currently displayed user.
      */
     public void doReloadUser() {
-        user = userService.loadUser(user.getUsername());
+        this.user = this.userService.loadUser(this.user.getUsername());
     }
 
     /**
      * Action to save the currently displayed user.
      */
     public void doSaveUser() {
-        user = this.userService.saveUser(user);
+        this.user = this.userService.saveUser(this.user);
     }
 
     /**
      * Action to delete the currently displayed user.
      */
     public void doDeleteUser() {
-        this.userService.deleteUser(user);
+        try {
+            this.userService.deleteUser(this.user);
+        } catch (UserService.UnauthorizedActionException unauthorizedActionException) {
+            System.out.println(unauthorizedActionException.getMessage());
+            // TODO: Exception-Handling
+        }
+        this.user = null;
         user = null;
+    }
+
+    public void changeUserRoles(){
+    	userService.changeUserRoles(user, newRolesString);
     }
 
 }

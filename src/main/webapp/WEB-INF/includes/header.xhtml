@@ -3,31 +3,38 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:c="http://java.sun.com/jstl/core"
       xmlns:p="http://primefaces.org/ui">
     <body>
         <ui:composition>
+            <h1 style="margin: 0; padding: 10px 0">
+                <img src="/assets/favicon.png" style="height: 1em; vertical-align: middle" alt="Library icon"/>
+                Library
+            </h1>
             <h:form>
-                <p:menubar>
-                    <p:submenu label="Employee Submenu 1" rendered="#{sessionInfoBean.hasRole('EMPLOYEE')}">
-                        <p:menuitem value="Employee Action 1 - 1"/>
-                        <p:menuitem value="Employee Action 1 - 2"/>
-                    </p:submenu>
-                    <p:submenu label="Employee Submenu 2" rendered="#{sessionInfoBean.hasRole('EMPLOYEE')}">
-                        <p:menuitem value="Employee Action 2 - 1"/>
-                        <p:menuitem value="Employee Action 2 - 2"/>
-                    </p:submenu>
-                    <p:submenu label="Manager Submenu" rendered="#{sessionInfoBean.hasRole('MANAGER')}">
-                        <p:menuitem value="Manager Action 1"/>
-                        <p:menuitem value="Manager Action 2"/>
-                    </p:submenu>
-                    <p:submenu label="Admin Submenu" rendered="#{sessionInfoBean.hasRole('ADMIN')}">
-                        <p:menuitem value="Manage Users" url="/admin/users.xhtml"/>
-                    </p:submenu>
-                    <p:submenu label="Test Submenu" rendered="#{sessionInfoBean.loggedIn}">
-                        <p:menuitem value="Security Test" url="/secured/test.xhtml"/>
-                    </p:submenu>
-                    <p:menuitem value="Login" url="/login.xhtml" rendered="#{!sessionInfoBean.loggedIn}"/>
-                    <p:menuitem value="Logout" url="/logout" rendered="#{sessionInfoBean.loggedIn}"/>
+                <p:menubar style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 0">
+                    <p:menuitem value="List media" icon="pi pi-list" url="/media/list.xhtml"/>
+
+                    <c:choose>
+                        <c:when test="${sessionInfoBean.loggedIn}">
+                            <p:menuitem value="Borrowed" icon="pi pi-briefcase" url="/customer/borrowed.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
+                            <p:menuitem value="Bookmarks" icon="pi pi-bookmark" url="/customer/bookmarks.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
+
+                            <p:submenu label="Admin" icon="pi pi-star" rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}">
+                                <p:menuitem value="Manage customers" icon="pi pi-user-edit" url="/admin/users.xhtml"/>
+                                <p:menuitem value="Manage librarians" icon="pi pi-user-edit" url="/admin/users.xhtml" rendered="#{sessionInfoBean.hasRole('ADMIN')}"/>
+                                <p:menuitem value="Manage media" icon="pi pi-list" url="/admin/media.xhtml"/>
+                            </p:submenu>
+                            <p:submenu label="User" icon="pi pi-user">
+                                <p:menuitem value="Settings" icon="pi pi-cog" url="/secured/user_settings.xhtml"/>
+                                <p:menuitem value="Logout" icon="pi pi-sign-out" url="/logout"/>
+                            </p:submenu>
+                        </c:when>
+
+                        <c:otherwise>
+                            <p:menuitem value="Login" icon="pi pi-key" url="/login.xhtml"/>
+                        </c:otherwise>
+                    </c:choose>
                 </p:menubar>
             </h:form>
         </ui:composition>
