@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import at.qe.skeleton.model.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import at.qe.skeleton.model.User;
@@ -80,6 +82,16 @@ public class UserService {
 		} else {
 			user.setUpdateDate(new Date());
 			user.setUpdateUser(getAuthenticatedUser());
+			// if password was changed, then encrypt it again
+			Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2a?\\$\\d\\d\\$[./0-9A-Za-z]{53}");
+			if (BCRYPT_PATTERN.matcher(user.getPassword()).matches()) {
+				// stringToCheck is an encoded bcrypt password.
+			} else {
+				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+				String newencodedPassword = passwordEncoder.encode(user.getPassword());
+				user.setPassword(newencodedPassword);
+			}
+
 		}
 		return userRepository.save(user);
 	}
