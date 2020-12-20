@@ -11,7 +11,7 @@ import javax.persistence.ManyToOne;
 import org.springframework.data.domain.Persistable;
 
 @Entity
-public class Bookmarks implements Serializable, Persistable<Long> {
+public class Bookmark implements Serializable, Persistable<Long> {
 
 	private static final long serialVersionUID = 1L;
 
