@@ -25,16 +25,6 @@ public class MediaListController implements Serializable {
      * Returns a Collection of all Media.
      */
     public Collection<Media> getMedia() {
-
-        Collection<String> titles = new ArrayList<>();
-        Collection<Media> media = this.mediaService.getAllMedia();
-
-        for (Media current : media) {
-            titles.add(current.getTitle());
-        }
-
-        System.out.println("Media: " + titles.toString());
-
         return this.mediaService.getAllMedia();
     }
 

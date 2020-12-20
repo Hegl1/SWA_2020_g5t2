@@ -29,16 +29,6 @@ public class UserListController implements Serializable {
      * @return
      */
     public Collection<User> getUsers() {
-
-        Collection<String> usernames = new ArrayList<>();
-        Collection<User> users = this.userService.getAllUsers();
-
-        for(User current : users) {
-            usernames.add(current.getUsername());
-        }
-
-        System.out.println("Users: " + usernames.toString());
-
         return this.userService.getAllUsers();
     }
 

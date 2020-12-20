@@ -211,7 +211,6 @@ public class User implements Persistable<String>, Serializable {
 	@Override
 	public boolean isNew() {
 		return (this.username == null);
-		return (null == createDate);
 	}
 
 	@PrePersist
