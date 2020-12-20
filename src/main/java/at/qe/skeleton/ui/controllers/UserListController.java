@@ -3,6 +3,7 @@ package at.qe.skeleton.ui.controllers;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.services.UserService;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -28,6 +29,16 @@ public class UserListController implements Serializable {
      * @return
      */
     public Collection<User> getUsers() {
+
+        Collection<String> usernames = new ArrayList<>();
+        Collection<User> users = this.userService.getAllUsers();
+
+        for(User current : users) {
+            usernames.add(current.getUsername());
+        }
+
+        System.out.println("Users: " + usernames.toString());
+
         return this.userService.getAllUsers();
     }
 

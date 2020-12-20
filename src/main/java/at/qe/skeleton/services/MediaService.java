@@ -7,8 +7,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 
 /**
@@ -30,12 +32,8 @@ public class MediaService {
     private VideoRepository videoRepository;
 
 
-
-
-
     /**
      * Return collection of Media of desired type.
-     *
      */
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
@@ -64,42 +62,38 @@ public class MediaService {
     }
 
 
-
-
-
     /**
      * Loads a single Media of desired type by its ID.
-     *
      */
-    // TODO: correct usage of @PreAuthorize annotation
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media loadMedia(final Long mediaId) {
         return this.mediaRepository.findById(mediaId);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media loadAudioBook(final Long mediaId) {
         return this.audioBookRepository.findById(mediaId);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media loadBook(final Long mediaId) {
         return this.bookRepository.findById(mediaId);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media loadMagazine(final Long mediaId) {
         return this.magazineRepository.findById(mediaId);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media loadVideo(final Long mediaId) {
         return this.videoRepository.findById(mediaId);
     }
 
 
-
-
-
     /**
      * Save media in desired repository.
-     *
      */
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
@@ -128,105 +122,43 @@ public class MediaService {
     }
 
 
-
-
-
     /**
-     * Create Media of desired type.
-     *
+     * Search in Media by title.
      */
+    public Media searchMediaByTitle(String title) {
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public Media createAudioBook(final String title, final Date publishingDate, final String language, final int totalAvail, final MediaType mediaType, final String speaker, final int length, final String author, final String ISBN) {
+        Collection<Media> medias = this.getAllMedia();
 
-        AudioBook newAudioBook = new AudioBook(title, publishingDate, language, totalAvail, mediaType, speaker, length, author, ISBN);
-        this.saveAudioBook(newAudioBook);
-        this.saveMedia(newAudioBook);
-        return newAudioBook;
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public Media createBook(final String title, final Date publishingDate, final String language, final int totalAvail, final MediaType mediaType, final String author, final String ISBN) {
-
-        Book newBook = new Book(title, publishingDate, language, totalAvail, mediaType, author, ISBN);
-        this.saveBook(newBook);
-        this.saveMedia(newBook);
-        return newBook;
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public Media createMagazine(final String title, final Date publishingDate, final String language, final int totalAvail, final MediaType mediaType, final String series) {
-
-        Magazine newMagazine = new Magazine(title, publishingDate, language, totalAvail, mediaType, series);
-        this.saveMagazine(newMagazine);
-        this.saveMedia(newMagazine);
-        return newMagazine;
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public Media createVideo(final String title, final Date publishingDate, final String language, final int totalAvail, final MediaType mediaType, final int length) {
-
-        Video newVideo = new Video(title, publishingDate, language, totalAvail, mediaType, length);
-        this.saveVideo(newVideo);
-        this.saveMedia(newVideo);
-        return newVideo;
-    }
-
-
-
-
-
-    /**
-     * Delete Media of desired repository
-     *
-     */
-    // TODO: ensure that media gets deleted in every repository it occurs, maybe throw an Exception in default case
-
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public void deleteMedia(final Media media) {
-        this.mediaRepository.delete(media);
-
-        switch (media.getMediaType()) {
-            case AUDIOBOOK: this.audioBookRepository.delete((AudioBook) media); break;
-            case BOOK:      this.bookRepository.delete((Book) media); break;
-            case MAGAZINE:  this.magazineRepository.delete((Magazine) media); break;
-            case VIDEO:     this.videoRepository.delete((Video) media); break;
-            default:        break;
+        for(Media current : medias) {
+            if(current.getTitle().equals(title)) {
+                return current;
+            } else {
+                // TODO: throw NoMediaFoundException
+            }
         }
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public void deleteAudioBook(final AudioBook audioBook) {
-        this.audioBookRepository.delete(audioBook);
-        this.mediaRepository.delete(audioBook);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public void deleteBook(final Book book) {
-        this.bookRepository.delete(book);
-        this.mediaRepository.delete(book);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public void deleteMagazine(final Magazine magazine) {
-        this.magazineRepository.delete(magazine);
-        this.mediaRepository.delete(magazine);
-    }
-
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public void deleteVideo(final Video video) {
-        this.videoRepository.delete(video);
-        this.mediaRepository.delete(video);
+        return null;
     }
 
 
+    /**
+     * Filter Media by property
+     */
+    // TODO: currently the methods filter always the whole Collection of Media,
+    //  not e.g. an already filtered Collection of Media
 
+    public Collection<Media> filterMediaByAvailability() {
+        Collection<Media> filteredMedia = this.getAllMedia();
+        return filteredMedia.stream().filter(x -> x.getTotalAvail() > 0).collect(Collectors.toCollection(ArrayList::new));
+    }
 
+    public Collection<Media> filterMediaByLanguage(final String language) {
+        Collection<Media> filteredMedia = this.getAllMedia();
+        return filteredMedia.stream().filter(x -> x.getLanguage().equals(language)).collect(Collectors.toCollection(ArrayList::new));
+    }
 
-    // potentially some custom Exceptions
-
-
-
-
+    public Collection<Media> filterMediaByType(final MediaType mediaType) {
+        Collection<Media> filteredMedia = this.getAllMedia();
+        return filteredMedia.stream().filter(x -> x.getMediaType().equals(mediaType)).collect(Collectors.toCollection(ArrayList::new));
+    }
 
 }

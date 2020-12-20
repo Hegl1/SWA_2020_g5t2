@@ -54,7 +54,9 @@ public class UserDetailController implements Serializable {
     /**
      * Creates User.
      */
-    public void doCreateUser(final String username, final String password, final String firstName, final String lastName, final Boolean enabled, final UserRole roles, final String email) {
+    public void doCreateUser(final String username, final String password, final String firstName,
+                             final String lastName, final Boolean enabled, final UserRole roles, final String email) {
+
         try {
             this.userService.createUser(username, password, firstName, lastName, enabled, roles, email);
         } catch (UserService.UnauthorizedActionException | UserService.UnallowedInputException e) {
@@ -63,6 +65,7 @@ public class UserDetailController implements Serializable {
         }
         this.doReloadUser();
     }
+
 
     /**
      * Action to force a reload of the currently displayed user.

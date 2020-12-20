@@ -11,7 +11,9 @@ public class Book extends Media {
 	private String author;
 	private String ISBN;
 
-	public Book(final String title, final Date publishingDate, final String language, final int totalAvail, final MediaType mediaType, final String author, final String ISBN) {
+	public Book(final String title, final Date publishingDate, final String language, final int totalAvail,
+				final MediaType mediaType, final String author, final String ISBN) {
+
 		super(title, publishingDate, language, totalAvail, mediaType);
 		this.author = author;
 		this.ISBN = ISBN;

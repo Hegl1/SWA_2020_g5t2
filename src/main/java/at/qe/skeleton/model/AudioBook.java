@@ -13,7 +13,10 @@ public class AudioBook extends Media {
 	private String author;
 	private String ISBN;
 
-	public AudioBook(final String title, final Date publishingDate, final String language, final int totalAvail, final MediaType mediaType, final String speaker, final int length, final String author, final String ISBN) {
+	public AudioBook(final String title, final Date publishingDate, final String language,
+					 final int totalAvail, final MediaType mediaType, final String speaker,
+					 final int length, final String author, final String ISBN) {
+
 		super(title, publishingDate, language, totalAvail, mediaType);
 		this.speaker = speaker;
 		this.length = length;

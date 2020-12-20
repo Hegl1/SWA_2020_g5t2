@@ -66,9 +66,11 @@ public class UserService {
 	/**
 	 * Creates a user.
 	 */
-	// TODO THOMAS: TEST THIS SHIT!
+	// TODO @THOMAS: needs testing
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public User createUser(final String username, final String password, final String firstName, final String lastName, final Boolean enabled, final UserRole roles, final String email) throws UnauthorizedActionException, UnallowedInputException {
+	public User createUser(final String username, final String password, final String firstName,
+						   final String lastName, final Boolean enabled, final UserRole roles,
+						   final String email) throws UnauthorizedActionException, UnallowedInputException {
 
 		if(this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN) &&
 				(roles.equals(UserRole.LIBRARIAN) || roles.equals(UserRole.ADMIN))) {
@@ -89,6 +91,7 @@ public class UserService {
 		this.saveUser(createdUser);
 		return createdUser;
 	}
+
 
 	/**
 	 * Deletes the user.
@@ -119,6 +122,11 @@ public class UserService {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		return this.userRepository.findFirstByUsername(auth.getName());
 	}
+
+
+	/**
+	 * Custom Exceptions
+	 */
 
 	public static class UnauthorizedActionException extends Exception {
 		private static final long serialVersionUID = 1L;

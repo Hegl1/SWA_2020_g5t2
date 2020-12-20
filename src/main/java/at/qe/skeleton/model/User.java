@@ -44,11 +44,13 @@ public class User implements Persistable<String>, Serializable {
 	@Enumerated(EnumType.STRING)
 	private Set<UserRole> roles;
 
+
 	public User(){
 
 	}
 
-	public User(final String username, final String password, final String firstName, final String lastName, final Boolean enabled, final UserRole roles, final String email) {
+	public User(final String username, final String password, final String firstName, final String lastName,
+				final Boolean enabled, final UserRole roles, final String email) {
 
 		PasswordEncoder pwEncoder = new BCryptPasswordEncoder(9);
 
