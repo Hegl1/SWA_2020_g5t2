@@ -1,10 +1,17 @@
 package at.qe.skeleton.services;
 
+import java.io.File;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,6 +29,27 @@ public class MailService {
 		msg.setSubject(messageSubject);
 		msg.setText(messageContent);
 		mailSender.send(msg);
+	}
+
+	public void sendMailWithAttachment(final String targetMail, final String messageSubject,
+			final String messagecontent, final String attachmentName, final String path) throws MailException {
+		try {
+			MimeMessage msg = mailSender.createMimeMessage();
+			MimeMessageHelper msgHelper = new MimeMessageHelper(msg, true);
+			msgHelper.setTo(targetMail);
+			msgHelper.setFrom("swa.grp.5.2@gmail.com");
+			msgHelper.setSubject(messageSubject);
+			msgHelper.setText(messagecontent);
+
+			FileSystemResource attachment = new FileSystemResource(new File(path));
+			msgHelper.addAttachment(attachmentName, attachment);
+
+			mailSender.send(msg);
+
+		} catch (MessagingException e) {
+			System.out.println("Error while constructing the msgHelper in MailService, no mail sent.");
+		}
+
 	}
 
 }
