@@ -2,15 +2,12 @@ package at.qe.skeleton.services;
 
 import java.util.Collection;
 
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.BookmarkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import at.qe.skeleton.model.Bookmark;
-import at.qe.skeleton.repositories.BookmarkRepository;
 
 /**
  * Service for listing the customers own bookmarks.
@@ -22,6 +19,9 @@ public class BookmarkService {
 
     @Autowired
     private BookmarkRepository bookmarkRepository;
+
+    @Autowired
+    private MediaService mediaService_2;
 
     /**
      * Returns a collection of all the customers bookmarks.
@@ -40,7 +40,46 @@ public class BookmarkService {
      */
     public Bookmark loadBookmark(final Long bookmarkID ) { return bookmarkRepository.findFirstByBookmarkID(bookmarkID);}
 
+    /**
+     * the following 4 functions return type specific information about the media
+     * */
+    public String getThatType(final Bookmark bookmark) {   return bookmark.getMedia().getMediaType().toString(); }
 
+    public String getThatTitle(final Bookmark bookmark) {   return bookmark.getMedia().getTitle(); }
+
+    public String getThatAddInfo(final Bookmark bookmark) {
+
+        switch (bookmark.getMedia().getMediaType().toString()) {
+            case "BOOK":
+                return "Buch - Author";
+
+            case "AUDIOBOOK":
+                return "AudioBuch - Author";
+
+            case "MAGAZINE":
+                return "Magazin - Serie";
+
+            case "VIDEO":
+                return "Video - Länge";
+
+            default:
+                return "nicht definierter Medientyp";
+        }
+    }
+
+    public String getIfCurrentBorrowed(final Bookmark bookmark) {
+
+        switch (bookmark.getMedia().getCurBorrowed()) {
+            case 0:
+                return "0 - frei";
+
+            case 1:
+                return "1 - ausgeliehen";
+
+            default:
+                return "Status nicht verfügbar";
+        }
+    }
 
 
 
