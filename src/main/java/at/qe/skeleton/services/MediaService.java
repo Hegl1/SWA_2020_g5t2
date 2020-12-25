@@ -146,19 +146,28 @@ public class MediaService {
     // TODO: currently the methods filter always the whole Collection of Media,
     //  not e.g. an already filtered Collection of Media
 
-    public Collection<Media> filterMediaByAvailability() {
-        Collection<Media> filteredMedia = this.getAllMedia();
-        return filteredMedia.stream().filter(x -> x.getTotalAvail() > 0).collect(Collectors.toCollection(ArrayList::new));
+    public Collection<Media> filterMediaByAvailability(Collection<Media> filteredMedia, boolean isAvailable) {
+        return filteredMedia.stream().filter(x -> isAvailable ? x.getTotalAvail() > 0 : x.getTotalAvail() == 0).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public Collection<Media> filterMediaByLanguage(Collection<Media> filteredMedia, final String language) {
+        return filteredMedia.stream().filter(x -> x.getLanguage().equalsIgnoreCase(language)).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public Collection<Media> filterMediaByType(Collection<Media> filteredMedia, final MediaType mediaType) {
+        return filteredMedia.stream().filter(x -> x.getMediaType().equals(mediaType)).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public Collection<Media> filterMediaByAvailability(boolean isAvailable) {
+        return filterMediaByAvailability(this.getAllMedia(), isAvailable);
     }
 
     public Collection<Media> filterMediaByLanguage(final String language) {
-        Collection<Media> filteredMedia = this.getAllMedia();
-        return filteredMedia.stream().filter(x -> x.getLanguage().equals(language)).collect(Collectors.toCollection(ArrayList::new));
+        return filterMediaByLanguage(this.getAllMedia(), language);
     }
 
     public Collection<Media> filterMediaByType(final MediaType mediaType) {
-        Collection<Media> filteredMedia = this.getAllMedia();
-        return filteredMedia.stream().filter(x -> x.getMediaType().equals(mediaType)).collect(Collectors.toCollection(ArrayList::new));
+        return filterMediaByType(this.getAllMedia(), mediaType);
     }
 
 }

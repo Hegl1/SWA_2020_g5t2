@@ -1,26 +1,17 @@
 package at.qe.skeleton.services;
 
 import at.qe.skeleton.model.User;
-import java.sql.SQLOutput;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
-
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
