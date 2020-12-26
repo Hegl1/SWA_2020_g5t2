@@ -36,10 +36,11 @@
                     <p:commandButton icon="pi pi-ticket" />
                 </p:column>
                 <p:column headerText="remove">
-                    <p:commandButton icon="pi pi-times" />
+                    <p:commandButton icon="pi pi-times" action="#{bookmarkService.deleteBookmark(bookmark)}" title="delete" update=":bookmarkForm:bookmarksTable" />
                 </p:column>
-                <p:column headerText="remove / options">
-                    <p:commandButton icon="pi pi-ellipsis-h" />
+                <p:column headerText="options">
+                    <p:commandButton icon="pi pi-ellipsis-h"  />
+
                 </p:column>
 
             </p:dataTable>

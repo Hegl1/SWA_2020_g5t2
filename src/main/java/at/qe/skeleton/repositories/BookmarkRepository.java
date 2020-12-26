@@ -3,6 +3,7 @@ package at.qe.skeleton.repositories;
 import at.qe.skeleton.model.Bookmark;
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.User;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -16,4 +17,5 @@ public interface BookmarkRepository extends AbstractRepository<Bookmark, Long> {
 
 	Bookmark findFirstByMedia(Media media);
 
+	void delete(@Param("bookmark") Bookmark bookmark);
 }
