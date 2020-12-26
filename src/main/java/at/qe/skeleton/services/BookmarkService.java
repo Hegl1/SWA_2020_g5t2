@@ -2,13 +2,11 @@ package at.qe.skeleton.services;
 
 import java.util.Collection;
 
+import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.repositories.BookmarkRepository;
-import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import at.qe.skeleton.model.Bookmark;
@@ -26,6 +24,9 @@ public class BookmarkService {
 
     @Autowired
     private MediaService mediaService_2;
+
+    @Autowired
+    private UserService userService;
 
     /**
      * Returns a collection of all the customers bookmarks.
@@ -96,6 +97,21 @@ public class BookmarkService {
 
             bookmarkRepository.delete(bookmark);
         }
+
+    /**
+     * add a bookmark.
+     *
+     * @param media the media to add as one's own bookmark
+     */
+    public void addBookmark(Media media) {
+
+        System.out.println("add the media as bookmark to the own user");
+        User myUser = userService.loadCurrentUser();
+        bookmarkRepository.add(media, myUser.getUsername());
+        System.out.println("done, nice!");
+
+    }
+
 
 
 }

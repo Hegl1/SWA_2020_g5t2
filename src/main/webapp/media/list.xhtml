@@ -6,7 +6,27 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
-        Media list and search
+        Media list and search --- customer view:
+        <h:form id="mediaForm">
 
+            <p:dataTable id="mediaTable" var="media" value="#{mediaListController.media}">
+                <f:facet name="header">
+                </f:facet>
+                <p:column headerText="id">
+                    <h:outputText value="#{media.mediaID}"/>
+                </p:column>
+                <p:column headerText="title">
+                    <h:outputText value="#{media.title}"/>
+                </p:column>
+                <p:column headerText="Details &amp; Borrowing">
+<!--                    <p:commandButton icon="pi pi-th-large" />-->
+                </p:column>
+                <p:column headerText="add as bookmark">
+                    <p:commandButton  icon="pi pi-star-o" action="#{bookmarkService.addBookmark(media)}" title="add" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        
     </ui:define>
 </ui:composition>
