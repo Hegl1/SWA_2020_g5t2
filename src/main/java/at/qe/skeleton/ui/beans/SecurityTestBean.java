@@ -18,7 +18,7 @@ public class SecurityTestBean {
     private boolean showOkDialog = false;
     private String performedAction = "NONE";
 
-    // :TODO: Fix the corresponding vulnerability , cf. http://localhost:8080/secured/test.xhtml
+
     private String testString = "CHANGE ME";
 
     public String getTestString() {
@@ -26,7 +26,13 @@ public class SecurityTestBean {
     }
 
     public void setTestString(String testString) {
-        this.testString = testString;
+        // this should fix the corresponding vulnerability , cf. http://localhost:8080/secured/test.xhtml
+        if(testString.length() <= 10) {
+            this.testString = testString;
+        } else {
+            // TODO: throw an Exception
+            this.testString = testString.substring(0,9);
+        }
     }
 
     public boolean isShowOkDialog() {

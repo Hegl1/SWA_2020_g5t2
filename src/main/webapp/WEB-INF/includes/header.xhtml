@@ -21,8 +21,7 @@
                             <p:menuitem value="Bookmarks" icon="pi pi-bookmark" url="/customer/bookmarks.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
 
                             <p:submenu label="Admin" icon="pi pi-star" rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}">
-                                <p:menuitem value="Manage customers" icon="pi pi-user-edit" url="/admin/users.xhtml"/>
-                                <p:menuitem value="Manage librarians" icon="pi pi-user-edit" url="/admin/users.xhtml" rendered="#{sessionInfoBean.hasRole('ADMIN')}"/>
+                                <p:menuitem value="Manage User" icon="pi pi-user-edit" url="/admin/users.xhtml" rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}"/>
                                 <p:menuitem value="Manage media" icon="pi pi-list" url="/admin/media.xhtml"/>
                             </p:submenu>
                             <p:submenu label="User" icon="pi pi-user">
