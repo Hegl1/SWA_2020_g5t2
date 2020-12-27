@@ -19,10 +19,14 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import io.micrometer.core.instrument.util.JsonUtils;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * Entity representing users.
@@ -64,14 +68,15 @@ public class User implements Persistable<String>, Serializable {
 	@Enumerated(EnumType.STRING)
 	private Set<UserRole> roles;
 
-	public User(){
+	public User() {
 
 	}
 
 	public User(final String username, final String password, final String firstName, final String lastName,
-				final Boolean enabled, final UserRole roles, final String email) {
+			final Boolean enabled, final UserRole roles, final String email) {
 
 		PasswordEncoder pwEncoder = new BCryptPasswordEncoder(9);
+		this.roles = new HashSet<UserRole>();
 
 		this.username = username;
 		this.password = pwEncoder.encode(password);
@@ -81,7 +86,6 @@ public class User implements Persistable<String>, Serializable {
 		this.roles.add(roles);
 		this.email = email;
 	}
-
 
 	public String getUsername() {
 		return this.username;
@@ -187,19 +191,24 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		User other = (User) obj;
 		if (username == null) {
-			if (other.username != null)
+			if (other.username != null) {
 				return false;
-		} else if (!username.equals(other.username))
+			}
+		} else if (!username.equals(other.username)) {
 			return false;
+		}
 		return true;
 	}
 
