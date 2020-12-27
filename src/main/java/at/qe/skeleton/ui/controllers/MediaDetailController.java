@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 
+
 /**
  * Controller for the media detail view.
  */
@@ -20,6 +21,7 @@ public class MediaDetailController implements Serializable {
 
     @Autowired
     private MediaService mediaService;
+
 
     /**
      * Attribute to cache the currently displayed media
@@ -48,23 +50,28 @@ public class MediaDetailController implements Serializable {
      * Filter a Collection of Media by different properties.
      */
 
-    public Collection<Media> doFilterMediaByAvailability() {
-        Collection<Media> media = this.mediaService.filterMediaByAvailability();
-        this.doReloadMedia();
-        return media;
+    public Collection<Media> doFilterMediaByAvailability(final Collection<Media> mediaList, final boolean isAvailable) {
+        return this.mediaService.filterMediaByAvailability(mediaList, isAvailable);
+    }
+
+    public Collection<Media> doFilterMediaByLanguage(final Collection<Media> mediaList, final String language) {
+        return this.mediaService.filterMediaByLanguage(mediaList, language);
+    }
+
+    public Collection<Media> doFilterMediaByType(final Collection<Media> mediaList, final MediaType mediaType) {
+        return this.mediaService.filterMediaByType(mediaList, mediaType);
+    }
+
+    public Collection<Media> doFilterMediaByAvailability(final boolean isAvailable) {
+        return this.mediaService.filterMediaByAvailability(isAvailable);
     }
 
     public Collection<Media> doFilterMediaByLanguage(final String language) {
-        Collection<Media> media = this.mediaService.filterMediaByLanguage(language);
-        this.doReloadMedia();
-        return media;
+        return this.mediaService.filterMediaByLanguage(language);
     }
 
-
     public Collection<Media> doFilterMediaByType(final MediaType mediaType) {
-        Collection<Media> media = this.mediaService.filterMediaByType(mediaType);
-        this.doReloadMedia();
-        return media;
+        return this.mediaService.filterMediaByType(mediaType);
     }
 
 

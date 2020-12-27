@@ -95,7 +95,6 @@ public class UserDetailController implements Serializable {
             // TODO: Exception-Handling
         }
         this.user = null;
-        user = null;
     }
 
     public void changeUserRoles(){
