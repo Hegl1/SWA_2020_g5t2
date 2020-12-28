@@ -29,13 +29,20 @@ public class BookmarkService {
     private UserService userService;
 
     /**
-     * Returns a collection of all the customers bookmarks.
-     *
-     * @return all bookmarks the current logged in users has
+     * Returns a collection of all the bookmarks.
+     * @return all bookmarks in the database
      */
-    public Collection<Bookmark> getAllBookmarks() {
-        return bookmarkRepository.findAll();
-    }
+    public Collection<Bookmark> getAllBookmarks() { return bookmarkRepository.findAll(); }
+
+    /**
+     * Returns a collection of the current user bookmarks.
+     *
+     * @return only the bookmarks which belong to the current logged in users
+     * @param myCurrentUser
+     */
+    public Collection<Bookmark> getMyBookmarks(User myCurrentUser) {
+
+        return bookmarkRepository.findMine(myCurrentUser.getUsername());}
 
     /**
      * Returns 1 bookmark according to a given ID.

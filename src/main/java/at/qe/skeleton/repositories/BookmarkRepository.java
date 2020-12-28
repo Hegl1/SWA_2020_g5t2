@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 public interface BookmarkRepository extends AbstractRepository<Bookmark, Long> {
 
@@ -19,14 +20,16 @@ public interface BookmarkRepository extends AbstractRepository<Bookmark, Long> {
 	void delete(@Param("bookmark") Bookmark bookmark);
 
 
-		@Modifying
-		@Transactional
-		@Query(value = "INSERT INTO BOOKMARK " +
-			"(MEDIA_MEDIAID, USER_USERNAME) "
-			+ "VALUES " + "(:#{#media.mediaID} , + :username)", nativeQuery = true)
-		void add(@Param("media") Media media, @Param("username") String username);
+	@Modifying
+	@Transactional
+	@Query(value = "INSERT INTO BOOKMARK " +
+		"(MEDIA_MEDIAID, USER_USERNAME) "
+		+ "VALUES " + "(:#{#media.mediaID} , + :username)", nativeQuery = true)
+	void add(@Param("media") Media media, @Param("username") String username);
 
 
+	@Query(value = "SELECT *" + " FROM BOOKMARK b" + " WHERE b.USER_USERNAME = :myCurrentUser", nativeQuery = true)
+	List<Bookmark> findMine(@Param("myCurrentUser") String myCurrentUser);
 
 
 }
