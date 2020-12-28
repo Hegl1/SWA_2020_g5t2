@@ -2,6 +2,7 @@ package at.qe.skeleton.services;
 
 import java.util.Collection;
 
+import at.qe.skeleton.model.Book;
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.BookmarkRepository;
@@ -112,10 +113,17 @@ public class BookmarkService {
      */
     public void addBookmark(Media media) {
 
-        System.out.println("add the media as bookmark to the own user");
+//        System.out.println("add the media as bookmark to the own user");
         User myUser = userService.loadCurrentUser();
-        bookmarkRepository.add(media, myUser.getUsername());
-        System.out.println("done, nice!");
+        Bookmark b_check = bookmarkRepository.findFirstByMedia(media);
+        if (b_check != null) {
+            System.out.println("The bookmark for this media was already made.");
+        } else {
+            bookmarkRepository.add(media, myUser.getUsername());
+            System.out.println("done, nice!");
+        }
+
+
 
     }
 
