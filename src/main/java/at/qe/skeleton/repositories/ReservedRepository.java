@@ -18,4 +18,6 @@ public interface ReservedRepository extends AbstractRepository<Reserved, Long> {
 
 	List<Reserved> findByMedia(Media media);
 
+	Reserved findByUserAndMedia(User user, Media media);
+
 }
