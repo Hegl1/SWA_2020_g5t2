@@ -43,8 +43,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //Permit access to the H2 console
                 .antMatchers("/h2-console/**").permitAll()
                 //Permit access for all to error pages
-                .antMatchers("/error/**")
-                .permitAll()
+                .antMatchers("/error/**").permitAll()
+                .antMatchers("/media/**").permitAll()
                 // Only access with customer
                 .antMatchers("/customer/**")
                 .hasAnyAuthority("CUSTOMER")

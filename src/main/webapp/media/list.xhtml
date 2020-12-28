@@ -2,11 +2,63 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
-    <ui:define name ="content">
-        Media list and search
+    <ui:define name="content">
+        <style type="text/css">
+            #mediaTable tr{
+                transition: background 0.2s;
+            }
 
+            #mediaTable tr:hover{
+                background: rgba(0, 0, 0, 0.1);
+            }
+        </style>
+
+        <h:form id="filter" style="margin-bottom: 15px">
+            <p:accordionPanel activeIndex="-2">
+                <p:tab title="Search">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="@next" value="Search:" />
+                        <p:inputText id="title_filter" value="" />
+
+                        <p:outputLabel for="@next" value="Type:" />
+                        <p:selectOneMenu id="type_filter" value="">
+                            <f:selectItem itemLabel="Any" itemValue="" />
+                            <f:selectItem itemLabel="Book" itemValue="BOOK" />
+                            <f:selectItem itemLabel="Audiobook" itemValue="AUDIOBOOK" />
+                            <f:selectItem itemLabel="Video" itemValue="VIDEO" />
+                            <f:selectItem itemLabel="Magazine" itemValue="MAGAZINE" />
+                        </p:selectOneMenu>
+
+                        <p:outputLabel for="@next" value="Language:" />
+                        <p:selectOneMenu id="language_filter" value="" dynamic="true">
+                            <f:selectItem itemLabel="Any" itemValue="" />
+                            <f:selectItems value="#{mediaListController.allLanguages}" />
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                </p:tab>
+            </p:accordionPanel>
+        </h:form>
+
+        <p:dataTable id="mediaTable" var="media" value="#{mediaListController.media}">
+            <p:column headerText="" style="width: 1.25rem; text-align: center">
+                <a href="/media/detail.xhtml?id=#{media.id}" title="Show details">
+                    <i class="pi pi-info-circle"></i>
+                </a>
+            </p:column>
+            <p:column headerText="Title">
+                <h:outputText value="#{media.title}"/>
+            </p:column>
+            <p:column headerText="Type">
+                <h:outputText value="#{media.mediaTypeHuman}"/>
+            </p:column>
+            <p:column headerText="Language">
+                <h:outputText value="#{media.languageHuman}"/>
+            </p:column>
+            <p:column headerText="Publishing Year" style="width: 8rem; text-align: center">
+                <h:outputText value="#{media.publishingYear}"/>
+            </p:column>
+        </p:dataTable>
     </ui:define>
 </ui:composition>

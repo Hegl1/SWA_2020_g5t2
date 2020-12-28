@@ -5,6 +5,8 @@ import javax.servlet.ServletException;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Locale;
+
 /**
  * Spring configuration for servlet context.
  *
@@ -20,6 +22,8 @@ public class CustomServletContextInitializer implements ServletContextInitialize
         sc.setInitParameter("javax.faces.DEFAULT_SUFFIX", ".xhtml");
         sc.setInitParameter("javax.faces.PROJECT_STAGE", "Development");
         sc.setInitParameter("primefaces.THEME", "nova-light");
+
+        Locale.setDefault(new Locale("EN"));
     }
 
 }
