@@ -39,43 +39,6 @@ public class MediaDetailController implements Serializable {
 
 
     /**
-     * Search in Media by Title
-     */
-    public Media doSearchMediaByTitle(final String title) {
-        return this.mediaService.searchMediaByTitle(title);
-    }
-
-
-    /**
-     * Filter a Collection of Media by different properties.
-     */
-
-    public Collection<Media> doFilterMediaByAvailability(final Collection<Media> mediaList, final boolean isAvailable) {
-        return this.mediaService.filterMediaByAvailability(mediaList, isAvailable);
-    }
-
-    public Collection<Media> doFilterMediaByLanguage(final Collection<Media> mediaList, final String language) {
-        return this.mediaService.filterMediaByLanguage(mediaList, language);
-    }
-
-    public Collection<Media> doFilterMediaByType(final Collection<Media> mediaList, final MediaType mediaType) {
-        return this.mediaService.filterMediaByType(mediaList, mediaType);
-    }
-
-    public Collection<Media> doFilterMediaByAvailability(final boolean isAvailable) {
-        return this.mediaService.filterMediaByAvailability(isAvailable);
-    }
-
-    public Collection<Media> doFilterMediaByLanguage(final String language) {
-        return this.mediaService.filterMediaByLanguage(language);
-    }
-
-    public Collection<Media> doFilterMediaByType(final MediaType mediaType) {
-        return this.mediaService.filterMediaByType(mediaType);
-    }
-
-
-    /**
      * Action to force a reload of the currently displayed media.
      */
     public void doReloadMedia() {
