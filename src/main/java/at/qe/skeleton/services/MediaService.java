@@ -36,7 +36,7 @@ public class MediaService {
      * Return collection of Media of desired type.
      */
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+//    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Collection<Media> getAllMedia() {
         return this.mediaRepository.findAll();
     }
@@ -66,7 +66,7 @@ public class MediaService {
      * Loads a single Media of desired type by its ID.
      */
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+//    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media loadMedia(final Long mediaId) {
         return this.mediaRepository.findById(mediaId);
     }
