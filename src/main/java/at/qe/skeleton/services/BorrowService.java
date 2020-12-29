@@ -4,9 +4,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -25,7 +30,9 @@ import at.qe.skeleton.repositories.UserRepository;
 
 @Component
 @Scope("application")
-public class BorrowService {
+public class BorrowService implements CommandLineRunner {
+
+	private static final long schedulingDelay = (long) 1e7;
 
 	@Autowired
 	BorrowedRepository borrowedRepostiroy;
@@ -44,6 +51,8 @@ public class BorrowService {
 
 	@Autowired
 	UserRepository userRepository;
+
+	Logger logger = LoggerFactory.getLogger(BorrowService.class);
 
 	// TEMPORAL
 	public void testMethod() {
@@ -129,6 +138,7 @@ public class BorrowService {
 		headBuild.append(targetMedia.getTitle());
 		String head = headBuild.toString();
 		mailService.sendMail(reserved.getUser().getEmail(), head, body);
+		logger.info("Email about freed media send to " + reserved.getUser().getEmail());
 		reserverdreRepository.delete(reserved);
 	}
 
@@ -148,9 +158,20 @@ public class BorrowService {
 		return reserverdreRepository.findByUserAndMedia(user, media);
 	}
 
+	@Scheduled(fixedDelay = schedulingDelay, initialDelay = 30000)
 	public void checkBorrowTimeout() {
-		// TODO implement functionality
-		// find annotation for proper timing
+		Map<MediaType, Integer> allowedBorrowTimes = getMediaBorrowTimesAsMap();
+		Collection<Borrowed> currentlyBorrowed = borrowedRepostiroy.findAll();
+		Date currentDate = new Date();
+		for (Borrowed current : currentlyBorrowed) {
+			long diff = currentDate.getTime() - current.getBorrowDate().getTime();
+			long diffInDays = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+			if (diffInDays > allowedBorrowTimes.get(current.getMedia().getMediaType())) {
+				logger.info(
+						"Automatic return of media " + current.getMedia().getMediaID() + " due to time limitations");
+				unBorrowMedia(current);
+			}
+		}
 	}
 
 	private Map<MediaType, Integer> getMediaBorrowTimesAsMap() {
@@ -165,6 +186,12 @@ public class BorrowService {
 	private User getAuthenticatedUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		return this.userRepository.findFirstByUsername(auth.getName());
+	}
+
+	@Override
+	public void run(final String... args) throws Exception {
+		// used for initial loading of the component so scheduled task starts
+		logger.info("BorrowService Component loaded at startup");
 	}
 
 }
