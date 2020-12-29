@@ -28,6 +28,7 @@ import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
 import at.qe.skeleton.repositories.MediaRepository;
 import at.qe.skeleton.repositories.ReservedRepository;
 import at.qe.skeleton.repositories.UserRepository;
+import org.springframework.web.servlet.tags.Param;
 
 @Component
 @Scope("application")
@@ -53,33 +54,54 @@ public class BorrowService implements CommandLineRunner {
 	@Autowired
 	UserRepository userRepository;
 
+	@Autowired
+	UserService userService;
+
 	Logger logger = LoggerFactory.getLogger(BorrowService.class);
 
 	/**
 	 * Method that borrows Media for a customer.
-	 * 
-	 * @param borrower      customer that borrows the media
+	 *
 	 * @param mediaToBorrow media to borrow
 	 * @return true if it was successfully borrowed, else false
 	 */
-	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public boolean borrowMedia(final User borrower, final Media mediaToBorrow) {
+
+	public boolean borrowMedia(Long linkParameter) {
+
+		System.out.println("übergeben wurde eine ID: " + linkParameter);
+//		System.out.println("übergeben wurde ein  Media: " + linkParameter.getMediaID());
+
+		Media mediaToBorrow;
+		if (linkParameter != null){
+			System.out.println("Parameter funktioniert endlich");
+			mediaToBorrow = mediaRepository.findFirstByMediaID(linkParameter);
+		} else {
+			System.out.println("Fehler, stattdessen fortfahren mit Beispiel-ID:    1");
+			mediaToBorrow = mediaRepository.findFirstByMediaID(1L);
+		}
+
+		User borrower = userService.loadCurrentUser();
+
 		if (mediaToBorrow.getTotalAvail() <= mediaToBorrow.getCurBorrowed()) {
+			System.out.println("zu wenig Exemplare verfügbar");
 			// TODO subject to change, maybe add auto reserve mechanism
 			return false;
 		} else {
+			System.out.println("Ausreichend Exemplare sind vorhanden, fahre fort");
 			mediaToBorrow.setCurBorrowed(mediaToBorrow.getCurBorrowed() + 1);
 			mediaRepository.save(mediaToBorrow);
 			Borrowed borrow = new Borrowed(borrower, mediaToBorrow, new Date());
 			borrowedRepostiroy.save(borrow);
+			System.out.println("Artikel wurde ausgeliehen.");
 			return true;
 		}
+//	return true;
 	}
 
-	public boolean borrowMediaForAuthenticatedUser(final Media mediaToBorrow) {
-		User borrower = getAuthenticatedUser();
-		return borrowMedia(borrower, mediaToBorrow);
-	}
+//	public boolean borrowMediaForAuthenticatedUser(final Media mediaToBorrow) {
+//		User borrower2 = getAuthenticatedUser();
+//		return borrowMedia(borrower, mediaToBorrow);
+//	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void unBorrowMedia(final Borrowed borrowed) {

@@ -170,8 +170,8 @@ public class MediaService {
         return filterMediaByType(this.getAllMedia(), mediaType);
     }
 
- //   public Collection<String> getAllLanguages() {
- //       return this.mediaRepository.getAllLanguages();
- //   }
+    public Collection<String> getAllLanguages() {
+        return this.mediaRepository.getAllLanguages();
+    }
 
 }
