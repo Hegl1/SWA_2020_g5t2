@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -54,13 +55,6 @@ public class BorrowService implements CommandLineRunner {
 
 	Logger logger = LoggerFactory.getLogger(BorrowService.class);
 
-	// TEMPORAL
-	public void testMethod() {
-		Media media = mediaRepository.findFirstByMediaID(3L);
-		User user = userRepository.findFirstByUsername("csauer");
-		unBorrowMedia(user, media);
-	}
-
 	/**
 	 * Method that borrows Media for a customer.
 	 * 
@@ -68,6 +62,7 @@ public class BorrowService implements CommandLineRunner {
 	 * @param mediaToBorrow media to borrow
 	 * @return true if it was successfully borrowed, else false
 	 */
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public boolean borrowMedia(final User borrower, final Media mediaToBorrow) {
 		if (mediaToBorrow.getTotalAvail() <= mediaToBorrow.getCurBorrowed()) {
 			// TODO subject to change, maybe add auto reserve mechanism
@@ -86,6 +81,7 @@ public class BorrowService implements CommandLineRunner {
 		return borrowMedia(borrower, mediaToBorrow);
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void unBorrowMedia(final Borrowed borrowed) {
 		borrowedRepostiroy.delete(borrowed);
 		borrowed.getMedia().setCurBorrowed(borrowed.getMedia().getCurBorrowed() - 1);
@@ -96,6 +92,7 @@ public class BorrowService implements CommandLineRunner {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void unBorrowMedia(final User borrower, final Media mediaToUnBorrow) {
 		unBorrowMedia(borrowedRepostiroy.findFirstByUserAndMedia(borrower, mediaToUnBorrow));
 	}
@@ -105,25 +102,38 @@ public class BorrowService implements CommandLineRunner {
 		unBorrowMedia(user, mediaToUnBorrow);
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Borrowed> getAllBorrows() {
 		return borrowedRepostiroy.findAll();
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Borrowed> getAllBorrowsByUser(final User user) {
 		return borrowedRepostiroy.findByUser(user);
 	}
 
+	public Collection<Borrowed> getAllBorrowsByAuthenticatedUser() {
+		return getAllBorrowsByUser(getAuthenticatedUser());
+	}
+
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Borrowed> getAllBorrowsByMedia(final Media media) {
 		return borrowedRepostiroy.findByMedia(media);
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Borrowed loadBorrowed(final User borrower, final Media media) {
 		return borrowedRepostiroy.findFirstByUserAndMedia(borrower, media);
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void reserveMedia(final User reserver, final Media mediaToReserve) {
 		Reserved res = new Reserved(reserver, mediaToReserve, new Date());
 		reserverdreRepository.save(res);
+	}
+
+	public void reserveMediaForAuthenticatedUser(final Media mediaToResMedia) {
+		reserveMedia(getAuthenticatedUser(), mediaToResMedia);
 	}
 
 	private void unreserveMedia(final Reserved reserved) {
@@ -142,18 +152,26 @@ public class BorrowService implements CommandLineRunner {
 		reserverdreRepository.delete(reserved);
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Reserved> getAllReserved() {
 		return reserverdreRepository.findAll();
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Reserved> getAllReservedByUser(final User user) {
 		return reserverdreRepository.findByUser(user);
 	}
 
+	public Collection<Reserved> getAllReservedByAuthenticatedUser() {
+		return getAllReservedByUser(getAuthenticatedUser());
+	}
+
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Reserved> getAllReservedByMedia(final Media media) {
 		return reserverdreRepository.findByMedia(media);
 	}
 
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Reserved loadReserved(final User user, final Media media) {
 		return reserverdreRepository.findByUserAndMedia(user, media);
 	}
