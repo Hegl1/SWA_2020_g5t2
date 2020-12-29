@@ -18,6 +18,6 @@ public interface BorrowedRepository extends AbstractRepository<Borrowed, Long> {
 
 	List<Borrowed> findByMedia(Media media);
 
-	Borrowed findByUserAndMedia(User user, Media media);
+	Borrowed findFirstByUserAndMedia(User user, Media media);
 
 }

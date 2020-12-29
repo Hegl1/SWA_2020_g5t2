@@ -31,6 +31,17 @@ public class Borrowed implements Serializable, Persistable<Long> {
 	@Temporal(TemporalType.DATE)
 	private Date borrowDate;
 
+	public Borrowed() {
+
+	}
+
+	public Borrowed(final User user, final Media media, final Date date) {
+		this();
+		this.user = user;
+		this.media = media;
+		this.borrowDate = date;
+	}
+
 	public Long getBorrowID() {
 		return this.borrowID;
 	}
