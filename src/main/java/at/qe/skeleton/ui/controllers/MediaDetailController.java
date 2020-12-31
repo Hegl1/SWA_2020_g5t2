@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.Date;
 
 
 /**
@@ -57,7 +56,7 @@ public class MediaDetailController implements Serializable {
      * Create different Medias.
      */
 
-    public void doCreateAudioBook(final String title, final Date publishingDate, final String language,
+    public void doCreateAudioBook(final String title, final int publishingDate, final String language,
                                   final int totalAvail, final MediaType mediaType, final String speaker,
                                   final int length, final String author, final String ISBN) {
 
@@ -65,21 +64,21 @@ public class MediaDetailController implements Serializable {
         // this.doReloadMedia();
     }
 
-    public void doCreateBook(final String title, final Date publishingDate, final String language, final int totalAvail,
+    public void doCreateBook(final String title, final int publishingDate, final String language, final int totalAvail,
                              final MediaType mediaType, final String author, final String ISBN) {
 
         this.mediaService.createBook(title, publishingDate, language, totalAvail, mediaType, author, ISBN);
         // this.doReloadMedia();
     }
 
-    public void doCreateMagazine(final String title, final Date publishingDate, final String language,
+    public void doCreateMagazine(final String title, final int publishingDate, final String language,
                                  final int totalAvail, final MediaType mediaType, final String series) {
 
         this.mediaService.createMagazine(title, publishingDate, language, totalAvail, mediaType, series);
         // this.doReloadMedia();
     }
 
-    public void doCreateVideo(final String title, final Date publishingDate, final String language,
+    public void doCreateVideo(final String title, final int publishingDate, final String language,
                               final int totalAvail, final MediaType mediaType, final int length) {
 
         this.mediaService.createVideo(title, publishingDate, language, totalAvail, mediaType, length);

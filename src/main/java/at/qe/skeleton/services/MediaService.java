@@ -114,7 +114,7 @@ public class MediaService {
      */
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public Media createAudioBook(final String title, final Date publishingDate, final String language,
+    public Media createAudioBook(final String title, final int publishingDate, final String language,
                                  final int totalAvail, final MediaType mediaType, final String speaker,
                                  final int length, final String author, final String ISBN) {
 
@@ -125,7 +125,7 @@ public class MediaService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public Media createBook(final String title, final Date publishingDate, final String language, final int totalAvail,
+    public Media createBook(final String title, final int publishingDate, final String language, final int totalAvail,
                             final MediaType mediaType, final String author, final String ISBN) {
 
         Book newBook = new Book(title, publishingDate, language, totalAvail, mediaType, author, ISBN);
@@ -134,7 +134,7 @@ public class MediaService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public Media createMagazine(final String title, final Date publishingDate, final String language,
+    public Media createMagazine(final String title, final int publishingDate, final String language,
                                 final int totalAvail, final MediaType mediaType, final String series) {
 
         Magazine newMagazine = new Magazine(title, publishingDate, language, totalAvail, mediaType, series);
@@ -143,7 +143,7 @@ public class MediaService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public Media createVideo(final String title, final Date publishingDate, final String language,
+    public Media createVideo(final String title, final int publishingDate, final String language,
                              final int totalAvail, final MediaType mediaType, final int length) {
 
         Video newVideo = new Video(title, publishingDate, language, totalAvail, mediaType, length);
@@ -204,4 +204,30 @@ public class MediaService {
         return this.mediaRepository.getAllLanguages();
     }
 
+    /**
+     return this.mediaRepository.getAllLanguages();
+     * Delete any Media
+     */
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+    public void deleteMedia(final Media media) {
+
+        switch (media.getMediaType()) {
+            case AUDIOBOOK:
+                this.audioBookRepository.delete((AudioBook) media);
+                break;
+            case BOOK:
+                this.bookRepository.delete((Book) media);
+                break;
+            case MAGAZINE:
+                this.magazineRepository.delete((Magazine) media);
+                break;
+            case VIDEO:
+                this.videoRepository.delete((Video) media);
+                break;
+            default:
+                break;
+        }
+    }
+
 }
+
