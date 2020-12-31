@@ -88,27 +88,57 @@ public class MediaService {
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media saveMedia(final Media media) {
-        return this.mediaRepository.save(media);
+
+        switch(media.getMediaType()) {
+            case AUDIOBOOK: return this.audioBookRepository.save((AudioBook) media);
+            case BOOK:      return this.bookRepository.save((Book) media);
+            case MAGAZINE:  return this.magazineRepository.save((Magazine) media);
+            case VIDEO:     return this.videoRepository.save((Video) media);
+            default:        return null;
+        }
+    }
+
+
+    /**
+     * Create Media of desired type.
+     */
+
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+    public Media createAudioBook(final String title, final Date publishingDate, final String language,
+                                 final int totalAvail, final MediaType mediaType, final String speaker,
+                                 final int length, final String author, final String ISBN) {
+
+        AudioBook newAudioBook =
+                new AudioBook(title, publishingDate, language, totalAvail, mediaType, speaker, length, author, ISBN);
+        this.saveMedia(newAudioBook);
+        return newAudioBook;
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public Media saveAudioBook(final AudioBook audiobook) {
-        return this.audioBookRepository.save(audiobook);
+    public Media createBook(final String title, final Date publishingDate, final String language, final int totalAvail,
+                            final MediaType mediaType, final String author, final String ISBN) {
+
+        Book newBook = new Book(title, publishingDate, language, totalAvail, mediaType, author, ISBN);
+        this.saveMedia(newBook);
+        return newBook;
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public Media saveBook(final Book book) {
-        return this.bookRepository.save(book);
+    public Media createMagazine(final String title, final Date publishingDate, final String language,
+                                final int totalAvail, final MediaType mediaType, final String series) {
+
+        Magazine newMagazine = new Magazine(title, publishingDate, language, totalAvail, mediaType, series);
+        this.saveMedia(newMagazine);
+        return newMagazine;
     }
 
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public Media saveMagazine(final Magazine magazine) {
-        return this.magazineRepository.save(magazine);
-    }
+    public Media createVideo(final String title, final Date publishingDate, final String language,
+                             final int totalAvail, final MediaType mediaType, final int length) {
 
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public Media saveVideo(final Video video) {
-        return this.videoRepository.save(video);
+        Video newVideo = new Video(title, publishingDate, language, totalAvail, mediaType, length);
+        this.saveMedia(newVideo);
+        return newVideo;
     }
 
 
@@ -156,6 +186,22 @@ public class MediaService {
 
     public Collection<Media> filterMediaByType(final MediaType mediaType) {
         return filterMediaByType(this.getAllMedia(), mediaType);
+    }
+
+
+    /**
+     * Delete any Media
+     */
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+    public void deleteMedia(final Media media) {
+
+        switch (media.getMediaType()) {
+            case AUDIOBOOK: this.audioBookRepository.delete((AudioBook) media); break;
+            case BOOK:      this.bookRepository.delete((Book) media); break;
+            case MAGAZINE:  this.magazineRepository.delete((Magazine) media); break;
+            case VIDEO:     this.videoRepository.delete((Video) media); break;
+            default:        break;
+        }
     }
 
 }

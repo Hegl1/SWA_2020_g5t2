@@ -13,7 +13,8 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(name="media_sequence", initialValue=10)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="media_sequence")
 	private Long mediaID;
 	private String title;
 	@Temporal(TemporalType.DATE)
