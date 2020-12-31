@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import at.qe.skeleton.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +13,19 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import at.qe.skeleton.model.Borrowed;
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.MediaBorrowTime;
+import at.qe.skeleton.model.MediaType;
+import at.qe.skeleton.model.Reserved;
+import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.BorrowedRepository;
 import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
 import at.qe.skeleton.repositories.MediaRepository;
 import at.qe.skeleton.repositories.ReservedRepository;
 import at.qe.skeleton.repositories.UserRepository;
-import org.springframework.web.servlet.tags.Param;
 
 @Component
 @Scope("application")
@@ -61,26 +63,10 @@ public class BorrowService implements CommandLineRunner {
 	 * @return true if it was successfully borrowed, else false
 	 */
 
-	public boolean borrowMedia(User borrower, String linkParameter) {
-
-		System.out.println("übergeben wurde eine ID: " + linkParameter);
-//		System.out.println("übergeben wurde ein  Media: " + linkParameter.getMediaID());
-		Long linkParameterLong = Long.parseLong(linkParameter);
-
-		Media mediaToBorrow;
-		if (linkParameter != null){
-			System.out.println("Parameter funktioniert endlich");
-			mediaToBorrow = mediaRepository.findFirstByMediaID(linkParameterLong);
-		} else {
-			System.out.println("Fehler, stattdessen fortfahren mit Beispiel-ID:    1");
-			mediaToBorrow = mediaRepository.findFirstByMediaID(1L);
-		}
-
-//		User borrower = userService.loadCurrentUser();
+	public boolean borrowMedia(final User borrower, final Media mediaToBorrow) {
 
 		if (mediaToBorrow.getTotalAvail() <= mediaToBorrow.getCurBorrowed()) {
 			System.out.println("zu wenig Exemplare verfügbar");
-			// TODO subject to change, maybe add auto reserve mechanism
 			return false;
 		} else {
 			System.out.println("Ausreichend Exemplare sind vorhanden, fahre fort");
@@ -91,10 +77,26 @@ public class BorrowService implements CommandLineRunner {
 			System.out.println("Artikel wurde ausgeliehen.");
 			return true;
 		}
-//	return true;
 	}
 
-	public boolean borrowMediaForAuthenticatedUser(String mediaToBorrow_String) {
+	// TODO probalby refactor, put link between linkparameter and media in
+	// controller
+	public boolean borrowMedia(final User borrower, final String linkParameter) {
+		System.out.println("übergeben wurde eine ID: " + linkParameter);
+		Long linkParameterLong = Long.parseLong(linkParameter);
+
+		Media mediaToBorrow;
+		if (linkParameter != null) {
+			System.out.println("Parameter funktioniert endlich");
+			mediaToBorrow = mediaRepository.findFirstByMediaID(linkParameterLong);
+		} else {
+			System.out.println("Fehler, stattdessen fortfahren mit Beispiel-ID:    1");
+			mediaToBorrow = mediaRepository.findFirstByMediaID(1L);
+		}
+		return borrowMedia(borrower, mediaToBorrow);
+	}
+
+	public boolean borrowMediaForAuthenticatedUser(final String mediaToBorrow_String) {
 		User borrower = userService.loadCurrentUser();
 		return borrowMedia(borrower, mediaToBorrow_String);
 	}
@@ -152,7 +154,7 @@ public class BorrowService implements CommandLineRunner {
 	}
 
 	public void reserveMediaForAuthenticatedUser(final Media mediaToResMedia) {
-		reserveMedia(getAuthenticatedUser(), mediaToResMedia);
+		reserveMedia(userService.loadCurrentUser(), mediaToResMedia);
 	}
 
 	private void unreserveMedia(final Reserved reserved) {
@@ -182,7 +184,7 @@ public class BorrowService implements CommandLineRunner {
 	}
 
 	public Collection<Reserved> getAllReservedByAuthenticatedUser() {
-		return getAllReservedByUser(getAuthenticatedUser());
+		return getAllReservedByUser(userService.loadCurrentUser());
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
@@ -218,11 +220,6 @@ public class BorrowService implements CommandLineRunner {
 			allowedBorrowTimes.put(current.getMediaType(), current.getAllowedBorrowTime());
 		}
 		return allowedBorrowTimes;
-	}
-
-	private User getAuthenticatedUser() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		return this.userRepository.findFirstByUsername(auth.getName());
 	}
 
 	@Override
