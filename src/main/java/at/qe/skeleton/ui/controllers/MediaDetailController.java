@@ -37,6 +37,13 @@ public class MediaDetailController implements Serializable {
         this.doReloadMedia();
     }
 
+    /**
+     * Returns the currently displayed media.
+     *
+     * @return
+     */
+    public Media getMedia() { return media; }
+
 
     /**
      * Action to force a reload of the currently displayed media.

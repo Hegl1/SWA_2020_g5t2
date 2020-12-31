@@ -66,21 +66,22 @@ public class BorrowService implements CommandLineRunner {
 	 * @return true if it was successfully borrowed, else false
 	 */
 
-	public boolean borrowMedia(Long linkParameter) {
+	public boolean borrowMedia(User borrower, String linkParameter) {
 
 		System.out.println("übergeben wurde eine ID: " + linkParameter);
 //		System.out.println("übergeben wurde ein  Media: " + linkParameter.getMediaID());
+		Long linkParameterLong = Long.parseLong(linkParameter);
 
 		Media mediaToBorrow;
 		if (linkParameter != null){
 			System.out.println("Parameter funktioniert endlich");
-			mediaToBorrow = mediaRepository.findFirstByMediaID(linkParameter);
+			mediaToBorrow = mediaRepository.findFirstByMediaID(linkParameterLong);
 		} else {
 			System.out.println("Fehler, stattdessen fortfahren mit Beispiel-ID:    1");
 			mediaToBorrow = mediaRepository.findFirstByMediaID(1L);
 		}
 
-		User borrower = userService.loadCurrentUser();
+//		User borrower = userService.loadCurrentUser();
 
 		if (mediaToBorrow.getTotalAvail() <= mediaToBorrow.getCurBorrowed()) {
 			System.out.println("zu wenig Exemplare verfügbar");
@@ -98,10 +99,10 @@ public class BorrowService implements CommandLineRunner {
 //	return true;
 	}
 
-//	public boolean borrowMediaForAuthenticatedUser(final Media mediaToBorrow) {
-//		User borrower2 = getAuthenticatedUser();
-//		return borrowMedia(borrower, mediaToBorrow);
-//	}
+	public boolean borrowMediaForAuthenticatedUser(String mediaToBorrow_String) {
+		User borrower = userService.loadCurrentUser();
+		return borrowMedia(borrower, mediaToBorrow_String);
+	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void unBorrowMedia(final Borrowed borrowed) {
