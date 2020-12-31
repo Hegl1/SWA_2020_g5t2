@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Date;
 
 
 /**
@@ -58,6 +56,49 @@ public class MediaDetailController implements Serializable {
      */
     public void doSaveMedia() {
         this.media = this.mediaService.saveMedia(this.media);
+    }
+
+
+    /**
+     * Create different Medias.
+     */
+
+    public void doCreateAudioBook(final String title, final int publishingDate, final String language,
+                                  final int totalAvail, final MediaType mediaType, final String speaker,
+                                  final int length, final String author, final String ISBN) {
+
+        this.mediaService.createAudioBook(title, publishingDate, language, totalAvail, mediaType, speaker, length, author, ISBN);
+        // this.doReloadMedia();
+    }
+
+    public void doCreateBook(final String title, final int publishingDate, final String language, final int totalAvail,
+                             final MediaType mediaType, final String author, final String ISBN) {
+
+        this.mediaService.createBook(title, publishingDate, language, totalAvail, mediaType, author, ISBN);
+        // this.doReloadMedia();
+    }
+
+    public void doCreateMagazine(final String title, final int publishingDate, final String language,
+                                 final int totalAvail, final MediaType mediaType, final String series) {
+
+        this.mediaService.createMagazine(title, publishingDate, language, totalAvail, mediaType, series);
+        // this.doReloadMedia();
+    }
+
+    public void doCreateVideo(final String title, final int publishingDate, final String language,
+                              final int totalAvail, final MediaType mediaType, final int length) {
+
+        this.mediaService.createVideo(title, publishingDate, language, totalAvail, mediaType, length);
+        // this.doReloadMedia();
+    }
+
+
+    /**
+     * Action to delete the currently displayed media.
+     */
+    public void doDeleteMedia(final Media media) {
+        this.mediaService.deleteMedia(media);
+        this.media = null;
     }
 
 }
