@@ -5,7 +5,33 @@
                 xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
+
     <ui:define name ="content">
         Borrowed
+        <h:form id="borrowedForm">
+
+            <p:dataTable id="borrowedTable" var="borrowed" value="#{borrowedListController.borroweds}">
+                <f:facet name="header">
+
+                </f:facet>
+                <p:column headerText="Nr">
+                    <h:outputText value="#{borrowed.borrowID}"/>
+                </p:column>
+                <p:column headerText="Type">
+                    <!--                    <h:outputText value="Picture of a Book / Sheet / DVD"/>-->
+                    <h:outputText value="#{borrowService.getThatType_borrowed(borrowed)}"/>
+                </p:column>
+                <p:column headerText="Title">
+                    <!--                    <h:outputText value="Name of the Media"/>-->
+                    <h:outputText value="#{borrowService.getThatTitle(borrowed)}"/>
+                </p:column>
+                <p:column headerText="restore">
+                    <p:commandButton icon="pi pi-times" action="#{borrowService.unBorrowMedia(borrowed)}" title="restore now" update=":borrowedForm:borrowedTable" />
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+
+
     </ui:define>
 </ui:composition>

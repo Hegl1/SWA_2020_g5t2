@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import at.qe.skeleton.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaBorrowTime;
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.model.Reserved;
-import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.BorrowedRepository;
 import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
 import at.qe.skeleton.repositories.MediaRepository;
@@ -113,15 +108,16 @@ public class BorrowService implements CommandLineRunner {
 		for (Reserved current : reservations) {
 			unreserveMedia(current);
 		}
+		System.out.println("Article was returned, please reload the page");
 	}
 
-	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+
 	public void unBorrowMedia(final User borrower, final Media mediaToUnBorrow) {
 		unBorrowMedia(borrowedRepostiroy.findFirstByUserAndMedia(borrower, mediaToUnBorrow));
 	}
 
 	public void unBorrowMediaForAuthenticatedUser(final Media mediaToUnBorrow) {
-		User user = getAuthenticatedUser();
+		User user = userService.loadCurrentUser();
 		unBorrowMedia(user, mediaToUnBorrow);
 	}
 
@@ -130,13 +126,13 @@ public class BorrowService implements CommandLineRunner {
 		return borrowedRepostiroy.findAll();
 	}
 
-	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+
 	public Collection<Borrowed> getAllBorrowsByUser(final User user) {
 		return borrowedRepostiroy.findByUser(user);
 	}
 
 	public Collection<Borrowed> getAllBorrowsByAuthenticatedUser() {
-		return getAllBorrowsByUser(getAuthenticatedUser());
+		return getAllBorrowsByUser(userService.loadCurrentUser());
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
@@ -234,5 +230,12 @@ public class BorrowService implements CommandLineRunner {
 		// used for initial loading of the component so scheduled task starts
 		logger.info("BorrowService Component loaded at startup");
 	}
+
+	/**
+	 * the following 2 functions return type specific information about the borrowed media
+	 * */
+	public String getThatType_borrowed(final Borrowed borrowed) {   return borrowed.getMedia().getMediaType().toString(); }
+
+	public String getThatTitle(final Borrowed borrowed) {   return borrowed.getMedia().getTitle(); }
 
 }
