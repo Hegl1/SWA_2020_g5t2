@@ -12,54 +12,36 @@
                 <f:facet name="header">
 
                 </f:facet>
-                <p:column headerText="Bookmark ID">
-                    <h:outputText value="#{bookmark.bookmarkID}"/>
-                </p:column>
-                <p:column headerText="Bookmark user">
-                    <h:outputText value="#{bookmark.user}"/>
-                </p:column>
-                <p:column headerText="Bookmark Media">
-                    <h:outputText value="#{bookmark.media}"/>
-                </p:column>
-
-
-
-            </p:dataTable>
-
-        </h:form>
-        später:
-        <h:form id="bookmarkForm2">
-
-            <p:dataTable id="bookmarksTable2" var="bookmark" value="#{bookmarkListController.bookmarks}">
-                <f:facet name="header">
-
-                </f:facet>
                 <p:column headerText="Nr">
                     <h:outputText value="#{bookmark.bookmarkID}"/>
                 </p:column>
                 <p:column headerText="Type">
-                    <h:outputText value="Picture of a Book / Sheet / DVD"/>
+<!--                    <h:outputText value="Picture of a Book / Sheet / DVD"/>-->
+                    <h:outputText value="#{bookmarkService.getThatType(bookmark)}"/>
                 </p:column>
                 <p:column headerText="Title">
-                    <h:outputText value="Name of the Media"/>
+<!--                    <h:outputText value="Name of the Media"/>-->
+                    <h:outputText value="#{bookmarkService.getThatTitle(bookmark)}"/>
+
                 </p:column>
-                <p:column headerText="Publisher">
-                    <h:outputText value="Name of the Publisher"/>
+                <p:column headerText="Additional Information">
+<!--                    <h:outputText value="Author / Series / Lenght "/>-->
+                    <h:outputText value="#{bookmarkService.getThatAddInfo(bookmark)}"/>
                 </p:column>
                 <p:column headerText="Status">
-                    <h:outputText value="free / occupied"/>
+<!--                    <h:outputText value="free / occupied"/>-->
+                    <h:outputText value="#{bookmarkService.getIfCurrentBorrowed(bookmark)}"/>
                 </p:column>
                 <p:column headerText="book request">
                     <p:commandButton icon="pi pi-ticket" />
                 </p:column>
-                <p:column headerText="add to Wishlist">
-                    <p:commandButton icon="pi pi-plus" />
+                <p:column headerText="remove">
+                    <p:commandButton icon="pi pi-times" action="#{bookmarkService.deleteBookmark(bookmark)}" title="delete" update=":bookmarkForm:bookmarksTable" />
                 </p:column>
-                <p:column headerText="remove / options">
-                    <p:commandButton icon="pi pi-times" />
-                    / <p:commandButton icon="pi pi-ellipsis-h" />
-                </p:column>
+                <p:column headerText="options">
+                    <p:commandButton icon="pi pi-ellipsis-h"  />
 
+                </p:column>
 
             </p:dataTable>
 

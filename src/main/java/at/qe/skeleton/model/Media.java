@@ -4,7 +4,10 @@ import org.springframework.data.domain.Persistable;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -17,19 +20,18 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="media_sequence")
 	private Long mediaID;
 	private String title;
-	@Temporal(TemporalType.DATE)
-	private Date publishingDate;
+	private int publishingYear;
 	private String language;
 	private int totalAvail;
 	private int curBorrowed;
 	@Enumerated(EnumType.STRING)
 	private MediaType mediaType;
 
-	public Media(final String title, final Date publishingDate, final String language,
+	public Media(final String title, final int publishingYear, final String language,
 				 final int totalAvail, final MediaType mediaType) {
 
 		this.title = title;
-		this.publishingDate = publishingDate;
+		this.publishingYear = publishingYear;
 		this.language = language;
 		this.totalAvail = totalAvail;
 		this.curBorrowed = 0;
@@ -56,16 +58,21 @@ public abstract class Media implements Persistable<Long>, Serializable {
 		this.title = title;
 	}
 
-	public Date getPublishingDate() {
-		return this.publishingDate;
+	public int getPublishingYear() {
+		return this.publishingYear;
 	}
 
-	public void setPublishingDate(final Date publishingDate) {
-		this.publishingDate = publishingDate;
+	public void setPublishingYear(final int publishingYear) {
+		this.publishingYear = publishingYear;
 	}
 
 	public String getLanguage() {
 		return this.language;
+	}
+
+	public String getLanguageHuman() {
+		Locale l = new Locale(this.language);
+		return l.getDisplayLanguage();
 	}
 
 	public void setLanguage(final String language) {
@@ -82,6 +89,10 @@ public abstract class Media implements Persistable<Long>, Serializable {
 
 	public MediaType getMediaType() {
 		return this.mediaType;
+	}
+
+	public String getMediaTypeHuman() {
+		return this.mediaType.toString().substring(0, 1).toUpperCase() + this.mediaType.toString().substring(1).toLowerCase();
 	}
 
 	public void setMediaType(final MediaType mediaType) {

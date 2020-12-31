@@ -31,6 +31,16 @@ public class Reserved implements Serializable, Persistable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date reserveTime;
 
+	public Reserved() {
+	}
+
+	public Reserved(final User user, final Media media, final Date timestamp) {
+		this();
+		this.user = user;
+		this.media = media;
+		this.reserveTime = timestamp;
+	}
+
 	public Long getReservedID() {
 		return this.reservedID;
 	}

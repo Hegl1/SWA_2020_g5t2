@@ -30,6 +30,7 @@ public class MediaListController implements Serializable {
         return this.mediaService.getAllMedia();
     }
 
+    public Collection<String> getAllLanguages() { return this.mediaService.getAllLanguages(); }
 
     /**
      * Search in Media by Title

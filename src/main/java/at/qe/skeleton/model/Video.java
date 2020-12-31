@@ -10,10 +10,10 @@ public class Video extends Media {
 
 	private int length;
 
-	public Video(final String title, final Date publishingDate, final String language, final int totalAvail,
+	public Video(final String title, final int publishingYear, final String language, final int totalAvail,
 				 final MediaType mediaType, final int length) {
 
-		super(title, publishingDate, language, totalAvail, mediaType);
+		super(title, publishingYear, language, totalAvail, mediaType);
 		this.length = length;
 	}
 

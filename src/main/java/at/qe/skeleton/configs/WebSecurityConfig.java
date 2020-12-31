@@ -43,14 +43,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //Permit access to the H2 console
                 .antMatchers("/h2-console/**").permitAll()
                 //Permit access for all to error pages
-                .antMatchers("/error/**")
-                .permitAll()
+                .antMatchers("/error/**").permitAll()
+                .antMatchers("/media/**").permitAll()
                 // Only access with customer
                 .antMatchers("/customer/**")
                 .hasAnyAuthority("CUSTOMER")
                 // Only access with admin role
                 .antMatchers("/admin/**")
-                .hasAnyAuthority("ADMIN")
+                .hasAnyAuthority("ADMIN", "LIBRARIAN")
                 //Permit access only for some roles
                 .antMatchers("/secured/**")
                 .hasAnyAuthority("ADMIN", "LIBRARIAN", "CUSTOMER")
@@ -62,7 +62,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/media/list.xhtml")
                 .failureUrl("/login.xhtml?error=incorrect");
 
-        http.exceptionHandling().accessDeniedPage("/error/denied.xhtml");
+        http.exceptionHandling().accessDeniedPage("/error/access_denied.xhtml");
 
         http.sessionManagement().invalidSessionUrl("/login.xhtml?error=invalid_session");
 

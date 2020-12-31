@@ -36,22 +36,27 @@ public class MediaService {
      * Return collection of Media of desired type.
      */
 
+ //   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Collection<Media> getAllMedia() {
         return this.mediaRepository.findAll();
     }
 
+    //   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Collection<AudioBook> getAllAudioBooks() {
         return this.audioBookRepository.findAll();
     }
 
+    //   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Collection<Book> getAllBooks() {
         return this.bookRepository.findAll();
     }
 
+    //   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Collection<Magazine> getAllMagazines() {
         return this.magazineRepository.findAll();
     }
 
+    //   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Collection<Video> getAllVideos() {
         return this.videoRepository.findAll();
     }
@@ -61,24 +66,29 @@ public class MediaService {
      * Loads a single Media of desired type by its ID.
      */
 
+    //  @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media loadMedia(final Long mediaId) {
-        return this.mediaRepository.findFirstByMediaID(mediaId);
+        return this.mediaRepository.findById(mediaId);
     }
 
+    //   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media loadAudioBook(final Long mediaId) {
-        return this.audioBookRepository.findFirstByMediaID(mediaId);
+        return this.audioBookRepository.findById(mediaId);
     }
 
+    //   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media loadBook(final Long mediaId) {
-        return this.bookRepository.findFirstByMediaID(mediaId);
+        return this.bookRepository.findById(mediaId);
     }
 
+    //   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media loadMagazine(final Long mediaId) {
-        return this.magazineRepository.findFirstByMediaID(mediaId);
+        return this.magazineRepository.findById(mediaId);
     }
 
+    //   @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media loadVideo(final Long mediaId) {
-        return this.videoRepository.findFirstByMediaID(mediaId);
+        return this.videoRepository.findById(mediaId);
     }
 
 
@@ -163,6 +173,8 @@ public class MediaService {
     /**
      * Filter Media by property
      */
+    // TODO: currently the methods filter always the whole Collection of Media,
+    //  not e.g. an already filtered Collection of Media
 
     public Collection<Media> filterMediaByAvailability(Collection<Media> filteredMedia, boolean isAvailable) {
         return filteredMedia.stream().filter(x -> isAvailable ? x.getTotalAvail() > 0 : x.getTotalAvail() == 0).collect(Collectors.toCollection(ArrayList::new));
@@ -188,20 +200,8 @@ public class MediaService {
         return filterMediaByType(this.getAllMedia(), mediaType);
     }
 
-
-    /**
-     * Delete any Media
-     */
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-    public void deleteMedia(final Media media) {
-
-        switch (media.getMediaType()) {
-            case AUDIOBOOK: this.audioBookRepository.delete((AudioBook) media); break;
-            case BOOK:      this.bookRepository.delete((Book) media); break;
-            case MAGAZINE:  this.magazineRepository.delete((Magazine) media); break;
-            case VIDEO:     this.videoRepository.delete((Video) media); break;
-            default:        break;
-        }
+    public Collection<String> getAllLanguages() {
+        return this.mediaRepository.getAllLanguages();
     }
 
 }

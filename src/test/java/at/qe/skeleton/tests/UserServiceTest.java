@@ -71,8 +71,6 @@ public class UserServiceTest {
 		Assertions.assertEquals(loadedNewUser.getEmail(), "tester@email.com");
 		Assertions.assertTrue(loadedNewUser.getRoles().contains(UserRole.ADMIN),
 				"Userrole was not correctly persisted");
-		// TODO: Check for createUser, updateUser, and createTime/updateTime when talked
-		// back to colleagues
 	}
 
 	@Test
