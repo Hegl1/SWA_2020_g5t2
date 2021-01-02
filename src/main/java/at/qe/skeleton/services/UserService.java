@@ -3,6 +3,8 @@ package at.qe.skeleton.services;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.repositories.UserRepository;
+import javassist.compiler.ast.NewExpr;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -118,6 +120,9 @@ public class UserService {
 				break;
 			case "admin":
 				newRolesSet.add(UserRole.ADMIN);
+				break;
+			case "customer":
+				newRolesSet.add(UserRole.CUSTOMER);
 				break;
 			default:
 				System.err.println(
