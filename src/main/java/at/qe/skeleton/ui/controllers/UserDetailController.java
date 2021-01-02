@@ -42,7 +42,7 @@ public class UserDetailController implements Serializable {
      */
     public void setUser(final User user) {
         this.user = user;
-        this.doReloadUser();
+        //this.doReloadUser();
     }
 
     /**
@@ -52,6 +52,14 @@ public class UserDetailController implements Serializable {
      */
     public User getUser() {
         return this.user;
+    }
+    
+    public void setNewRolesString(List<String> roles){
+    	this.newRolesString = roles;
+    }
+    
+    public List<String> getNewRolesString(){
+    	return newRolesString;
     }
 
     /**
