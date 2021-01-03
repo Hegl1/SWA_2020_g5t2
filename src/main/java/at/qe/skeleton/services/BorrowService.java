@@ -96,6 +96,8 @@ public class BorrowService implements CommandLineRunner {
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void unBorrowMedia(final Borrowed borrowed) {
+		if(borrowed == null) return;
+
 		borrowedRepository.delete(borrowed);
 		borrowed.getMedia().setCurBorrowed(borrowed.getMedia().getCurBorrowed() - 1);
 		mediaRepository.save(borrowed.getMedia());

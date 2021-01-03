@@ -1,38 +1,11 @@
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
-                xmlns:p="http://primefaces.org/ui"
+                xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
                 template="/WEB-INF/templates/main.xhtml">
 
     <ui:define name ="content">
         Borrowed
-        <h:form id="borrowedForm">
-
-            <p:messages for="asMessage" />
-            <p:growl for="asGrowl" closable="true"  showDetail="=true" showSummary="true"  >  <p:autoUpdate /> </p:growl>
-
-            <p:dataTable id="borrowedTable" var="borrowed" value="#{borrowedListController.borroweds}">
-                <f:facet name="header">
-
-                </f:facet>
-                <p:column headerText="Nr">
-                    <h:outputText value="#{borrowed.borrowID}"/>
-                </p:column>
-                <p:column headerText="Type">
-                    <h:outputText value="#{borrowService.getMediaTypeAsString(borrowed)}"/>
-                </p:column>
-                <p:column headerText="Title">
-                    <h:outputText value="#{borrowService.getMediaTitle(borrowed)}"/>
-                </p:column>
-                <p:column headerText="restore">
-                    <p:commandButton icon="fa fa-fw fa-times" action="#{borrowService.unBorrowMediaForAuthenticatedUser(borrowed.media)}" title="restore now" update=":borrowedForm:borrowedTable" />
-                </p:column>
-
-            </p:dataTable>
-        </h:form>
-
-
+        <!-- TODO: add growl tags -->
+        <lib:MediaList mediaList="#{borrowedListController.borroweds}" context="borrowed" />
     </ui:define>
 </ui:composition>

@@ -1,48 +1,10 @@
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
+                xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
-        My Bookmarks
-        <h:form id="bookmarkForm">
+        Bookmarks
 
-            <p:messages for="asMessage" />
-            <p:growl for="asGrowl" closable="true"  showDetail="=true" showSummary="true" redisplay="true"  >  <p:autoUpdate /> </p:growl>
-            <p:growl autoUpdate="true"/>
-
-            <p:dataTable id="bookmarksTable" var="bookmark" value="#{bookmarkListController.bookmarks}">
-                <f:facet name="header">
-
-                </f:facet>
-                <p:column headerText="Nr">
-                    <h:outputText value="#{bookmark.bookmarkID}"/>
-                </p:column>
-                <p:column headerText="Type">
-                    <h:outputText value="#{bookmarkService.getMediaTypeAsString(bookmark)}"/>
-                </p:column>
-                <p:column headerText="Title">
-                    <h:outputText value="#{bookmarkService.getMediaTitle(bookmark)}"/>
-
-                </p:column>
-                <p:column headerText="Additional Information">
-                    <h:outputText value="#{bookmarkService.getMediaInfo(bookmark)}"/>
-                </p:column>
-                <p:column headerText="Status">
-                    <h:outputText value="#{bookmarkService.getIfCurrentBorrowed(bookmark)}"/>
-                </p:column>
-                <p:column headerText="book request">
-                    <p:commandButton action="#{borrowBean.editAction}" id="borrowRequestButton"  style="margin-right:20px;" icon="fa fa-fw fa-ticket"   >
-                        <f:setPropertyActionListener target="#{borrowBean.action}" value="#{mediaListController.doSearchMediaByTitle(bookmarkService.getMediaTitle(bookmark)).mediaID}"/>
-                    </p:commandButton>
-                </p:column>
-                <p:column headerText="remove">
-                    <p:commandButton icon="fa fa-fw fa-times" action="#{bookmarkService.deleteBookmark(bookmark)}" title="delete" update=":bookmarkForm:bookmarksTable" />
-                </p:column>
-
-            </p:dataTable>
-
-        </h:form>
+        <lib:MediaList mediaList="#{bookmarkListController.bookmarks}" context="bookmarks" />
     </ui:define>
 </ui:composition>
