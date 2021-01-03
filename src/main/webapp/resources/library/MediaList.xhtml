@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:c="http://java.sun.com/jstl/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <composite:interface>
+        <composite:attribute name="context" default="list" />
+        <composite:attribute name="mediaList" type="java.util.Collection" required="true" />
+    </composite:interface>
+
+    <composite:implementation>
+        <h:form id="mediaListForm">
+            <p:dataTable id="mediaTable" var="row" value="#{cc.attrs.mediaList}">
+                <!-- BEGIN: Sets the media variable according to the context -->
+                <c:choose>
+                    <c:when test="${cc.attrs.context == 'bookmarks'}">
+                        <c:set var="media" value="#{row.media}" />
+                    </c:when>
+
+                    <c:when test="${cc.attrs.context == 'borrowed'}">
+                        <c:set var="media" value="#{row.media}" />
+                    </c:when>
+
+                    <c:otherwise>
+                        <c:set var="media" value="#{row}" />
+                    </c:otherwise>
+                </c:choose>
+                <!-- END -->
+
+                <p:column headerText="" style="width: 2rem; text-align: center">
+                    <p:commandButton update="@form:mediaListDialog" oncomplete="PF('mediaListDialog').show()" icon="fa fa-fw fa-info-circle" title="Show details">
+                        <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
+                    </p:commandButton>
+                </p:column>
+                <p:column headerText="Title">
+                    <h:outputText value="#{media.title}"/>
+                </p:column>
+                <p:column headerText="Type">
+                    <h:outputText value="#{media.mediaTypeHuman}"/>
+                </p:column>
+                <p:column headerText="Language">
+                    <h:outputText value="#{media.languageHuman}"/>
+                </p:column>
+                <p:column headerText="Publishing Year" style="width: 8rem; text-align: center">
+                    <h:outputText value="#{media.publishingYear}"/>
+                </p:column>
+                <p:column headerText="Bookmark" style="width: 5rem; text-align: center" rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}">
+                    <p:commandButton icon="fa fa-fw fa-bookmark#{bookmarkService.isBookmarkedForAuthenticatedUser(media) ? '' : '-o'}" action="#{bookmarkService.toggleBookmark(media)}" title="Toggle bookmark" update="@parent" />
+                </p:column>
+            </p:dataTable>
+
+            <p:dialog header="Detail" id="mediaListDialog" widgetVar="mediaListDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel id="mediaData" rendered="#{not empty mediaDetailController.media}">
+                    <h:panelGrid columns="2" >
+                        <p:outputLabel for="mId" value="ID: " />
+                        <p:inputText style="width:250px" id="mId" value="#{mediaDetailController.media.mediaID}" disabled="true"/>
+                        <p:outputLabel for="mTitle" value="Title: " />
+                        <p:inputText style="width:250px" id="mTitle" value="#{mediaDetailController.media.title}" disabled="true"/>
+                        <p:outputLabel for="mType" value="Type: "  />
+                        <p:inputText style="width:250px" id="mType" value="#{mediaDetailController.media.mediaType}" disabled="true"/>
+                        <p:outputLabel for="mLan" value="Language: " />
+                        <p:inputText style="width:250px" id="mLan" value="#{mediaDetailController.media.language}" disabled="true"/>
+                        <p:outputLabel for="mPubYear" value="Publishing Year: " />
+                        <p:inputText style="width:250px" id="mPubYear" value="#{mediaDetailController.media.publishingYear}" disabled="true"/>
+                        <p:outputLabel for="mcurBor" value="Is currently borrowed? " />
+                        <p:inputText style="width:250px" id="mcurBor" value="#{mediaDetailController.media.curBorrowed}" disabled="true"/>
+                        <p:outputLabel for="mTotalAvail" value="Amount available: " />
+                        <p:inputText style="width:250px" id="mTotalAvail" value="#{mediaDetailController.media.totalAvail}" disabled="true"/>
+
+                        <p:commandButton action="#{borrowBean.editTargetMedia}" value="Borrow" id="borrowButton"  style="margin-right:20px;" icon="fa fa-fw fa-plus-square-o"
+                                         oncomplete="PF('mediaListDialog').hide()" update="@form:mediaTable" >
+                            <f:setPropertyActionListener target="#{borrowBean.targetMedia}" value="#{mediaDetailController.media.mediaID}"/>
+                        </p:commandButton>
+
+                    </h:panelGrid>
+                </p:outputPanel>
+            </p:dialog>
+        </h:form>
+    </composite:implementation>
+</html>

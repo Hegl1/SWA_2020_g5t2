@@ -1,50 +1,10 @@
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
+                xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
-        My Bookmarks
-        <h:form id="bookmarkForm">
+        Bookmarks
 
-            <p:dataTable id="bookmarksTable" var="bookmark" value="#{bookmarkListController.bookmarks}">
-                <f:facet name="header">
-
-                </f:facet>
-                <p:column headerText="Nr">
-                    <h:outputText value="#{bookmark.bookmarkID}"/>
-                </p:column>
-                <p:column headerText="Type">
-<!--                    <h:outputText value="Picture of a Book / Sheet / DVD"/>-->
-                    <h:outputText value="#{bookmarkService.getMediaTypeAsString(bookmark)}"/>
-                </p:column>
-                <p:column headerText="Title">
-<!--                    <h:outputText value="Name of the Media"/>-->
-                    <h:outputText value="#{bookmarkService.getMediaTitle(bookmark)}"/>
-
-                </p:column>
-                <p:column headerText="Additional Information">
-<!--                    <h:outputText value="Author / Series / Lenght "/>-->
-                    <h:outputText value="#{bookmarkService.getMediaInfo(bookmark)}"/>
-                </p:column>
-                <p:column headerText="Status">
-<!--                    <h:outputText value="free / occupied"/>-->
-                    <h:outputText value="#{bookmarkService.getIfCurrentBorrowed(bookmark)}"/>
-                </p:column>
-                <p:column headerText="book request">
-                    <p:commandButton icon="fa fa-fw fa-ticket" />
-                </p:column>
-                <p:column headerText="remove">
-                    <p:commandButton icon="fa fa-fw fa-times" action="#{bookmarkService.deleteBookmark(bookmark)}" title="delete" update=":bookmarkForm:bookmarksTable" />
-                </p:column>
-                <p:column headerText="options">
-                    <p:commandButton icon="fa fa-fw fa-ellipsis-h"  />
-
-                </p:column>
-
-            </p:dataTable>
-
-        </h:form>
+        <lib:MediaList mediaList="#{bookmarkListController.bookmarks}" context="bookmarks" />
     </ui:define>
 </ui:composition>

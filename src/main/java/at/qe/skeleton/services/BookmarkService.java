@@ -27,7 +27,7 @@ public class BookmarkService {
 
 	/**
 	 * Returns a collection of all the bookmarks.
-	 * 
+	 *
 	 * @return all bookmarks in the database
 	 */
 	public Collection<Bookmark> getAllBookmarks() {
@@ -100,12 +100,20 @@ public class BookmarkService {
 		}
 	}
 
+	public boolean isBookmarkedForAuthenticatedUser(final Media media) {
+		User myUser = userService.loadCurrentUser();
+		Bookmark b_check = bookmarkRepository.findFirstByUserAndMedia(myUser, media);
+
+		return b_check != null;
+	}
+
 	/**
 	 * Deletes the bookmark.
 	 *
 	 * @param bookmark the bookmark to delete
 	 */
 	public void deleteBookmark(final Bookmark bookmark) {
+		if(bookmark == null) return;
 
 		bookmarkRepository.delete(bookmark);
 	}
@@ -117,9 +125,8 @@ public class BookmarkService {
 	 */
 	public void addBookmark(final Media media) {
 		User myUser = userService.loadCurrentUser();
-		Bookmark b_check = bookmarkRepository.findFirstByMedia(media);
 
-		if (b_check == null) {
+		if (!this.isBookmarkedForAuthenticatedUser(media)) {
 			Bookmark mark = new Bookmark();
 			mark.setMedia(media);
 			mark.setUser(myUser);
@@ -127,4 +134,13 @@ public class BookmarkService {
 		}
 	}
 
+	public void toggleBookmark(final Media media) {
+		User myUser = userService.loadCurrentUser();
+
+		if(this.isBookmarkedForAuthenticatedUser(media)){
+			this.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(myUser, media));
+		}else{
+			this.addBookmark(media);
+		}
+	}
 }
