@@ -34,10 +34,10 @@ public class BorrowService implements CommandLineRunner {
 	private static final long schedulingDelay = (long) 1e7;
 
 	@Autowired
-	BorrowedRepository borrowedRepostiroy;
+	BorrowedRepository borrowedRepository;
 
 	@Autowired
-	ReservedRepository reserverdreRepository;
+	ReservedRepository reservedRepository;
 
 	@Autowired
 	MediaBorrowTimeRepository mediaBorrowTimeRepository;
@@ -62,35 +62,27 @@ public class BorrowService implements CommandLineRunner {
 	 * @param mediaToBorrow media to borrow
 	 * @return true if it was successfully borrowed, else false
 	 */
-
 	public boolean borrowMedia(final User borrower, final Media mediaToBorrow) {
 
 		if (mediaToBorrow.getTotalAvail() <= mediaToBorrow.getCurBorrowed()) {
-			System.out.println("zu wenig Exemplare verfügbar");
 			return false;
 		} else {
-			System.out.println("Ausreichend Exemplare sind vorhanden, fahre fort");
 			mediaToBorrow.setCurBorrowed(mediaToBorrow.getCurBorrowed() + 1);
 			mediaRepository.save(mediaToBorrow);
 			Borrowed borrow = new Borrowed(borrower, mediaToBorrow, new Date());
-			borrowedRepostiroy.save(borrow);
-			System.out.println("Artikel wurde ausgeliehen.");
+			borrowedRepository.save(borrow);
 			return true;
 		}
 	}
 
-	// TODO probalby refactor, put link between linkparameter and media in
-	// controller
+	// TODO probably refactor, put link between link parameter and media in controller
 	public boolean borrowMedia(final User borrower, final String linkParameter) {
-		System.out.println("übergeben wurde eine ID: " + linkParameter);
 		Long linkParameterLong = Long.parseLong(linkParameter);
 
 		Media mediaToBorrow;
 		if (linkParameter != null) {
-			System.out.println("Parameter funktioniert endlich");
 			mediaToBorrow = mediaRepository.findFirstByMediaID(linkParameterLong);
 		} else {
-			System.out.println("Fehler, stattdessen fortfahren mit Beispiel-ID:    1");
 			mediaToBorrow = mediaRepository.findFirstByMediaID(1L);
 		}
 		return borrowMedia(borrower, mediaToBorrow);
@@ -103,19 +95,18 @@ public class BorrowService implements CommandLineRunner {
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void unBorrowMedia(final Borrowed borrowed) {
-		borrowedRepostiroy.delete(borrowed);
+		borrowedRepository.delete(borrowed);
 		borrowed.getMedia().setCurBorrowed(borrowed.getMedia().getCurBorrowed() - 1);
 		mediaRepository.save(borrowed.getMedia());
-		Collection<Reserved> reservations = reserverdreRepository.findByMedia(borrowed.getMedia());
+		Collection<Reserved> reservations = reservedRepository.findByMedia(borrowed.getMedia());
+
 		for (Reserved current : reservations) {
 			unreserveMedia(current);
 		}
-		System.out.println("Article was returned, please reload the page");
 	}
 
-
 	public void unBorrowMedia(final User borrower, final Media mediaToUnBorrow) {
-		unBorrowMedia(borrowedRepostiroy.findFirstByUserAndMedia(borrower, mediaToUnBorrow));
+		unBorrowMedia(borrowedRepository.findFirstByUserAndMedia(borrower, mediaToUnBorrow));
 	}
 
 	public void unBorrowMediaForAuthenticatedUser(final Media mediaToUnBorrow) {
@@ -125,12 +116,11 @@ public class BorrowService implements CommandLineRunner {
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Borrowed> getAllBorrows() {
-		return borrowedRepostiroy.findAll();
+		return borrowedRepository.findAll();
 	}
 
-
 	public Collection<Borrowed> getAllBorrowsByUser(final User user) {
-		return borrowedRepostiroy.findByUser(user);
+		return borrowedRepository.findByUser(user);
 	}
 
 	public Collection<Borrowed> getAllBorrowsByAuthenticatedUser() {
@@ -139,18 +129,18 @@ public class BorrowService implements CommandLineRunner {
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Borrowed> getAllBorrowsByMedia(final Media media) {
-		return borrowedRepostiroy.findByMedia(media);
+		return borrowedRepository.findByMedia(media);
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Borrowed loadBorrowed(final User borrower, final Media media) {
-		return borrowedRepostiroy.findFirstByUserAndMedia(borrower, media);
+		return borrowedRepository.findFirstByUserAndMedia(borrower, media);
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void reserveMedia(final User reserver, final Media mediaToReserve) {
 		Reserved res = new Reserved(reserver, mediaToReserve, new Date());
-		reserverdreRepository.save(res);
+		reservedRepository.save(res);
 	}
 
 	public void reserveMediaForAuthenticatedUser(final Media mediaToResMedia) {
@@ -170,17 +160,17 @@ public class BorrowService implements CommandLineRunner {
 		String head = headBuild.toString();
 		mailService.sendMail(reserved.getUser().getEmail(), head, body);
 		logger.info("Email about freed media send to " + reserved.getUser().getEmail());
-		reserverdreRepository.delete(reserved);
+		reservedRepository.delete(reserved);
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Reserved> getAllReserved() {
-		return reserverdreRepository.findAll();
+		return reservedRepository.findAll();
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Reserved> getAllReservedByUser(final User user) {
-		return reserverdreRepository.findByUser(user);
+		return reservedRepository.findByUser(user);
 	}
 
 	public Collection<Reserved> getAllReservedByAuthenticatedUser() {
@@ -189,18 +179,18 @@ public class BorrowService implements CommandLineRunner {
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Reserved> getAllReservedByMedia(final Media media) {
-		return reserverdreRepository.findByMedia(media);
+		return reservedRepository.findByMedia(media);
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Reserved loadReserved(final User user, final Media media) {
-		return reserverdreRepository.findByUserAndMedia(user, media);
+		return reservedRepository.findByUserAndMedia(user, media);
 	}
 
 	@Scheduled(fixedDelay = schedulingDelay, initialDelay = 30000)
 	public void checkBorrowTimeout() {
 		Map<MediaType, Integer> allowedBorrowTimes = getMediaBorrowTimesAsMap();
-		Collection<Borrowed> currentlyBorrowed = borrowedRepostiroy.findAll();
+		Collection<Borrowed> currentlyBorrowed = borrowedRepository.findAll();
 		Date currentDate = new Date();
 		for (Borrowed current : currentlyBorrowed) {
 			long diff = currentDate.getTime() - current.getBorrowDate().getTime();
@@ -214,7 +204,7 @@ public class BorrowService implements CommandLineRunner {
 	}
 
 	private Map<MediaType, Integer> getMediaBorrowTimesAsMap() {
-		Map<MediaType, Integer> allowedBorrowTimes = new HashMap<MediaType, Integer>();
+		Map<MediaType, Integer> allowedBorrowTimes = new HashMap<>();
 		Collection<MediaBorrowTime> borrowTimes = mediaBorrowTimeRepository.findAll();
 		for (MediaBorrowTime current : borrowTimes) {
 			allowedBorrowTimes.put(current.getMediaType(), current.getAllowedBorrowTime());
