@@ -1,10 +1,10 @@
 package at.qe.skeleton.repositories;
 
-import java.util.List;
-
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.MediaType;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface MediaRepository extends AbstractRepository<Media, Long> {
 

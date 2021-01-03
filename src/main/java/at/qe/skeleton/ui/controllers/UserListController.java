@@ -2,11 +2,12 @@ package at.qe.skeleton.ui.controllers;
 
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.services.UserService;
-import java.io.Serializable;
-import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * Controller for the user list view.

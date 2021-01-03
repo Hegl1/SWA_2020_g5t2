@@ -1,7 +1,6 @@
 package at.qe.skeleton.model;
 
 import javax.persistence.Entity;
-import java.util.Date;
 
 @Entity
 public class AudioBook extends Media {

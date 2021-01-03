@@ -100,4 +100,6 @@ public class MediaDetailController implements Serializable {
         this.media = null;
     }
 
+
+
 }

@@ -1,11 +1,7 @@
 package at.qe.skeleton.services;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import at.qe.skeleton.model.*;
+import at.qe.skeleton.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,17 +11,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaBorrowTime;
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.model.Reserved;
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.repositories.BorrowedRepository;
-import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
-import at.qe.skeleton.repositories.MediaRepository;
-import at.qe.skeleton.repositories.ReservedRepository;
-import at.qe.skeleton.repositories.UserRepository;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Scope("application")
@@ -75,23 +65,9 @@ public class BorrowService implements CommandLineRunner {
 		}
 	}
 
-	// TODO probably refactor, put link between link parameter and media in
-	// controller
-	public boolean borrowMedia(final User borrower, final String linkParameter) {
-		Long linkParameterLong = Long.parseLong(linkParameter);
-
-		Media mediaToBorrow;
-		if (linkParameter != null) {
-			mediaToBorrow = mediaRepository.findFirstByMediaID(linkParameterLong);
-		} else {
-			mediaToBorrow = mediaRepository.findFirstByMediaID(1L);
-		}
-		return borrowMedia(borrower, mediaToBorrow);
-	}
-
-	public boolean borrowMediaForAuthenticatedUser(final String mediaToBorrow_String) {
+	public boolean borrowMediaForAuthenticatedUser(final Media media) {
 		User borrower = userService.loadCurrentUser();
-		return borrowMedia(borrower, mediaToBorrow_String);
+		return borrowMedia(borrower, media);
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
@@ -108,6 +84,7 @@ public class BorrowService implements CommandLineRunner {
 		}
 	}
 
+
 	public void unBorrowMedia(final User borrower, final Media mediaToUnBorrow) {
 		unBorrowMedia(borrowedRepository.findFirstByUserAndMedia(borrower, mediaToUnBorrow));
 	}
@@ -121,6 +98,7 @@ public class BorrowService implements CommandLineRunner {
 	public Collection<Borrowed> getAllBorrows() {
 		return borrowedRepository.findAll();
 	}
+
 
 	public Collection<Borrowed> getAllBorrowsByUser(final User user) {
 		return borrowedRepository.findByUser(user);
@@ -190,7 +168,7 @@ public class BorrowService implements CommandLineRunner {
 		return reservedRepository.findByUserAndMedia(user, media);
 	}
 
-	@Scheduled(fixedDelay = schedulingDelay, initialDelay = 30000)
+	@Scheduled(fixedDelay = schedulingDelay, initialDelay = 5000)
 	public void checkBorrowTimeout() {
 		Map<MediaType, Integer> allowedBorrowTimes = getMediaBorrowTimesAsMap();
 		Collection<Borrowed> currentlyBorrowed = borrowedRepository.findAll();
@@ -220,17 +198,4 @@ public class BorrowService implements CommandLineRunner {
 		// used for initial loading of the component so scheduled task starts
 		logger.info("BorrowService Component loaded at startup");
 	}
-
-	/**
-	 * the following 2 functions return type specific information about the borrowed
-	 * media
-	 */
-	public String getMediaTypeAsString(final Borrowed borrowed) {
-		return borrowed.getMedia().getMediaType().toString();
-	}
-
-	public String getMediaTitle(final Borrowed borrowed) {
-		return borrowed.getMedia().getTitle();
-	}
-
 }

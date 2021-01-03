@@ -3,7 +3,6 @@ package at.qe.skeleton.services;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.repositories.UserRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -87,7 +86,6 @@ public class UserService {
 				String newencodedPassword = passwordEncoder.encode(user.getPassword());
 				user.setPassword(newencodedPassword);
 			}
-
 		}
 		return userRepository.save(user);
 	}
