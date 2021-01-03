@@ -80,7 +80,7 @@
                         <p:inputText style="width:250px" id="mTotalAvail" value="#{mediaDetailController.media.totalAvail}" disabled="true"/>
 
                         <p:commandButton action="#{borrowBean.editTargetMedia}" value="Borrow" id="borrowButton"  style="margin-right:20px;" icon="fa fa-fw fa-plus-square-o"
-                                         oncomplete="PF('mediaListDialog').hide()" update="@form:mediaTable" rendered="#{cc.attrs.context != 'borrowed'}">
+                                         oncomplete="PF('mediaListDialog').hide()" update="@form:mediaTable" rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}">
                             <f:setPropertyActionListener target="#{borrowBean.targetMedia}" value="#{mediaDetailController.media.mediaID}"/>
                         </p:commandButton>
 
