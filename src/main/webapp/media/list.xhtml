@@ -3,8 +3,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name="content">
         <style type="text/css">
@@ -41,58 +41,7 @@
                 </p:tab>
             </p:accordionPanel>
         </h:form>
-        <h:form id="allmediaForm">
-            <p:dataTable id="mediaTable" var="media" value="#{mediaListController.media}">
-                <p:column headerText="" style="width: 2rem; text-align: center">
-                    <p:commandButton update=":allmediaForm:allmediaEditDialog" oncomplete="PF('allmediaEditDialog').show()" icon="fa fa-fw fa-info-circle" title="Show details">
-                        <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
-                    </p:commandButton>
-                </p:column>
-                <p:column headerText="Title">
-                    <h:outputText value="#{media.title}"/>
-                </p:column>
-                <p:column headerText="Type">
-                    <h:outputText value="#{media.mediaTypeHuman}"/>
-                </p:column>
-                <p:column headerText="Language">
-                    <h:outputText value="#{media.languageHuman}"/>
-                </p:column>
-                <p:column headerText="Publishing Year" style="width: 8rem; text-align: center">
-                    <h:outputText value="#{media.publishingYear}"/>
-                </p:column>
-                <p:column headerText="Bookmark" style="width: 5rem; text-align: center">
-                    <p:commandButton icon="fa fa-fw fa-bookmark-o" action="#{bookmarkService.addBookmark(media)}" title="Toggle bookmark" />
-                </p:column>
-            </p:dataTable>
 
-            <p:dialog header="Borrow a media" id="allmediaEditDialog" widgetVar="allmediaEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-                <p:outputPanel id="mediaData" rendered="#{not empty mediaDetailController.media}">
-                <h:panelGrid columns="2" >
-                    <p:outputLabel for="mId" value="ID: " />
-                    <p:inputText style="width:250px" id="mId" value="#{mediaDetailController.media.mediaID}" disabled="true"/>
-                    <p:outputLabel for="mTitle" value="Title: " />
-                    <p:inputText style="width:250px" id="mTitle" value="#{mediaDetailController.media.title}" disabled="true"/>
-                    <p:outputLabel for="mType" value="Type: "  />
-                    <p:inputText style="width:250px" id="mType" value="#{mediaDetailController.media.mediaType}" disabled="true"/>
-                    <p:outputLabel for="mLan" value="Language: " />
-                    <p:inputText style="width:250px" id="mLan" value="#{mediaDetailController.media.language}" disabled="true"/>
-                    <p:outputLabel for="mPubYear" value="Publishing Year: " />
-                    <p:inputText style="width:250px" id="mPubYear" value="#{mediaDetailController.media.publishingYear}" disabled="true"/>
-                    <p:outputLabel for="mcurBor" value="Is currently borrowed? " />
-                    <p:inputText style="width:250px" id="mcurBor" value="#{mediaDetailController.media.curBorrowed}" disabled="true"/>
-                    <p:outputLabel for="mTotalAvail" value="Amount available: " />
-                    <p:inputText style="width:250px" id="mTotalAvail" value="#{mediaDetailController.media.totalAvail}" disabled="true"/>
-
-                    <p:commandButton action="#{borrowBean.editTargetMedia}" value="Borrow" id="borrowButton"  style="margin-right:20px;" icon="fa fa-fw fa-plus-square-o"
-                                     oncomplete="PF('allmediaEditDialog').hide()" update=":allmediaForm:mediaTable" >
-                        <f:setPropertyActionListener target="#{borrowBean.targetMedia}" value="#{mediaDetailController.media.mediaID}"/>
-                    </p:commandButton>
-
-                </h:panelGrid>
-                </p:outputPanel>
-            </p:dialog>
-
-        </h:form>
-
+        <lib:MediaList mediaList="#{mediaListController.media}" context="list"></lib:MediaList>
     </ui:define>
 </ui:composition>
