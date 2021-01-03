@@ -42,28 +42,28 @@
             </p:accordionPanel>
         </h:form>
         <h:form id="allmediaForm">
-                <p:dataTable id="mediaTable" var="media" value="#{mediaListController.media}">
-                    <p:column headerText="" style="width: 2rem; text-align: center">
-                        <p:commandButton update=":allmediaForm:allmediaEditDialog" oncomplete="PF('allmediaEditDialog').show()" icon="pi pi-info-circle" title="Edit">
-                            <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
-                        </p:commandButton>
-                    </p:column>
-                    <p:column headerText="Title">
-                        <h:outputText value="#{media.title}"/>
-                    </p:column>
-                    <p:column headerText="Type">
-                        <h:outputText value="#{media.mediaTypeHuman}"/>
-                    </p:column>
-                    <p:column headerText="Language">
-                        <h:outputText value="#{media.languageHuman}"/>
-                    </p:column>
-                    <p:column headerText="Publishing Year" style="width: 8rem; text-align: center">
-                        <h:outputText value="#{media.publishingYear}"/>
-                    </p:column>
-                    <p:column headerText="Bookmark" style="width: 5rem; text-align: center">
-                        <p:commandButton icon="pi pi-star-o" action="#{bookmarkService.addBookmark(media)}" title="Toggle bookmark" />
-                    </p:column>
-                </p:dataTable>
+            <p:dataTable id="mediaTable" var="media" value="#{mediaListController.media}">
+                <p:column headerText="" style="width: 2rem; text-align: center">
+                    <p:commandButton update=":allmediaForm:allmediaEditDialog" oncomplete="PF('allmediaEditDialog').show()" icon="pi pi-info-circle" title="Edit">
+                        <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
+                    </p:commandButton>
+                </p:column>
+                <p:column headerText="Title">
+                    <h:outputText value="#{media.title}"/>
+                </p:column>
+                <p:column headerText="Type">
+                    <h:outputText value="#{media.mediaTypeHuman}"/>
+                </p:column>
+                <p:column headerText="Language">
+                    <h:outputText value="#{media.languageHuman}"/>
+                </p:column>
+                <p:column headerText="Publishing Year" style="width: 8rem; text-align: center">
+                    <h:outputText value="#{media.publishingYear}"/>
+                </p:column>
+                <p:column headerText="Bookmark" style="width: 5rem; text-align: center">
+                    <p:commandButton icon="pi pi-star-o" action="#{bookmarkService.addBookmark(media)}" title="Toggle bookmark" />
+                </p:column>
+            </p:dataTable>
 
             <p:dialog header="Borrow a media" id="allmediaEditDialog" widgetVar="allmediaEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="mediaData" rendered="#{not empty mediaDetailController.media}">

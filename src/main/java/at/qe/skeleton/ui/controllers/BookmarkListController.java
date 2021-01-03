@@ -36,7 +36,7 @@ public class BookmarkListController implements Serializable {
      */
     public Collection<Bookmark> getBookmarks() {
         User myCurrentUser = userService.loadCurrentUser();
-//        System.out.println("In controller - fetching bookmarks with: "+ myCurrentUser);
+        
         return bookmarkService.getMyBookmarks(myCurrentUser);
     }
 

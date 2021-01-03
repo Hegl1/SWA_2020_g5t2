@@ -112,19 +112,12 @@ public class BookmarkService {
      * @param media the media to add as one's own bookmark
      */
     public void addBookmark(Media media) {
-
-//        System.out.println("add the media as bookmark to the own user");
         User myUser = userService.loadCurrentUser();
         Bookmark b_check = bookmarkRepository.findFirstByMedia(media);
-        if (b_check != null) {
-            System.out.println("The bookmark for this media was already made.");
-        } else {
+
+        if (b_check == null) {
             bookmarkRepository.add(media, myUser.getUsername());
-            System.out.println("done, nice!");
         }
-
-
-
     }
 
 
