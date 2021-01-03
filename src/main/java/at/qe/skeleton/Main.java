@@ -1,12 +1,10 @@
 package at.qe.skeleton;
 
-import java.util.HashMap;
-
-import javax.faces.webapp.FacesServlet;
-
+import at.qe.skeleton.configs.CustomServletContextInitializer;
+import at.qe.skeleton.configs.WebSecurityConfig;
+import at.qe.skeleton.utils.ViewScope;
 import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -15,9 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
-import at.qe.skeleton.configs.CustomServletContextInitializer;
-import at.qe.skeleton.configs.WebSecurityConfig;
-import at.qe.skeleton.utils.ViewScope;
+import javax.faces.webapp.FacesServlet;
+import java.util.HashMap;
 
 /**
  * Spring boot application. Execute maven with <code>mvn spring-boot:run</code>

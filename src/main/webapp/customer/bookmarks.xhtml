@@ -1,9 +1,15 @@
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
                 xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
         Bookmarks
+
+        <p:messages for="asMessage" />
+        <p:growl for="asGrowl" closable="true" showDetail="true" showSummary="true" redisplay="true">
+            <p:autoUpdate />
+        </p:growl>
 
         <lib:MediaList mediaList="#{bookmarkListController.bookmarks}" context="bookmarks" />
     </ui:define>

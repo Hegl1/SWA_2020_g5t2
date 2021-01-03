@@ -1,10 +1,10 @@
 package at.qe.skeleton.repositories;
 
-import java.util.List;
-
 import at.qe.skeleton.model.Borrowed;
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.User;
+
+import java.util.List;
 
 public interface BorrowedRepository extends AbstractRepository<Borrowed, Long> {
 

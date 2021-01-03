@@ -1,6 +1,8 @@
 package at.qe.skeleton.ui.controllers;
 
 import at.qe.skeleton.model.Borrowed;
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.repositories.MediaRepository;
 import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
 import at.qe.skeleton.services.BorrowService;
 import at.qe.skeleton.services.UserService;
@@ -8,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Collection;
@@ -24,6 +28,9 @@ public class BorrowedListController implements Serializable {
 
     @Autowired
     private BorrowService borrowService;
+
+    @Autowired
+    private MediaRepository mediaRepository;
 
     private Borrowed borrowed;
 
@@ -51,8 +58,19 @@ public class BorrowedListController implements Serializable {
         return c.getTime();
     }
 
+    public void doUnBorrowMediaForAuthenticatedUser(final Media mediaToUnBorrow) {
+        borrowService.unBorrowMediaForAuthenticatedUser(mediaToUnBorrow);
 
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "The media was returned.", "" ));
+    }
 
+    public void doBorrowMediaForAuthenticatedUser(final Media media) {
+        borrowService.borrowMediaForAuthenticatedUser(media);
+
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "The media was borrowed.", "" ));
+    }
 }
 
 

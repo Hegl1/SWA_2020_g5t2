@@ -3,7 +3,6 @@ package at.qe.skeleton.services;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.repositories.UserRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,8 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,8 +74,6 @@ public class UserService {
 		if (user.isNew()) {
 			user.setCreateDate(new Date());
 			user.setCreateUser(getAuthenticatedUser());
-			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "User was added.", "" ));
 		} else {
 			user.setUpdateDate(new Date());
 			user.setUpdateUser(getAuthenticatedUser());
@@ -91,9 +86,6 @@ public class UserService {
 				String newencodedPassword = passwordEncoder.encode(user.getPassword());
 				user.setPassword(newencodedPassword);
 			}
-			FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_WARN, "User was edited!",  "" );
-			FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
-
 		}
 		return userRepository.save(user);
 	}
@@ -125,14 +117,10 @@ public class UserService {
 				case "customer": 	newRolesSet.add(UserRole.CUSTOMER); break;
 				default:
 					System.err.println("[Warning] UserService - changeUserRoles: Role \"" + selected + "\" not supported yet!");
-					FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning - this action is not supported yet!",  "" );
-					FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
 					return false;
 			}
 		}
 		user.setRoles(newRolesSet);
-		FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_INFO, "Userrole was set!",  "" );
-		FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
 
 		return true;
 	}
@@ -188,8 +176,6 @@ public class UserService {
 
 		} else {
 			this.userRepository.delete(user);
-			FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_WARN, "User was deleted!",  "" );
-			FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
 		}
 	}
 

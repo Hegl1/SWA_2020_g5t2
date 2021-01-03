@@ -1,9 +1,5 @@
 package at.qe.skeleton.ui.beans;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 

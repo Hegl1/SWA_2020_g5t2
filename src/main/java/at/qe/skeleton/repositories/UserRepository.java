@@ -1,12 +1,11 @@
 package at.qe.skeleton.repositories;
 
-import java.util.List;
-
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
+import java.util.List;
 
 /**
  * Repository for managing {@link User} entities.
