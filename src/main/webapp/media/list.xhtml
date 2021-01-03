@@ -42,28 +42,28 @@
             </p:accordionPanel>
         </h:form>
         <h:form id="allmediaForm">
-                <p:dataTable id="mediaTable" var="media" value="#{mediaListController.media}">
-                    <p:column headerText="" style="width: 1.25rem; text-align: center">
-                        <p:commandButton update=":allmediaForm:allmediaEditDialog" oncomplete="PF('allmediaEditDialog').show()" icon="pi pi-info-circle" title="Edit">
-                            <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
-                        </p:commandButton>
-                    </p:column>
-                    <p:column headerText="Title">
-                        <h:outputText value="#{media.title}"/>
-                    </p:column>
-                    <p:column headerText="Type">
-                        <h:outputText value="#{media.mediaTypeHuman}"/>
-                    </p:column>
-                    <p:column headerText="Language">
-                        <h:outputText value="#{media.languageHuman}"/>
-                    </p:column>
-                    <p:column headerText="Publishing Year" style="width: 8rem; text-align: center">
-                        <h:outputText value="#{media.publishingYear}"/>
-                    </p:column>
-                    <p:column headerText="add as bookmark">
-                        <p:commandButton  icon="pi pi-star-o" action="#{bookmarkService.addBookmark(media)}" title="add" />
-                    </p:column>
-                </p:dataTable>
+            <p:dataTable id="mediaTable" var="media" value="#{mediaListController.media}">
+                <p:column headerText="" style="width: 2rem; text-align: center">
+                    <p:commandButton update=":allmediaForm:allmediaEditDialog" oncomplete="PF('allmediaEditDialog').show()" icon="fa fa-fw fa-info-circle" title="Show details">
+                        <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
+                    </p:commandButton>
+                </p:column>
+                <p:column headerText="Title">
+                    <h:outputText value="#{media.title}"/>
+                </p:column>
+                <p:column headerText="Type">
+                    <h:outputText value="#{media.mediaTypeHuman}"/>
+                </p:column>
+                <p:column headerText="Language">
+                    <h:outputText value="#{media.languageHuman}"/>
+                </p:column>
+                <p:column headerText="Publishing Year" style="width: 8rem; text-align: center">
+                    <h:outputText value="#{media.publishingYear}"/>
+                </p:column>
+                <p:column headerText="Bookmark" style="width: 5rem; text-align: center">
+                    <p:commandButton icon="fa fa-fw fa-bookmark-o" action="#{bookmarkService.addBookmark(media)}" title="Toggle bookmark" />
+                </p:column>
+            </p:dataTable>
 
             <p:dialog header="Borrow a media" id="allmediaEditDialog" widgetVar="allmediaEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="mediaData" rendered="#{not empty mediaDetailController.media}">
@@ -83,9 +83,9 @@
                     <p:outputLabel for="mTotalAvail" value="Amount available: " />
                     <p:inputText style="width:250px" id="mTotalAvail" value="#{mediaDetailController.media.totalAvail}" disabled="true"/>
 
-                    <p:commandButton action="#{borrowBean.editAction}" value="borrow now" id="borrowButton"  style="margin-right:20px;" icon="pi pi-save"
+                    <p:commandButton action="#{borrowBean.editAction}" value="Borrow" id="borrowButton"  style="margin-right:20px;" icon="fa fa-fw fa-plus-square-o"
                                      oncomplete="PF('allmediaEditDialog').hide()" update=":allmediaForm:mediaTable" >
-                    <f:setPropertyActionListener target="#{borrowBean.action}" value="#{mediaDetailController.media.mediaID}"/>
+                        <f:setPropertyActionListener target="#{borrowBean.action}" value="#{mediaDetailController.media.mediaID}"/>
                     </p:commandButton>
 
                 </h:panelGrid>

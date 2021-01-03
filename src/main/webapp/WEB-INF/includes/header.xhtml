@@ -13,25 +13,25 @@
             </h1>
             <h:form>
                 <p:menubar style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 0">
-                    <p:menuitem value="List media" icon="pi pi-list" url="/media/list.xhtml"/>
+                    <p:menuitem value="List media" icon="fa fa-fw fa-list" url="/media/list.xhtml"/>
 
                     <c:choose>
                         <c:when test="${sessionInfoBean.loggedIn}">
-                            <p:menuitem value="Borrowed" icon="pi pi-briefcase" url="/customer/borrowed.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
-                            <p:menuitem value="Bookmarks" icon="pi pi-bookmark" url="/customer/bookmarks.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
+                            <p:menuitem value="Borrowed" icon="fa fa-fw fa-briefcase" url="/customer/borrowed.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
+                            <p:menuitem value="Bookmarks" icon="fa fa-fw fa-bookmark" url="/customer/bookmarks.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
 
-                            <p:submenu label="Admin" icon="pi pi-star" rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}">
-                                <p:menuitem value="Manage User" icon="pi pi-user-edit" url="/admin/users.xhtml" rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}"/>
-                                <p:menuitem value="Manage media" icon="pi pi-list" url="/admin/media.xhtml"/>
+                            <p:submenu label="Admin" icon="fa fa-fw fa-star" rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}">
+                                <p:menuitem value="Manage User" icon="fa fa-fw fa-user-plus" url="/admin/users.xhtml" rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}"/>
+                                <p:menuitem value="Manage media" icon="fa fa-fw fa-list" url="/admin/media.xhtml"/>
                             </p:submenu>
-                            <p:submenu label="User" icon="pi pi-user">
-                                <p:menuitem value="Settings" icon="pi pi-cog" url="/secured/user_settings.xhtml"/>
-                                <p:menuitem value="Logout" icon="pi pi-sign-out" url="/logout"/>
+                            <p:submenu label="User" icon="fa fa-fw fa-user">
+                                <p:menuitem value="Settings" icon="fa fa-fw fa-cog" url="/secured/user_settings.xhtml"/>
+                                <p:menuitem value="Logout" icon="fa fa-fw fa-sign-out" url="/logout"/>
                             </p:submenu>
                         </c:when>
 
                         <c:otherwise>
-                            <p:menuitem value="Login" icon="pi pi-key" url="/login.xhtml"/>
+                            <p:menuitem value="Login" icon="fa fa-fw fa-key" url="/login.xhtml"/>
                         </c:otherwise>
                     </c:choose>
                 </p:menubar>

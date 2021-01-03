@@ -22,6 +22,7 @@ public class CustomServletContextInitializer implements ServletContextInitialize
         sc.setInitParameter("javax.faces.DEFAULT_SUFFIX", ".xhtml");
         sc.setInitParameter("javax.faces.PROJECT_STAGE", "Development");
         sc.setInitParameter("primefaces.THEME", "nova-light");
+        sc.setInitParameter("primefaces.FONT_AWESOME", "true");
 
         Locale.setDefault(new Locale("EN"));
     }

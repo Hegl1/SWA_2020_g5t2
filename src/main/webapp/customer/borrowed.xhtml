@@ -26,7 +26,7 @@
                     <h:outputText value="#{borrowService.getThatTitle(borrowed)}"/>
                 </p:column>
                 <p:column headerText="restore">
-                    <p:commandButton icon="pi pi-times" action="#{borrowService.unBorrowMedia(borrowed)}" title="restore now" update=":borrowedForm:borrowedTable" />
+                    <p:commandButton icon="fa fa-fw fa-times" action="#{borrowService.unBorrowMedia(borrowed)}" title="restore now" update=":borrowedForm:borrowedTable" />
                 </p:column>
 
             </p:dataTable>
