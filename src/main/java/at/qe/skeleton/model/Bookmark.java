@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 
 import org.springframework.data.domain.Persistable;
 
@@ -16,7 +17,8 @@ public class Bookmark implements Serializable, Persistable<Long> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@SequenceGenerator(name = "bookmark_sequence", initialValue = 10)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bookmark_sequence")
 	private Long bookmarkID;
 
 	@ManyToOne

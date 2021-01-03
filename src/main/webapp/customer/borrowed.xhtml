@@ -19,14 +19,14 @@
                 </p:column>
                 <p:column headerText="Type">
                     <!--                    <h:outputText value="Picture of a Book / Sheet / DVD"/>-->
-                    <h:outputText value="#{borrowService.getThatType_borrowed(borrowed)}"/>
+                    <h:outputText value="#{borrowService.getMediaTypeAsString(borrowed)}"/>
                 </p:column>
                 <p:column headerText="Title">
                     <!--                    <h:outputText value="Name of the Media"/>-->
-                    <h:outputText value="#{borrowService.getThatTitle(borrowed)}"/>
+                    <h:outputText value="#{borrowService.getMediaTitle(borrowed)}"/>
                 </p:column>
                 <p:column headerText="restore">
-                    <p:commandButton icon="pi pi-times" action="#{borrowService.unBorrowMedia(borrowed)}" title="restore now" update=":borrowedForm:borrowedTable" />
+                    <p:commandButton icon="pi pi-times" action="#{borrowService.unBorrowMediaForAuthenticatedUser(borrowed.media)}" title="restore now" update=":borrowedForm:borrowedTable" />
                 </p:column>
 
             </p:dataTable>

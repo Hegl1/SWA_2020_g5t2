@@ -1,35 +1,20 @@
 package at.qe.skeleton.repositories;
 
-import at.qe.skeleton.model.Bookmark;
-import at.qe.skeleton.model.Media;
-import org.springframework.data.jpa.repository.Modifying;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.transaction.Transactional;
-import java.util.List;
+import at.qe.skeleton.model.Bookmark;
+import at.qe.skeleton.model.Media;
 
 public interface BookmarkRepository extends AbstractRepository<Bookmark, Long> {
 
 	Bookmark findFirstByBookmarkID(Long bookmarkID);
 
-//	Bookmark findFirstByUser(User user);
-
 	Bookmark findFirstByMedia(Media media);
 
-	void delete(@Param("bookmark") Bookmark bookmark);
-
-
-	@Modifying
-	@Transactional
-	@Query(value = "INSERT INTO BOOKMARK " +
-		"(MEDIA_MEDIAID, USER_USERNAME) "
-		+ "VALUES " + "(:#{#media.mediaID} , + :username)", nativeQuery = true)
-	void add(@Param("media") Media media, @Param("username") String username);
-
-
-	@Query(value = "SELECT *" + " FROM BOOKMARK b" + " WHERE b.USER_USERNAME = :myCurrentUser", nativeQuery = true)
-	List<Bookmark> findMine(@Param("myCurrentUser") String myCurrentUser);
-
+	@Query(value = "SELECT *" + " FROM BOOKMARK b" + " WHERE b.USER_USERNAME = :user", nativeQuery = true)
+	List<Bookmark> findByUsername(@Param("user") String user);
 
 }

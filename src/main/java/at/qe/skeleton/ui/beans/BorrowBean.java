@@ -1,32 +1,30 @@
 package at.qe.skeleton.ui.beans;
 
-import at.qe.skeleton.services.BorrowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import at.qe.skeleton.services.BorrowService;
 
 @Component
 @Scope("request")
 public class BorrowBean {
 
-    @Autowired
-    private BorrowService borrowService2;
+	@Autowired
+	private BorrowService borrowService;
 
-    public String action;
+	public String targetMedia;
 
-    public String getAction() {
-        return action;
-    }
+	public String getTargetMedia() {
+		return targetMedia;
+	}
 
-    public void setAction(String action) {
-        this.action = action;
-    }
+	public void setTargetMedia(final String action) {
+		this.targetMedia = action;
+	}
 
-    public void editAction() {
-        //now the action property contains the parameter
-        System.out.println(action);
-        borrowService2.borrowMediaForAuthenticatedUser(action);
-//        return "abc";   // redirect to media/"abc".xhtml
-    }
+	public void editTargetMedia() {
+		borrowService.borrowMediaForAuthenticatedUser(targetMedia);
+	}
 
 }

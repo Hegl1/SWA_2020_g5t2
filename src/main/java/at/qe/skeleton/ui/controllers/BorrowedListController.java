@@ -33,8 +33,6 @@ public class BorrowedListController implements Serializable {
      * @return all borrowed things of the logged in user
      */
     public Collection<Borrowed> getBorroweds() {
-
-        System.out.println("In borrow controller - fetching borrowed things with current user");
         return borrowService.getAllBorrowsByAuthenticatedUser();
     }
 
