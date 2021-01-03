@@ -61,23 +61,23 @@ public class MediaService {
      */
 
     public Media loadMedia(final Long mediaId) {
-        return this.mediaRepository.findById(mediaId);
+        return this.mediaRepository.findFirstByMediaID(mediaId);
     }
 
     public Media loadAudioBook(final Long mediaId) {
-        return this.audioBookRepository.findById(mediaId);
+        return this.audioBookRepository.findFirstByMediaID(mediaId);
     }
 
     public Media loadBook(final Long mediaId) {
-        return this.bookRepository.findById(mediaId);
+        return this.bookRepository.findFirstByMediaID(mediaId);
     }
 
     public Media loadMagazine(final Long mediaId) {
-        return this.magazineRepository.findById(mediaId);
+        return this.magazineRepository.findFirstByMediaID(mediaId);
     }
 
     public Media loadVideo(final Long mediaId) {
-        return this.videoRepository.findById(mediaId);
+        return this.videoRepository.findFirstByMediaID(mediaId);
     }
 
 
