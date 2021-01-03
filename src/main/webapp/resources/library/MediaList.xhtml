@@ -39,17 +39,25 @@
                 <p:column headerText="Title">
                     <h:outputText value="#{media.title}"/>
                 </p:column>
-                <p:column headerText="Type">
+                <p:column headerText="Type" style="width: 8rem; text-align: center">
                     <h:outputText value="#{media.mediaTypeHuman}"/>
                 </p:column>
-                <p:column headerText="Language">
+                <p:column headerText="Language" style="width: 6rem; text-align: center">
                     <h:outputText value="#{media.languageHuman}"/>
                 </p:column>
                 <p:column headerText="Publishing Year" style="width: 8rem; text-align: center">
                     <h:outputText value="#{media.publishingYear}"/>
                 </p:column>
+                <p:column headerText="Due date" style="width: 5rem; text-align: center" rendered="#{cc.attrs.context == 'borrowed'}">
+                    <h:outputText value="#{borrowedListController.getBorrowedDueDate(row)}" >
+                        <f:convertDateTime pattern="dd.MM.yyyy" />
+                    </h:outputText>
+                </p:column>
                 <p:column headerText="Bookmark" style="width: 5rem; text-align: center" rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}">
-                    <p:commandButton icon="fa fa-fw fa-bookmark#{bookmarkService.isBookmarkedForAuthenticatedUser(media) ? '' : '-o'}" action="#{bookmarkService.toggleBookmark(media)}" title="Toggle bookmark" update="@parent" />
+                    <p:commandButton icon="fa fa-fw fa-bookmark#{bookmarkService.isBookmarkedForAuthenticatedUser(media) ? '' : '-o'}" action="#{bookmarkService.toggleBookmark(media)}" title="Toggle bookmark" update="@form" />
+                </p:column>
+                <p:column headerText="Return" style="width: 5rem; text-align: center" rendered="#{cc.attrs.context == 'borrowed'}">
+                    <p:commandButton icon="fa fa-fw fa-times" action="#{borrowService.unBorrowMediaForAuthenticatedUser(media)}" title="Return media" update="@form" />
                 </p:column>
             </p:dataTable>
 
@@ -72,7 +80,7 @@
                         <p:inputText style="width:250px" id="mTotalAvail" value="#{mediaDetailController.media.totalAvail}" disabled="true"/>
 
                         <p:commandButton action="#{borrowBean.editTargetMedia}" value="Borrow" id="borrowButton"  style="margin-right:20px;" icon="fa fa-fw fa-plus-square-o"
-                                         oncomplete="PF('mediaListDialog').hide()" update="@form:mediaTable" >
+                                         oncomplete="PF('mediaListDialog').hide()" update="@form:mediaTable" rendered="#{cc.attrs.context != 'borrowed'}">
                             <f:setPropertyActionListener target="#{borrowBean.targetMedia}" value="#{mediaDetailController.media.mediaID}"/>
                         </p:commandButton>
 
