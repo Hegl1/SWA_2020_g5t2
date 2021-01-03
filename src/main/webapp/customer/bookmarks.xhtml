@@ -17,16 +17,16 @@
                 </p:column>
                 <p:column headerText="Type">
 <!--                    <h:outputText value="Picture of a Book / Sheet / DVD"/>-->
-                    <h:outputText value="#{bookmarkService.getThatType(bookmark)}"/>
+                    <h:outputText value="#{bookmarkService.getMediaTypeAsString(bookmark)}"/>
                 </p:column>
                 <p:column headerText="Title">
 <!--                    <h:outputText value="Name of the Media"/>-->
-                    <h:outputText value="#{bookmarkService.getThatTitle(bookmark)}"/>
+                    <h:outputText value="#{bookmarkService.getMediaTitle(bookmark)}"/>
 
                 </p:column>
                 <p:column headerText="Additional Information">
 <!--                    <h:outputText value="Author / Series / Lenght "/>-->
-                    <h:outputText value="#{bookmarkService.getThatAddInfo(bookmark)}"/>
+                    <h:outputText value="#{bookmarkService.getMediaInfo(bookmark)}"/>
                 </p:column>
                 <p:column headerText="Status">
 <!--                    <h:outputText value="free / occupied"/>-->
