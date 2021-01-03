@@ -3,13 +3,14 @@ package at.qe.skeleton.ui.controllers;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.UserService;
-import java.io.Serializable;
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Controller for the user detail view.
@@ -42,7 +43,7 @@ public class UserDetailController implements Serializable {
      */
     public void setUser(final User user) {
         this.user = user;
-        this.doReloadUser();
+        //this.doReloadUser();
     }
 
     /**
@@ -52,6 +53,14 @@ public class UserDetailController implements Serializable {
      */
     public User getUser() {
         return this.user;
+    }
+    
+    public void setNewRolesString(List<String> roles){
+    	this.newRolesString = roles;
+    }
+    
+    public List<String> getNewRolesString(){
+    	return newRolesString;
     }
 
     /**
@@ -82,6 +91,9 @@ public class UserDetailController implements Serializable {
      */
     public void doSaveUser() {
         this.user = this.userService.saveUser(this.user);
+
+        FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_INFO, "Changes saved!",  "" );
+        FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
     }
 
     /**
@@ -90,6 +102,9 @@ public class UserDetailController implements Serializable {
     public void doDeleteUser() {
         try {
             this.userService.deleteUser(this.user);
+
+            FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_WARN, "User was deleted!",  "" );
+            FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
         } catch (UserService.UnauthorizedActionException unauthorizedActionException) {
             System.out.println(unauthorizedActionException.getMessage());
             // TODO: Exception-Handling

@@ -1,12 +1,52 @@
+
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
                 template="/WEB-INF/templates/main.xhtml">
-    <ui:define name ="content">
-        Media list and search
+    <ui:define name="content">
+        <style type="text/css">
+            #mediaTable tr{
+                transition: background 0.2s;
+            }
+            #mediaTable tr:hover{
+                background: rgba(0, 0, 0, 0.1);
+            }
+        </style>
 
+        <p:messages for="asMessage" />
+        <p:growl for="asGrowl" closable="true" showDetail="true" showSummary="true" redisplay="true">
+            <p:autoUpdate />
+        </p:growl>
+
+        <h:form id="filter" style="margin-bottom: 15px">
+            <p:accordionPanel activeIndex="-2">
+                <p:tab title="Search">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="@next" value="Search:" />
+                        <p:inputText id="title_filter" value="" />
+
+                        <p:outputLabel for="@next" value="Type:" />
+                        <p:selectOneMenu id="type_filter" value="">
+                            <f:selectItem itemLabel="Any" itemValue="" />
+                            <f:selectItem itemLabel="Book" itemValue="BOOK" />
+                            <f:selectItem itemLabel="Audiobook" itemValue="AUDIOBOOK" />
+                            <f:selectItem itemLabel="Video" itemValue="VIDEO" />
+                            <f:selectItem itemLabel="Magazine" itemValue="MAGAZINE" />
+                        </p:selectOneMenu>
+
+                        <p:outputLabel for="@next" value="Language:" />
+                        <p:selectOneMenu id="language_filter" value="" dynamic="true">
+                            <f:selectItem itemLabel="Any" itemValue="" />
+                            <f:selectItems value="#{mediaListController.allLanguages}" />
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                </p:tab>
+            </p:accordionPanel>
+        </h:form>
+
+        <lib:MediaList mediaList="#{mediaListController.media}" context="list"></lib:MediaList>
     </ui:define>
 </ui:composition>

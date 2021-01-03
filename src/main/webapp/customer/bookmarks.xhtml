@@ -1,68 +1,16 @@
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
-        My Bookmarks
-        <h:form id="bookmarkForm">
+        Bookmarks
 
-            <p:dataTable id="bookmarksTable" var="bookmark" value="#{bookmarkListController.bookmarks}">
-                <f:facet name="header">
+        <p:messages for="asMessage" />
+        <p:growl for="asGrowl" closable="true" showDetail="true" showSummary="true" redisplay="true">
+            <p:autoUpdate />
+        </p:growl>
 
-                </f:facet>
-                <p:column headerText="Bookmark ID">
-                    <h:outputText value="#{bookmark.bookmarkID}"/>
-                </p:column>
-                <p:column headerText="Bookmark user">
-                    <h:outputText value="#{bookmark.user}"/>
-                </p:column>
-                <p:column headerText="Bookmark Media">
-                    <h:outputText value="#{bookmark.media}"/>
-                </p:column>
-
-
-
-            </p:dataTable>
-
-        </h:form>
-        später:
-        <h:form id="bookmarkForm2">
-
-            <p:dataTable id="bookmarksTable2" var="bookmark" value="#{bookmarkListController.bookmarks}">
-                <f:facet name="header">
-
-                </f:facet>
-                <p:column headerText="Nr">
-                    <h:outputText value="#{bookmark.bookmarkID}"/>
-                </p:column>
-                <p:column headerText="Type">
-                    <h:outputText value="Picture of a Book / Sheet / DVD"/>
-                </p:column>
-                <p:column headerText="Title">
-                    <h:outputText value="Name of the Media"/>
-                </p:column>
-                <p:column headerText="Publisher">
-                    <h:outputText value="Name of the Publisher"/>
-                </p:column>
-                <p:column headerText="Status">
-                    <h:outputText value="free / occupied"/>
-                </p:column>
-                <p:column headerText="book request">
-                    <p:commandButton icon="pi pi-ticket" />
-                </p:column>
-                <p:column headerText="add to Wishlist">
-                    <p:commandButton icon="pi pi-plus" />
-                </p:column>
-                <p:column headerText="remove / options">
-                    <p:commandButton icon="pi pi-times" />
-                    / <p:commandButton icon="pi pi-ellipsis-h" />
-                </p:column>
-
-
-            </p:dataTable>
-
-        </h:form>
+        <lib:MediaList mediaList="#{bookmarkListController.bookmarks}" context="bookmarks" />
     </ui:define>
 </ui:composition>

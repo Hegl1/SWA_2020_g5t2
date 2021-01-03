@@ -1,14 +1,9 @@
 package at.qe.skeleton.model;
 
-import java.io.Serializable;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-
 import org.springframework.data.domain.Persistable;
+
+import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 public class Bookmark implements Serializable, Persistable<Long> {
@@ -16,7 +11,8 @@ public class Bookmark implements Serializable, Persistable<Long> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(name = "bookmark_sequence", initialValue = 10)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bookmark_sequence")
 	private Long bookmarkID;
 
 	@ManyToOne

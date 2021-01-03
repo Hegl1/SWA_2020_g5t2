@@ -1,7 +1,6 @@
 package at.qe.skeleton.model;
 
 import javax.persistence.Entity;
-import java.util.Date;
 
 @Entity
 public class Magazine extends Media {
@@ -10,10 +9,10 @@ public class Magazine extends Media {
 
 	private String series;
 
-	public Magazine(final String title, final Date publishingDate, final String language,
+	public Magazine(final String title, final int publishingYear, final String language,
 					final int totalAvail, final MediaType mediaType, final String series) {
 		
-		super(title, publishingDate, language, totalAvail, mediaType);
+		super(title, publishingYear, language, totalAvail, mediaType);
 		this.series = series;
 	}
 

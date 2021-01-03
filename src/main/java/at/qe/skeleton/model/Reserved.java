@@ -1,17 +1,10 @@
 package at.qe.skeleton.model;
 
+import org.springframework.data.domain.Persistable;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.springframework.data.domain.Persistable;
 
 @Entity
 public class Reserved implements Serializable, Persistable<Long> {
@@ -19,7 +12,8 @@ public class Reserved implements Serializable, Persistable<Long> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(name = "borrow_sequence", initialValue = 10)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "borrow_sequence")
 	private Long reservedID;
 
 	@ManyToOne
@@ -30,6 +24,16 @@ public class Reserved implements Serializable, Persistable<Long> {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date reserveTime;
+
+	public Reserved() {
+	}
+
+	public Reserved(final User user, final Media media, final Date timestamp) {
+		this();
+		this.user = user;
+		this.media = media;
+		this.reserveTime = timestamp;
+	}
 
 	public Long getReservedID() {
 		return this.reservedID;

@@ -7,6 +7,8 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
+        <p:messages for="asMessage" />
+        <p:growl for="asGrowl" closable="true"  showDetail="=true" showSummary="true" redisplay="true"  >  <p:autoUpdate /> </p:growl>
         <h:form id="userForm">
             <p:dataTable id="usersTable" var="user" value="#{userListController.users}">
                 <f:facet name="header">
@@ -28,10 +30,10 @@
                     <h:selectBooleanCheckbox value="#{user.enabled}" disabled="true"/>
                 </p:column>
                 <p:column style="width:100px;text-align: center">
-                    <p:commandButton update=":userForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="ui-icon-note" title="Bearbeiten">
+                    <p:commandButton update=":userForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="fa fa-fw fa-edit" title="Bearbeiten">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                     </p:commandButton>
-                    <p:commandButton action="#{userDetailController.doDeleteUser}" icon="ui-icon-trash" title="Löschen" update=":userForm:usersTable">
+                    <p:commandButton action="#{userDetailController.doDeleteUser}" icon="fa fa-fw fa-trash" title="Löschen" update=":userForm:usersTable">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                         <p:confirm header="Nutzer entfernen" message="Soll dieser Benutzer wirklich unwiderruflich gelöscht werden?" icon="ui-icon-alert" />
                     </p:commandButton>
@@ -61,6 +63,7 @@
                         <p:selectManyButton value="#{userDetailController.newRolesString}">
                             <f:selectItem itemLabel="Bibliothekar" itemValue="librarian" />
                             <f:selectItem itemLabel="Administrator" itemValue="admin" />
+                            <f:selectItem itemLabel="Kunde" itemValue="customer" />
                         </p:selectManyButton>
                         
                         

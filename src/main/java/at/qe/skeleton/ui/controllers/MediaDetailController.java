@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Date;
 
 
 /**
@@ -20,7 +18,7 @@ import java.util.Date;
 public class MediaDetailController implements Serializable {
 
     @Autowired
-    private MediaService mediaService;
+    MediaService mediaService;
 
 
     /**
@@ -39,40 +37,9 @@ public class MediaDetailController implements Serializable {
 
 
     /**
-     * Search in Media by Title
+     * Returns the currently displayed media.
      */
-    public Media doSearchMediaByTitle(final String title) {
-        return this.mediaService.searchMediaByTitle(title);
-    }
-
-
-    /**
-     * Filter a Collection of Media by different properties.
-     */
-
-    public Collection<Media> doFilterMediaByAvailability(final Collection<Media> mediaList, final boolean isAvailable) {
-        return this.mediaService.filterMediaByAvailability(mediaList, isAvailable);
-    }
-
-    public Collection<Media> doFilterMediaByLanguage(final Collection<Media> mediaList, final String language) {
-        return this.mediaService.filterMediaByLanguage(mediaList, language);
-    }
-
-    public Collection<Media> doFilterMediaByType(final Collection<Media> mediaList, final MediaType mediaType) {
-        return this.mediaService.filterMediaByType(mediaList, mediaType);
-    }
-
-    public Collection<Media> doFilterMediaByAvailability(final boolean isAvailable) {
-        return this.mediaService.filterMediaByAvailability(isAvailable);
-    }
-
-    public Collection<Media> doFilterMediaByLanguage(final String language) {
-        return this.mediaService.filterMediaByLanguage(language);
-    }
-
-    public Collection<Media> doFilterMediaByType(final MediaType mediaType) {
-        return this.mediaService.filterMediaByType(mediaType);
-    }
+    public Media getMedia() { return media; }
 
 
     /**
@@ -89,5 +56,50 @@ public class MediaDetailController implements Serializable {
     public void doSaveMedia() {
         this.media = this.mediaService.saveMedia(this.media);
     }
+
+
+    /**
+     * Create different Medias.
+     */
+
+    public void doCreateAudioBook(final String title, final int publishingDate, final String language,
+                                  final int totalAvail, final MediaType mediaType, final String speaker,
+                                  final int length, final String author, final String ISBN) {
+
+        this.mediaService.createAudioBook(title, publishingDate, language, totalAvail, mediaType, speaker, length, author, ISBN);
+        // this.doReloadMedia();
+    }
+
+    public void doCreateBook(final String title, final int publishingDate, final String language, final int totalAvail,
+                             final MediaType mediaType, final String author, final String ISBN) {
+
+        this.mediaService.createBook(title, publishingDate, language, totalAvail, mediaType, author, ISBN);
+        // this.doReloadMedia();
+    }
+
+    public void doCreateMagazine(final String title, final int publishingDate, final String language,
+                                 final int totalAvail, final MediaType mediaType, final String series) {
+
+        this.mediaService.createMagazine(title, publishingDate, language, totalAvail, mediaType, series);
+        // this.doReloadMedia();
+    }
+
+    public void doCreateVideo(final String title, final int publishingDate, final String language,
+                              final int totalAvail, final MediaType mediaType, final int length) {
+
+        this.mediaService.createVideo(title, publishingDate, language, totalAvail, mediaType, length);
+        // this.doReloadMedia();
+    }
+
+
+    /**
+     * Action to delete the currently displayed media.
+     */
+    public void doDeleteMedia(final Media media) {
+        this.mediaService.deleteMedia(media);
+        this.media = null;
+    }
+
+
 
 }

@@ -1,13 +1,12 @@
 package at.qe.skeleton.model;
 
-import java.io.Serializable;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-
-import org.springframework.data.domain.Persistable;
+import java.io.Serializable;
 
 @Entity
 public class MediaBorrowTime implements Serializable, Persistable<MediaType> {

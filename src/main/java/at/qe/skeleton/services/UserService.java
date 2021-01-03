@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 public class UserService {
 
 	@Autowired
-	private UserRepository userRepository;
+	UserRepository userRepository;
 
 	/**
 	 * Returns a collection of all users.
@@ -86,7 +86,6 @@ public class UserService {
 				String newencodedPassword = passwordEncoder.encode(user.getPassword());
 				user.setPassword(newencodedPassword);
 			}
-
 		}
 		return userRepository.save(user);
 	}
@@ -113,16 +112,12 @@ public class UserService {
 
 		for (String selected : newRolesString) {
 			switch (selected.toLowerCase()) {
-			case "librarian":
-				newRolesSet.add(UserRole.LIBRARIAN);
-				break;
-			case "admin":
-				newRolesSet.add(UserRole.ADMIN);
-				break;
-			default:
-				System.err.println(
-						"[Warning] UserService - changeUserRoles: Role \"" + selected + "\" not supported yet!");
-				return false;
+				case "librarian": 	newRolesSet.add(UserRole.LIBRARIAN); break;
+				case "admin": 		newRolesSet.add(UserRole.ADMIN); break;
+				case "customer": 	newRolesSet.add(UserRole.CUSTOMER); break;
+				default:
+					System.err.println("[Warning] UserService - changeUserRoles: Role \"" + selected + "\" not supported yet!");
+					return false;
 			}
 		}
 		user.setRoles(newRolesSet);
@@ -133,7 +128,6 @@ public class UserService {
 	/**
 	 * Creates a user.
 	 */
-	// TODO @THOMAS: needs testing
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public User createUser(final String username, final String password, final String firstName, final String lastName,
 			final Boolean enabled, final UserRole roles, final String email)
@@ -168,10 +162,8 @@ public class UserService {
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void deleteUser(final User user) throws UnauthorizedActionException {
 
-		// TODO: potential issue, that an Admin has less rights if he has the
-		// Librarian-Role as wel
-		// this problem should not occur, if only one Role is allowed in the Constructor
-		// and Setter of the User
+		// TODO: potential issue, that an Admin has less rights if he has the Librarian-Role as well
+		// this problem should not occur, if only one Role is allowed in the Constructor and Setter of the User
 
 		if (this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN)
 				&& user.getRoles().contains(UserRole.ADMIN)) {
@@ -191,6 +183,7 @@ public class UserService {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		return this.userRepository.findFirstByUsername(auth.getName());
 	}
+
 
 	/**
 	 * Custom Exceptions
