@@ -54,7 +54,7 @@ public class BorrowService implements CommandLineRunner {
 	@Autowired
 	UserService userService;
 
-	Logger logger = LoggerFactory.getLogger(BorrowService.class);
+	private Logger logger = LoggerFactory.getLogger(BorrowService.class);
 
 	/**
 	 * Method that borrows Media for a customer.
@@ -75,7 +75,8 @@ public class BorrowService implements CommandLineRunner {
 		}
 	}
 
-	// TODO probably refactor, put link between link parameter and media in controller
+	// TODO probably refactor, put link between link parameter and media in
+	// controller
 	public boolean borrowMedia(final User borrower, final String linkParameter) {
 		Long linkParameterLong = Long.parseLong(linkParameter);
 
@@ -219,10 +220,15 @@ public class BorrowService implements CommandLineRunner {
 	}
 
 	/**
-	 * the following 2 functions return type specific information about the borrowed media
-	 * */
-	public String getThatType_borrowed(final Borrowed borrowed) {   return borrowed.getMedia().getMediaType().toString(); }
+	 * the following 2 functions return type specific information about the borrowed
+	 * media
+	 */
+	public String getMediaTypeAsString(final Borrowed borrowed) {
+		return borrowed.getMedia().getMediaType().toString();
+	}
 
-	public String getThatTitle(final Borrowed borrowed) {   return borrowed.getMedia().getTitle(); }
+	public String getMediaTitle(final Borrowed borrowed) {
+		return borrowed.getMedia().getTitle();
+	}
 
 }
