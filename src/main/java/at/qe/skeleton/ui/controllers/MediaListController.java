@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -66,5 +68,7 @@ public class MediaListController implements Serializable {
     public Collection<Media> doFilterMediaByType(final MediaType mediaType) {
         return this.mediaService.filterMediaByType(mediaType);
     }
+
+
 
 }

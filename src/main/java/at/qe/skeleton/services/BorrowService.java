@@ -27,6 +27,9 @@ import at.qe.skeleton.repositories.MediaRepository;
 import at.qe.skeleton.repositories.ReservedRepository;
 import at.qe.skeleton.repositories.UserRepository;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
 @Component
 @Scope("application")
 public class BorrowService implements CommandLineRunner {
@@ -75,17 +78,14 @@ public class BorrowService implements CommandLineRunner {
 		}
 	}
 
-	// TODO probably refactor, put link between link parameter and media in
-	// controller
 	public boolean borrowMedia(final User borrower, final String linkParameter) {
-		Long linkParameterLong = Long.parseLong(linkParameter);
 
+		Long linkParameterLong = Long.parseLong(linkParameter);
 		Media mediaToBorrow;
-		if (linkParameter != null) {
-			mediaToBorrow = mediaRepository.findFirstByMediaID(linkParameterLong);
-		} else {
-			mediaToBorrow = mediaRepository.findFirstByMediaID(1L);
-		}
+		mediaToBorrow = mediaRepository.findFirstByMediaID(linkParameterLong);
+		FacesContext context = FacesContext.getCurrentInstance();
+		context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "The media was borrowed.", "" ));
+
 		return borrowMedia(borrower, mediaToBorrow);
 	}
 
@@ -104,7 +104,10 @@ public class BorrowService implements CommandLineRunner {
 		for (Reserved current : reservations) {
 			unreserveMedia(current);
 		}
+		FacesContext context = FacesContext.getCurrentInstance();
+		context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "The media was returned.", "" ));
 	}
+
 
 	public void unBorrowMedia(final User borrower, final Media mediaToUnBorrow) {
 		unBorrowMedia(borrowedRepository.findFirstByUserAndMedia(borrower, mediaToUnBorrow));
@@ -119,6 +122,7 @@ public class BorrowService implements CommandLineRunner {
 	public Collection<Borrowed> getAllBorrows() {
 		return borrowedRepository.findAll();
 	}
+
 
 	public Collection<Borrowed> getAllBorrowsByUser(final User user) {
 		return borrowedRepository.findByUser(user);

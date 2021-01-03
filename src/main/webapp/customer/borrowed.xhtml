@@ -10,6 +10,9 @@
         Borrowed
         <h:form id="borrowedForm">
 
+            <p:messages for="asMessage" />
+            <p:growl for="asGrowl" closable="true"  showDetail="=true" showSummary="true"  >  <p:autoUpdate /> </p:growl>
+
             <p:dataTable id="borrowedTable" var="borrowed" value="#{borrowedListController.borroweds}">
                 <f:facet name="header">
 
@@ -18,11 +21,9 @@
                     <h:outputText value="#{borrowed.borrowID}"/>
                 </p:column>
                 <p:column headerText="Type">
-                    <!--                    <h:outputText value="Picture of a Book / Sheet / DVD"/>-->
                     <h:outputText value="#{borrowService.getMediaTypeAsString(borrowed)}"/>
                 </p:column>
                 <p:column headerText="Title">
-                    <!--                    <h:outputText value="Name of the Media"/>-->
                     <h:outputText value="#{borrowService.getMediaTitle(borrowed)}"/>
                 </p:column>
                 <p:column headerText="restore">

@@ -2,6 +2,10 @@ package at.qe.skeleton.services;
 
 import java.util.Collection;
 
+import at.qe.skeleton.model.Book;
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.repositories.BookmarkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -10,6 +14,11 @@ import at.qe.skeleton.model.Bookmark;
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.BookmarkRepository;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
+
 
 /**
  * Service for listing the customers own bookmarks.
@@ -27,7 +36,7 @@ public class BookmarkService {
 
 	/**
 	 * Returns a collection of all the bookmarks.
-	 * 
+	 *
 	 * @return all bookmarks in the database
 	 */
 	public Collection<Bookmark> getAllBookmarks() {
@@ -68,37 +77,38 @@ public class BookmarkService {
 
 	public String getMediaInfo(final Bookmark bookmark) {
 
-		switch (bookmark.getMedia().getMediaType().toString()) {
-		case "BOOK":
-			return "Book - Author";
+        switch (bookmark.getMedia().getMediaType().toString()) {
+            case "BOOK":
+                return "Book - author";
 
-		case "AUDIOBOOK":
-			return "AudioBook - Author";
+            case "AUDIOBOOK":
+                return "Audiobook - author";
 
-		case "MAGAZINE":
-			return "Magazine - Serie";
+            case "MAGAZINE":
+                return "Magazine - series";
 
-		case "VIDEO":
-			return "Video - Länge";
+            case "VIDEO":
+                return "Video - length";
 
-		default:
-			return "non defined media type";
-		}
-	}
+            default:
+                return "Media type not defined";
+        }
+    }
 
-	public String getIfCurrentBorrowed(final Bookmark bookmark) {
+    public String getIfCurrentBorrowed(final Bookmark bookmark) {
 
-		switch (bookmark.getMedia().getCurBorrowed()) {
-		case 0:
-			return "0 - free";
+        switch (bookmark.getMedia().getCurBorrowed()) {
+            case 0:
+                return "available";
 
-		case 1:
-			return "1 - occupied";
+            case 1:
+                return "not available";
 
-		default:
-			return "no status available";
-		}
-	}
+            default:
+                return "availability status not defined";
+        }
+    }
+
 
 	/**
 	 * Deletes the bookmark.
@@ -107,8 +117,10 @@ public class BookmarkService {
 	 */
 	public void deleteBookmark(final Bookmark bookmark) {
 
-		bookmarkRepository.delete(bookmark);
-	}
+            bookmarkRepository.delete(bookmark);
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_FATAL, "Bookmark was removed.",  "") );
+        }
 
 	/**
 	 * add a bookmark.
@@ -124,7 +136,13 @@ public class BookmarkService {
 			mark.setMedia(media);
 			mark.setUser(myUser);
 			bookmarkRepository.save(mark);
-		}
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Bookmark was added.", "" ));
+		}else {
+            FacesContext context = FacesContext.getCurrentInstance();
+            FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_WARN, "Bookmark was already made!",  "" );
+            FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
+        }
 	}
 
 }

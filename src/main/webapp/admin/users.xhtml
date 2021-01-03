@@ -7,6 +7,8 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
+        <p:messages for="asMessage" />
+        <p:growl for="asGrowl" closable="true"  showDetail="=true" showSummary="true" redisplay="true"  >  <p:autoUpdate /> </p:growl>
         <h:form id="userForm">
             <p:dataTable id="usersTable" var="user" value="#{userListController.users}">
                 <f:facet name="header">

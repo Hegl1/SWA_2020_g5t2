@@ -8,6 +8,10 @@
         My Bookmarks
         <h:form id="bookmarkForm">
 
+            <p:messages for="asMessage" />
+            <p:growl for="asGrowl" closable="true"  showDetail="=true" showSummary="true" redisplay="true"  >  <p:autoUpdate /> </p:growl>
+            <p:growl autoUpdate="true"/>
+
             <p:dataTable id="bookmarksTable" var="bookmark" value="#{bookmarkListController.bookmarks}">
                 <f:facet name="header">
 
@@ -16,31 +20,25 @@
                     <h:outputText value="#{bookmark.bookmarkID}"/>
                 </p:column>
                 <p:column headerText="Type">
-<!--                    <h:outputText value="Picture of a Book / Sheet / DVD"/>-->
                     <h:outputText value="#{bookmarkService.getMediaTypeAsString(bookmark)}"/>
                 </p:column>
                 <p:column headerText="Title">
-<!--                    <h:outputText value="Name of the Media"/>-->
                     <h:outputText value="#{bookmarkService.getMediaTitle(bookmark)}"/>
 
                 </p:column>
                 <p:column headerText="Additional Information">
-<!--                    <h:outputText value="Author / Series / Lenght "/>-->
                     <h:outputText value="#{bookmarkService.getMediaInfo(bookmark)}"/>
                 </p:column>
                 <p:column headerText="Status">
-<!--                    <h:outputText value="free / occupied"/>-->
                     <h:outputText value="#{bookmarkService.getIfCurrentBorrowed(bookmark)}"/>
                 </p:column>
                 <p:column headerText="book request">
-                    <p:commandButton icon="fa fa-fw fa-ticket" />
+                    <p:commandButton action="#{borrowBean.editAction}" id="borrowRequestButton"  style="margin-right:20px;" icon="fa fa-fw fa-ticket"   >
+                        <f:setPropertyActionListener target="#{borrowBean.action}" value="#{mediaListController.doSearchMediaByTitle(bookmarkService.getMediaTitle(bookmark)).mediaID}"/>
+                    </p:commandButton>
                 </p:column>
                 <p:column headerText="remove">
                     <p:commandButton icon="fa fa-fw fa-times" action="#{bookmarkService.deleteBookmark(bookmark)}" title="delete" update=":bookmarkForm:bookmarksTable" />
-                </p:column>
-                <p:column headerText="options">
-                    <p:commandButton icon="fa fa-fw fa-ellipsis-h"  />
-
                 </p:column>
 
             </p:dataTable>

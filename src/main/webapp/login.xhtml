@@ -6,7 +6,9 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://java.sun.com/jstl/core"
                 template="/WEB-INF/templates/main.xhtml">
+
     <ui:define name ="content">
+
         <form id="login_form" action="#{request.contextPath}/login" method="post">
             <h:panelGrid columns="2">
                 <p:outputLabel for="username" value="Username:"/>

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 
 
@@ -99,5 +101,7 @@ public class MediaDetailController implements Serializable {
         this.mediaService.deleteMedia(media);
         this.media = null;
     }
+
+
 
 }
