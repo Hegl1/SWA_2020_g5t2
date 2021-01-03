@@ -33,13 +33,13 @@
                     <h:outputText value="#{bookmarkService.getIfCurrentBorrowed(bookmark)}"/>
                 </p:column>
                 <p:column headerText="book request">
-                    <p:commandButton icon="pi pi-ticket" />
+                    <p:commandButton icon="fa fa-fw fa-ticket" />
                 </p:column>
                 <p:column headerText="remove">
-                    <p:commandButton icon="pi pi-times" action="#{bookmarkService.deleteBookmark(bookmark)}" title="delete" update=":bookmarkForm:bookmarksTable" />
+                    <p:commandButton icon="fa fa-fw fa-times" action="#{bookmarkService.deleteBookmark(bookmark)}" title="delete" update=":bookmarkForm:bookmarksTable" />
                 </p:column>
                 <p:column headerText="options">
-                    <p:commandButton icon="pi pi-ellipsis-h"  />
+                    <p:commandButton icon="fa fa-fw fa-ellipsis-h"  />
 
                 </p:column>
 
