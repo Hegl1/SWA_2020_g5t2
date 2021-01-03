@@ -32,11 +32,11 @@
                             <f:selectItem itemLabel="Magazine" itemValue="MAGAZINE" />
                         </p:selectOneMenu>
 
-<!--                        <p:outputLabel for="@next" value="Language:" />-->
-<!--                        <p:selectOneMenu id="language_filter" value="" dynamic="true">-->
-<!--                            <f:selectItem itemLabel="Any" itemValue="" />-->
-<!--                            <f:selectItems value="#{mediaListController.allLanguages}" />-->
-<!--                        </p:selectOneMenu>-->
+                        <p:outputLabel for="@next" value="Language:" />
+                        <p:selectOneMenu id="language_filter" value="" dynamic="true">
+                            <f:selectItem itemLabel="Any" itemValue="" />
+                            <f:selectItems value="#{mediaListController.allLanguages}" />
+                        </p:selectOneMenu>
                     </h:panelGrid>
                 </p:tab>
             </p:accordionPanel>
@@ -83,9 +83,9 @@
                     <p:outputLabel for="mTotalAvail" value="Amount available: " />
                     <p:inputText style="width:250px" id="mTotalAvail" value="#{mediaDetailController.media.totalAvail}" disabled="true"/>
 
-                    <p:commandButton action="#{borrowBean.editAction}" value="Borrow" id="borrowButton"  style="margin-right:20px;" icon="fa fa-fw fa-plus-square-o"
+                    <p:commandButton action="#{borrowBean.editTargetMedia}" value="Borrow" id="borrowButton"  style="margin-right:20px;" icon="fa fa-fw fa-plus-square-o"
                                      oncomplete="PF('allmediaEditDialog').hide()" update=":allmediaForm:mediaTable" >
-                        <f:setPropertyActionListener target="#{borrowBean.action}" value="#{mediaDetailController.media.mediaID}"/>
+                        <f:setPropertyActionListener target="#{borrowBean.targetMedia}" value="#{mediaDetailController.media.mediaID}"/>
                     </p:commandButton>
 
                 </h:panelGrid>

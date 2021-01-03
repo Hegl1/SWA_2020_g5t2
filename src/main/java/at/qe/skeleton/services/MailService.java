@@ -5,6 +5,8 @@ import java.io.File;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.FileSystemResource;
@@ -20,6 +22,8 @@ public class MailService {
 
 	@Autowired
 	private JavaMailSender mailSender;
+
+	private Logger logger = LoggerFactory.getLogger(MailService.class);
 
 	public void sendMail(final String targetMail, final String messageSubject, final String messageContent)
 			throws MailException {
@@ -45,9 +49,8 @@ public class MailService {
 			msgHelper.addAttachment(attachmentName, attachment);
 
 			mailSender.send(msg);
-
 		} catch (MessagingException e) {
-			System.out.println("Error while constructing the msgHelper in MailService, no mail sent.");
+			logger.error("Error while constructing the msgHelper in MailService, no mail sent.");
 		}
 
 	}
