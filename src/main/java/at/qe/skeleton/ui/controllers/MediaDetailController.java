@@ -18,7 +18,7 @@ import java.io.Serializable;
 public class MediaDetailController implements Serializable {
 
     @Autowired
-    private MediaService mediaService;
+    MediaService mediaService;
 
 
     /**
@@ -35,10 +35,9 @@ public class MediaDetailController implements Serializable {
         this.doReloadMedia();
     }
 
+
     /**
      * Returns the currently displayed media.
-     *
-     * @return
      */
     public Media getMedia() { return media; }
 
