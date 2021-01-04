@@ -28,6 +28,9 @@ public class UndoRedoService {
 	UserService userService;
 
 	@Autowired
+	MediaService mediaService;
+
+	@Autowired
 	BorrowService borrowService;
 
 	@Autowired
@@ -81,12 +84,16 @@ public class UndoRedoService {
 		return new UserAction(user, type);
 	}
 
-	public ActionItem createAction(final User user, final User afterEditUser, final ActionType type) {
-		return new UserAction(user, afterEditUser, type);
+	public ActionItem createAction(final User beforeEditUser, final User afterEditUser, final ActionType type) {
+		return new UserAction(beforeEditUser, afterEditUser, type);
 	}
 
 	public ActionItem createAction(final Media media, final ActionType type) {
 		return new MediaAction(media, type);
+	}
+
+	public ActionItem createAction(final Media beforeEditMedia, final Media afterEditMedia, final ActionType type) {
+		return new MediaAction(beforeEditMedia, afterEditMedia, type);
 	}
 
 	public abstract class ActionItem {
@@ -139,7 +146,7 @@ public class UndoRedoService {
 	}
 
 	private class BookmarkAction extends ActionItem {
-
+		// TODO implement action in controller
 		protected Bookmark bookmark;
 
 		protected BookmarkAction(final Bookmark bookmark, final ActionType type) {
@@ -172,12 +179,12 @@ public class UndoRedoService {
 	}
 
 	private class UserAction extends ActionItem {
-
-		protected User user;
+		// TODO implement action in controller
+		protected User beforeEditUser;
 		protected User afterEditUser;
 
 		protected UserAction(final User user, final ActionType type) {
-			this.user = user;
+			this.beforeEditUser = user;
 			this.type = type;
 			this.afterEditUser = null;
 		}
@@ -191,14 +198,14 @@ public class UndoRedoService {
 		void performUndoAction() {
 			if (type.equals(ActionType.SAVE_USER)) {
 				try {
-					userService.deleteUser(user);
+					userService.deleteUser(beforeEditUser);
 				} catch (UnauthorizedActionException e) {
 					logger.error("Errror while undoing user actionm unauthrized deletion of user");
 				}
 			} else if (type.equals(ActionType.DELETE_USER)) {
-				userService.saveUser(user);
+				userService.saveUser(beforeEditUser);
 			} else if (type.equals(ActionType.EDIT_USER)) {
-				userService.saveUser(user);
+				userService.saveUser(beforeEditUser);
 			} else {
 				logger.error("Error while undoing user action, wrong action type");
 			}
@@ -208,10 +215,10 @@ public class UndoRedoService {
 		@Override
 		void performRedoAction() {
 			if (type.equals(ActionType.SAVE_USER)) {
-				userService.saveUser(user);
+				userService.saveUser(beforeEditUser);
 			} else if (type.equals(ActionType.DELETE_USER)) {
 				try {
-					userService.deleteUser(user);
+					userService.deleteUser(beforeEditUser);
 				} catch (UnauthorizedActionException e) {
 					logger.error("Errror while undoing user actionm unauthrized deletion of user");
 				}
@@ -227,28 +234,53 @@ public class UndoRedoService {
 
 	private class MediaAction extends ActionItem {
 
-		protected Media media;
+		protected Media beforeEditMedia;
+
+		protected Media afterEditMedia;
 
 		protected MediaAction(final Media media, final ActionType type) {
-			this.media = media;
+			this.beforeEditMedia = media;
 			this.type = type;
+			this.afterEditMedia = null;
+		}
+
+		protected MediaAction(final Media beforeEditMedia, final Media afterEditMedia, final ActionType type) {
+			this(beforeEditMedia, type);
+			this.afterEditMedia = afterEditMedia;
 		}
 
 		@Override
 		void performUndoAction() {
-			// TODO implement
+			if (type.equals(ActionType.SAVE_MEDIA)) {
+				mediaService.deleteMedia(beforeEditMedia);
+			} else if (type.equals(ActionType.DELETE_MEDIA)) {
+				mediaService.saveMedia(beforeEditMedia);
+			} else if (type.equals(ActionType.EDIT_MEDIA)) {
+				mediaService.saveMedia(beforeEditMedia);
+			} else {
+				logger.error("Error while undoing media action, wrong action type");
+			}
 		}
 
 		@Override
 		void performRedoAction() {
-			// TODO implement
+			if (type.equals(ActionType.SAVE_MEDIA)) {
+				mediaService.saveMedia(beforeEditMedia);
+			} else if (type.equals(ActionType.DELETE_MEDIA)) {
+				mediaService.deleteMedia(beforeEditMedia);
+			} else if (type.equals(ActionType.EDIT_MEDIA)) {
+				mediaService.saveMedia(afterEditMedia);
+			} else {
+				logger.error("Error while redoing media action, wrong action type");
+			}
 
 		}
 
 	}
 
 	public enum ActionType {
-		UNBORROW, BORROW, SAVE_USER, DELETE_USER, EDIT_USER, SAVE_MEDIA, DELETE_MEDIA, SAVE_BOOKMARK, DELETE_BOOKMARK
+		UNBORROW, BORROW, SAVE_USER, DELETE_USER, EDIT_USER, SAVE_MEDIA, DELETE_MEDIA, EDIT_MEDIA, SAVE_BOOKMARK,
+		DELETE_BOOKMARK
 	}
 
 }
