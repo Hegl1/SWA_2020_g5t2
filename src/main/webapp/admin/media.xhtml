@@ -1,11 +1,103 @@
+
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
-                xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/templates/main.xhtml">
-    <ui:define name ="content">
-        Admin media
-    </ui:define>
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
+	template="/WEB-INF/templates/main.xhtml">
+	<ui:define name="content">
+		<style type="text/css">
+#mediaTable tr {
+	transition: background 0.2s;
+}
+
+#mediaTable tr:hover {
+	background: rgba(0, 0, 0, 0.1);
+}
+</style>
+
+		<p:messages for="asMessage" />
+		<p:growl for="asGrowl" closable="true" showDetail="true"
+			showSummary="true" redisplay="true">
+			<p:autoUpdate />
+		</p:growl>
+
+		<h:form id="mediaForm">
+			<p:dataTable id="mediaTable" var="media"
+				value="#{mediaListController.media}">
+				<f:facet name="header">
+				</f:facet>
+				<p:column headerText="Title">
+					<h:outputText value="#{media.title}" />
+				</p:column>
+				<p:column headerText="Type">
+					<h:outputText value="#{media.mediaType}" />
+				</p:column>
+				<p:column headerText="Language">
+					<h:outputText value="#{media.language}" />
+				</p:column>
+				<p:column headerText="Publishing Year">
+					<h:outputText value="#{media.publishingYear}" />
+				</p:column>
+				<p:column style="width:100px;text-align: center">
+					<p:commandButton update=":mediaForm:mediaEditDialog"
+						oncomplete="PF('mediaEditDialog').show()" icon="fa fa-fw fa-edit"
+						title="Bearbeiten">
+						<f:setPropertyActionListener value="#{media}"
+							target="#{mediaDetailController.media}" />
+					</p:commandButton>
+				</p:column>
+			</p:dataTable>
+
+			<!-- Edit Media Dialog-->
+			<p:dialog header="Edit Media" id="mediaEditDialog"
+				widgetVar="mediaEditDialog" modal="true" showEffect="fade"
+				hideEffect="fade" resizable="false">
+				<p:outputPanel id="mediaData"
+					rendered="#{not empty mediaDetailController.media}">
+					<p:separator />
+					<h:panelGrid columns="2">
+						<p:outputLabel for="mediaID" value="Media ID: " />
+						<p:inputText id="mediaID"
+							value="#{mediaDetailController.media.mediaID}" />
+						<p:outputLabel for="title" value="Title: " />
+						<p:inputText id="title"
+							value="#{mediaDetailController.media.title}" />
+						<p:outputLabel for="mediaType" value="Type: " />
+						<p:inputText id="mediaType"
+							value="#{mediaDetailController.media.mediaType}" />
+						<p:outputLabel for="language" value="Language: " />
+						<p:inputText id="language"
+							value="#{mediaDetailController.media.language}" />
+						<p:outputLabel for="publishingYear" value="Publishing Year: " />
+						<p:inputText id="publishingYear"
+							value="#{mediaDetailController.media.publishingYear}" />
+						<p:outputLabel for="curBorrowed" value="Is currently Borrowed: " />
+						<p:inputText id="curBorrowed"
+							value="#{mediaDetailController.media.curBorrowed}" />
+						<p:outputLabel for="totalAvail" value="Total Available: " />
+						<p:inputText id="totalAvail"
+							value="#{mediaDetailController.media.totalAvail}" />
+
+					</h:panelGrid>
+
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:commandButton value="Save"
+							action="#{mediaDetailController.doSaveMedia()}"
+							oncomplete="PF('mediaEditDialog').hide()"
+							update=":mediaForm:mediaTable">
+						</p:commandButton>
+						<p:commandButton value="Reload"
+							action="#{mediaDetailController.doReloadMedia()}"
+							update=":mediaForm:mediaData" />
+						<p:commandButton value="Cancel"
+							onclick="PF('mediaEditDialog').hide()" />
+					</h:panelGrid>
+				</p:outputPanel>
+			</p:dialog>
+
+		</h:form>
+	</ui:define>
 </ui:composition>
