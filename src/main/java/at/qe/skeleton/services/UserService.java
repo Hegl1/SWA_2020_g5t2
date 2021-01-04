@@ -1,8 +1,13 @@
 package at.qe.skeleton.services;
 
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
-import at.qe.skeleton.repositories.UserRepository;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,9 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.repositories.UserRepository;
 
 /**
  * Service for accessing and manipulating user data.
@@ -112,12 +117,19 @@ public class UserService {
 
 		for (String selected : newRolesString) {
 			switch (selected.toLowerCase()) {
-				case "librarian": 	newRolesSet.add(UserRole.LIBRARIAN); break;
-				case "admin": 		newRolesSet.add(UserRole.ADMIN); break;
-				case "customer": 	newRolesSet.add(UserRole.CUSTOMER); break;
-				default:
-					System.err.println("[Warning] UserService - changeUserRoles: Role \"" + selected + "\" not supported yet!");
-					return false;
+			case "librarian":
+				newRolesSet.add(UserRole.LIBRARIAN);
+				break;
+			case "admin":
+				newRolesSet.add(UserRole.ADMIN);
+				break;
+			case "customer":
+				newRolesSet.add(UserRole.CUSTOMER);
+				break;
+			default:
+				System.err.println(
+						"[Warning] UserService - changeUserRoles: Role \"" + selected + "\" not supported yet!");
+				return false;
 			}
 		}
 		user.setRoles(newRolesSet);
@@ -162,8 +174,10 @@ public class UserService {
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void deleteUser(final User user) throws UnauthorizedActionException {
 
-		// TODO: potential issue, that an Admin has less rights if he has the Librarian-Role as well
-		// this problem should not occur, if only one Role is allowed in the Constructor and Setter of the User
+		// TODO: potential issue, that an Admin has less rights if he has the
+		// Librarian-Role as well
+		// this problem should not occur, if only one Role is allowed in the Constructor
+		// and Setter of the User
 
 		if (this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN)
 				&& user.getRoles().contains(UserRole.ADMIN)) {
@@ -183,7 +197,6 @@ public class UserService {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		return this.userRepository.findFirstByUsername(auth.getName());
 	}
-
 
 	/**
 	 * Custom Exceptions

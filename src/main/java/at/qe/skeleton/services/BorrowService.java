@@ -1,7 +1,11 @@
 package at.qe.skeleton.services;
 
-import at.qe.skeleton.model.*;
-import at.qe.skeleton.repositories.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +15,17 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import at.qe.skeleton.model.Borrowed;
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.MediaBorrowTime;
+import at.qe.skeleton.model.MediaType;
+import at.qe.skeleton.model.Reserved;
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.repositories.BorrowedRepository;
+import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
+import at.qe.skeleton.repositories.MediaRepository;
+import at.qe.skeleton.repositories.ReservedRepository;
+import at.qe.skeleton.repositories.UserRepository;
 
 @Component
 @Scope("application")
@@ -72,7 +82,9 @@ public class BorrowService implements CommandLineRunner {
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void unBorrowMedia(final Borrowed borrowed) {
-		if(borrowed == null) return;
+		if (borrowed == null) {
+			return;
+		}
 
 		borrowedRepository.delete(borrowed);
 		borrowed.getMedia().setCurBorrowed(borrowed.getMedia().getCurBorrowed() - 1);
@@ -83,7 +95,6 @@ public class BorrowService implements CommandLineRunner {
 			unreserveMedia(current);
 		}
 	}
-
 
 	public void unBorrowMedia(final User borrower, final Media mediaToUnBorrow) {
 		unBorrowMedia(borrowedRepository.findFirstByUserAndMedia(borrower, mediaToUnBorrow));
@@ -98,7 +109,6 @@ public class BorrowService implements CommandLineRunner {
 	public Collection<Borrowed> getAllBorrows() {
 		return borrowedRepository.findAll();
 	}
-
 
 	public Collection<Borrowed> getAllBorrowsByUser(final User user) {
 		return borrowedRepository.findByUser(user);
@@ -116,6 +126,11 @@ public class BorrowService implements CommandLineRunner {
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Borrowed loadBorrowed(final User borrower, final Media media) {
 		return borrowedRepository.findFirstByUserAndMedia(borrower, media);
+	}
+
+	public Borrowed loadBorrowedForAuthenticatedUser(final Media media) {
+		User borrower = userService.loadCurrentUser();
+		return loadBorrowed(borrower, media);
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
