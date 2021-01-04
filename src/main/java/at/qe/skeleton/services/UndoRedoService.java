@@ -3,12 +3,18 @@ package at.qe.skeleton.services;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import at.qe.skeleton.model.Bookmark;
 import at.qe.skeleton.model.Borrowed;
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.services.UserService.UnauthorizedActionException;
 
 @Component
 @Scope("session")
@@ -24,14 +30,25 @@ public class UndoRedoService {
 	@Autowired
 	BorrowService borrowService;
 
+	@Autowired
+	BookmarkService bookmarkService;
+
+	private Logger logger = LoggerFactory.getLogger(UndoRedoService.class);
+
+	private static final int MAX_SAVED_STATES = 20;
+
 	@Autowired(required = true)
 	public UndoRedoService() {
-		unDoQueue = new ArrayDeque<ActionItem>(20);
-		reDoQueue = new ArrayDeque<ActionItem>(20);
+		// TODO limit size of Deque
+		unDoQueue = new ArrayDeque<ActionItem>(MAX_SAVED_STATES + 1);
+		reDoQueue = new ArrayDeque<ActionItem>(MAX_SAVED_STATES + 1);
 	}
 
 	public void addAction(final ActionItem action) {
 		unDoQueue.push(action);
+		if (unDoQueue.size() >= MAX_SAVED_STATES) {
+			unDoQueue.removeLast();
+		}
 	}
 
 	public void undoLastAction() {
@@ -39,6 +56,9 @@ public class UndoRedoService {
 		if (action != null) {
 			action.performUndoAction();
 			reDoQueue.push(action);
+			if (reDoQueue.size() >= MAX_SAVED_STATES) {
+				reDoQueue.removeLast();
+			}
 		}
 	}
 
@@ -46,7 +66,6 @@ public class UndoRedoService {
 		ActionItem action = reDoQueue.pop();
 		if (action != null) {
 			action.performRedoAction();
-			addAction(action);
 		}
 	}
 
@@ -54,24 +73,42 @@ public class UndoRedoService {
 		return new BorrowAction(borrow, tpye);
 	}
 
-	public interface ActionItem {
-		void performUndoAction();
-
-		void performRedoAction();
+	public ActionItem createAction(final Bookmark bookmark, final ActionType type) {
+		return new BookmarkAction(bookmark, type);
 	}
 
-	private class BorrowAction implements ActionItem {
+	public ActionItem createAction(final User user, final ActionType type) {
+		return new UserAction(user, type);
+	}
 
-		Borrowed borrowed;
-		ActionType type;
+	public ActionItem createAction(final User user, final User afterEditUser, final ActionType type) {
+		return new UserAction(user, afterEditUser, type);
+	}
 
-		public BorrowAction(final Borrowed borrowed, final ActionType type) {
+	public ActionItem createAction(final Media media, final ActionType type) {
+		return new MediaAction(media, type);
+	}
+
+	public abstract class ActionItem {
+
+		protected ActionType type;
+
+		abstract void performUndoAction();
+
+		abstract void performRedoAction();
+	}
+
+	private class BorrowAction extends ActionItem {
+
+		protected Borrowed borrowed;
+
+		protected BorrowAction(final Borrowed borrowed, final ActionType type) {
 			this.borrowed = borrowed;
 			this.type = type;
 		}
 
 		@Override
-		public void performUndoAction() {
+		protected void performUndoAction() {
 			if (type.equals(ActionType.BORROW)) {
 				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
 					borrowService.unBorrowMedia(borrowed);
@@ -80,11 +117,13 @@ public class UndoRedoService {
 				}
 			} else if (type.equals(ActionType.UNBORROW)) {
 				borrowService.borrowMedia(borrowed.getUser(), borrowed.getMedia());
+			} else {
+				logger.error("Error while undoing borrow action, wrong action type");
 			}
 		}
 
 		@Override
-		public void performRedoAction() {
+		protected void performRedoAction() {
 			if (type.equals(ActionType.BORROW)) {
 				borrowService.borrowMedia(borrowed.getUser(), borrowed.getMedia());
 			} else if (type.equals(ActionType.UNBORROW)) {
@@ -93,25 +132,123 @@ public class UndoRedoService {
 				} else {
 					borrowService.unBorrowMediaForAuthenticatedUser(borrowed.getMedia());
 				}
+			} else {
+				logger.error("Error while redoing borrow action, wrong action type");
 			}
 		}
 	}
 
-	private class BookmarkAction {
+	private class BookmarkAction extends ActionItem {
+
+		protected Bookmark bookmark;
+
+		protected BookmarkAction(final Bookmark bookmark, final ActionType type) {
+			this.bookmark = bookmark;
+			this.type = type;
+		}
+
+		@Override
+		protected void performUndoAction() {
+			if (type.equals(ActionType.SAVE_BOOKMARK)) {
+				bookmarkService.deleteBookmark(bookmark);
+			} else if (type.equals(ActionType.DELETE_BOOKMARK)) {
+				bookmarkService.addBookmark(bookmark.getMedia());
+			} else {
+				logger.error("Error while undoing bookmark action, wrong action type");
+			}
+		}
+
+		@Override
+		protected void performRedoAction() {
+			if (type.equals(ActionType.SAVE_BOOKMARK)) {
+				bookmarkService.addBookmark(bookmark.getMedia());
+			} else if (type.equals(ActionType.DELETE_BOOKMARK)) {
+				bookmarkService.deleteBookmark(bookmark);
+			} else {
+				logger.error("Error while redoing bookmark action, wrong action type");
+			}
+		}
 
 	}
 
-	private class UserAction {
+	private class UserAction extends ActionItem {
+
+		protected User user;
+		protected User afterEditUser;
+
+		protected UserAction(final User user, final ActionType type) {
+			this.user = user;
+			this.type = type;
+			this.afterEditUser = null;
+		}
+
+		protected UserAction(final User user, final User afterEditUser, final ActionType type) {
+			this(user, type);
+			this.afterEditUser = afterEditUser;
+		}
+
+		@Override
+		void performUndoAction() {
+			if (type.equals(ActionType.SAVE_USER)) {
+				try {
+					userService.deleteUser(user);
+				} catch (UnauthorizedActionException e) {
+					logger.error("Errror while undoing user actionm unauthrized deletion of user");
+				}
+			} else if (type.equals(ActionType.DELETE_USER)) {
+				userService.saveUser(user);
+			} else if (type.equals(ActionType.EDIT_USER)) {
+				userService.saveUser(user);
+			} else {
+				logger.error("Error while undoing user action, wrong action type");
+			}
+
+		}
+
+		@Override
+		void performRedoAction() {
+			if (type.equals(ActionType.SAVE_USER)) {
+				userService.saveUser(user);
+			} else if (type.equals(ActionType.DELETE_USER)) {
+				try {
+					userService.deleteUser(user);
+				} catch (UnauthorizedActionException e) {
+					logger.error("Errror while undoing user actionm unauthrized deletion of user");
+				}
+			} else if (type.equals(ActionType.EDIT_USER)) {
+				userService.saveUser(afterEditUser);
+			} else {
+				logger.error("Error while redoing user action, wrong action type");
+			}
+
+		}
 
 	}
 
-	private class MediaAction {
+	private class MediaAction extends ActionItem {
+
+		protected Media media;
+
+		protected MediaAction(final Media media, final ActionType type) {
+			this.media = media;
+			this.type = type;
+		}
+
+		@Override
+		void performUndoAction() {
+			// TODO implement
+		}
+
+		@Override
+		void performRedoAction() {
+			// TODO implement
+
+		}
 
 	}
 
 	public enum ActionType {
-		UNBORROW, BORROW, CREATE_USER, EDIT_USER, DELETE_USER, CREATE_MEDIA, EDIT_MEDIA, DELETE_MEDIA, ADD_BOOKMARK,
-		DELETE_BOOKMARK,
+		UNBORROW, BORROW, SAVE_USER, DELETE_USER, EDIT_USER, SAVE_MEDIA, DELETE_MEDIA, SAVE_BOOKMARK, DELETE_BOOKMARK
 	}
 
 }
