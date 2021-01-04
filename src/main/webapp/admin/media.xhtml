@@ -28,6 +28,9 @@
 				value="#{mediaListController.media}">
 				<f:facet name="header">
 				</f:facet>
+				<p:column headerText="ID">
+					<h:outputText value="#{media.mediaID}" />
+				</p:column>
 				<p:column headerText="Title">
 					<h:outputText value="#{media.title}" />
 				</p:column>
@@ -46,6 +49,15 @@
 						title="Bearbeiten">
 						<f:setPropertyActionListener value="#{media}"
 							target="#{mediaDetailController.media}" />
+					</p:commandButton>
+					<p:commandButton action="#{mediaDetailController.doDeleteMedia(media)}"
+						icon="fa fa-fw fa-trash" title="Delete"
+						update=":mediaForm:mediaTable">
+						<f:setPropertyActionListener value="#{media}"
+							target="#{mediaDetailController.media}" />
+						<p:confirm header="Delete Media"
+							message="Are you sure? Delete this media irretrievably!"
+							icon="ui-icon-alert" />
 					</p:commandButton>
 				</p:column>
 			</p:dataTable>
@@ -97,6 +109,15 @@
 					</h:panelGrid>
 				</p:outputPanel>
 			</p:dialog>
+
+			<!-- delete Dialog-->
+			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
+				width="300">
+				<p:commandButton value="Yes" type="button"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+				<p:commandButton value="No" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</p:confirmDialog>
 
 		</h:form>
 	</ui:define>
