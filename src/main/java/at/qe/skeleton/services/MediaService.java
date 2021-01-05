@@ -21,6 +21,7 @@ public class MediaService {
     @Autowired
     MediaRepository mediaRepository;
 
+
     /**
      * Return collection of Media of desired type.
      */
