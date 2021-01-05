@@ -20,80 +20,29 @@ public class MediaService {
 
     @Autowired
     MediaRepository mediaRepository;
-    @Autowired
-    AudioBookRepository audioBookRepository;
-    @Autowired
-    BookRepository bookRepository;
-    @Autowired
-    MagazineRepository magazineRepository;
-    @Autowired
-    VideoRepository videoRepository;
-
 
     /**
      * Return collection of Media of desired type.
      */
-
     public Collection<Media> getAllMedia() {
         return this.mediaRepository.findAll();
-    }
-
-    public Collection<AudioBook> getAllAudioBooks() {
-        return this.audioBookRepository.findAll();
-    }
-
-    public Collection<Book> getAllBooks() {
-        return this.bookRepository.findAll();
-    }
-
-    public Collection<Magazine> getAllMagazines() {
-        return this.magazineRepository.findAll();
-    }
-
-    public Collection<Video> getAllVideos() {
-        return this.videoRepository.findAll();
     }
 
 
     /**
      * Loads a single Media of desired type by its ID.
      */
-
     public Media loadMedia(final Long mediaId) {
         return this.mediaRepository.findFirstByMediaID(mediaId);
     }
 
-    public Media loadAudioBook(final Long mediaId) {
-        return this.audioBookRepository.findFirstByMediaID(mediaId);
-    }
-
-    public Media loadBook(final Long mediaId) {
-        return this.bookRepository.findFirstByMediaID(mediaId);
-    }
-
-    public Media loadMagazine(final Long mediaId) {
-        return this.magazineRepository.findFirstByMediaID(mediaId);
-    }
-
-    public Media loadVideo(final Long mediaId) {
-        return this.videoRepository.findFirstByMediaID(mediaId);
-    }
-
 
     /**
-     * Save media in desired repository.
+     * Save Media in repository
      */
-
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public Media saveMedia(final Media media) {
-
-        switch(media.getMediaType()) {
-            case AUDIOBOOK: return this.audioBookRepository.save((AudioBook) media);
-            case BOOK:      return this.bookRepository.save((Book) media);
-            case MAGAZINE:  return this.magazineRepository.save((Magazine) media);
-            case VIDEO:     return this.videoRepository.save((Video) media);
-            default:        return null;
-        }
+        return this.mediaRepository.save(media);
     }
 
 
@@ -106,7 +55,7 @@ public class MediaService {
                                  final int totalAvail, final MediaType mediaType, final String speaker,
                                  final int length, final String author, final String ISBN) {
 
-        AudioBook newAudioBook =
+        Media newAudioBook =
                 new AudioBook(title, publishingDate, language, totalAvail, mediaType, speaker, length, author, ISBN);
         this.saveMedia(newAudioBook);
         return newAudioBook;
@@ -116,7 +65,7 @@ public class MediaService {
     public Media createBook(final String title, final int publishingDate, final String language, final int totalAvail,
                             final MediaType mediaType, final String author, final String ISBN) {
 
-        Book newBook = new Book(title, publishingDate, language, totalAvail, mediaType, author, ISBN);
+        Media newBook = new Book(title, publishingDate, language, totalAvail, mediaType, author, ISBN);
         this.saveMedia(newBook);
         return newBook;
     }
@@ -125,7 +74,7 @@ public class MediaService {
     public Media createMagazine(final String title, final int publishingDate, final String language,
                                 final int totalAvail, final MediaType mediaType, final String series) {
 
-        Magazine newMagazine = new Magazine(title, publishingDate, language, totalAvail, mediaType, series);
+        Media newMagazine = new Magazine(title, publishingDate, language, totalAvail, mediaType, series);
         this.saveMedia(newMagazine);
         return newMagazine;
     }
@@ -134,7 +83,7 @@ public class MediaService {
     public Media createVideo(final String title, final int publishingDate, final String language,
                              final int totalAvail, final MediaType mediaType, final int length) {
 
-        Video newVideo = new Video(title, publishingDate, language, totalAvail, mediaType, length);
+        Media newVideo = new Video(title, publishingDate, language, totalAvail, mediaType, length);
         this.saveMedia(newVideo);
         return newVideo;
     }
@@ -144,17 +93,7 @@ public class MediaService {
      * Search in Media by title.
      */
     public Media searchMediaByTitle(String title) {
-
-        Collection<Media> medias = this.getAllMedia();
-
-        for(Media current : medias) {
-            if(current.getTitle().equals(title)) {
-                return current;
-            } else {
-                // TODO: throw NoMediaFoundException
-            }
-        }
-        return null;
+        return this.mediaRepository.findFirstByTitle(title);
     }
 
 
@@ -196,18 +135,11 @@ public class MediaService {
 
 
     /**
-     * Delete any Media
+     * Delete Media from repository
      */
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public void deleteMedia(final Media media) {
-
-        switch (media.getMediaType()) {
-            case AUDIOBOOK: this.audioBookRepository.delete((AudioBook) media); break;
-            case BOOK:      this.bookRepository.delete((Book) media); break;
-            case MAGAZINE:  this.magazineRepository.delete((Magazine) media); break;
-            case VIDEO:     this.videoRepository.delete((Video) media); break;
-            default:        break;
-        }
+        this.mediaRepository.delete(media);
     }
 
 }
