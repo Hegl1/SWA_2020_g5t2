@@ -315,9 +315,13 @@ public class BorrowService implements CommandLineRunner {
 			long diff = currentDate.getTime() - current.getBorrowDate().getTime();
 			long diffInDays = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 			if (diffInDays > allowedBorrowTimes.get(current.getMedia().getMediaType())) {
-				logger.info(
-						"Automatic return of media " + current.getMedia().getMediaID() + " due to time limitations");
-				// TODO: send email for automatic return
+				logger.info("Automatic return of media " + current.getMedia().getMediaID()
+						+ " due to time limitations. Sent email to: " + current.getUser().getEmail());
+
+				String head = "Automatic return of " + current.getMedia().getTitle();
+				String body = "Dear customer,\n the media " + current.getMedia().getTitle()
+						+ " has been returned automatically due the rental period expiring.\n\nYours sincerely,\nThe Library Team";
+				mailService.sendMail(current.getUser().getEmail(), head, body);
 				unBorrowMedia(current);
 			}
 		}
