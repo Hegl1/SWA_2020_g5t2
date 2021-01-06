@@ -1,5 +1,10 @@
 package at.qe.skeleton.services;
 
+import java.io.File;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +16,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.File;
+/**
+ * Class that provides the ability to send emails either with our withouth
+ * attachment.
+ * 
+ * @author Marcel Huber
+ * @version 1.0
+ *
+ */
 
 @Component
 @Scope("application")
@@ -24,6 +34,15 @@ public class MailService {
 
 	private Logger logger = LoggerFactory.getLogger(MailService.class);
 
+	/**
+	 * Method that sends an email without an attachment.
+	 * 
+	 * @param targetMail     the target email address
+	 * @param messageSubject the subject of the email
+	 * @param messageContent the content of the email
+	 * @throws MailException thrown when the email cannot be constructed or send for
+	 *                       whatever reason.
+	 */
 	public void sendMail(final String targetMail, final String messageSubject, final String messageContent)
 			throws MailException {
 		SimpleMailMessage msg = new SimpleMailMessage();
@@ -34,6 +53,17 @@ public class MailService {
 		mailSender.send(msg);
 	}
 
+	/**
+	 * Method that sends an email with an attachment.
+	 * 
+	 * @param targetMail     the target email address
+	 * @param messageSubject the subject of the email
+	 * @param messagecontent the content of the email
+	 * @param attachmentName the name of the attachment
+	 * @param path           the path of the attachment
+	 * @throws MailException thrown when the email cannot be constructed or send for
+	 *                       whatever reason.
+	 */
 	public void sendMailWithAttachment(final String targetMail, final String messageSubject,
 			final String messagecontent, final String attachmentName, final String path) throws MailException {
 		try {

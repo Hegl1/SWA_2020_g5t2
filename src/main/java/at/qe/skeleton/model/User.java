@@ -1,21 +1,33 @@
 package at.qe.skeleton.model;
 
-import org.springframework.data.domain.Persistable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.springframework.data.domain.Persistable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 /**
- * Entity representing users.
- *
- * This class is part of the skeleton project provided for students of the
- * courses "Software Architecture" and "Software Engineering" offered by the
- * University of Innsbruck.
+ * Entity representing users. Very similar to the User class of the skeleton
+ * project.
+ * 
+ * @author Marcel Huber
+ * @version 1.0
  */
 @Entity
 public class User implements Persistable<String>, Serializable {
@@ -31,15 +43,9 @@ public class User implements Persistable<String>, Serializable {
 	private String lastName;
 	private String email;
 
-	@ManyToOne(optional = true)
-	private User createUser;
-
 	@Column(nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate;
-
-	@ManyToOne(optional = true)
-	private User updateUser;
 
 	@Column(nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
@@ -50,16 +56,31 @@ public class User implements Persistable<String>, Serializable {
 	@Enumerated(EnumType.STRING)
 	private Set<UserRole> roles;
 
+	/**
+	 * Default construcotr. Initializes the set of user roles.
+	 */
 	public User() {
-
+		this.roles = new HashSet<UserRole>();
+		this.updateDate = new Date();
+		this.createDate = new Date();
 	}
 
+	/**
+	 * Constructor that initializes most of the fields of the user.
+	 * 
+	 * @param username  the username for the user
+	 * @param password  the password for the user
+	 * @param firstName the first name of the user
+	 * @param lastName  the last name of the user
+	 * @param enabled   boolean for whether the user is enabled
+	 * @param roles     one role to add to the set of roles
+	 * @param email     email of the user
+	 */
 	public User(final String username, final String password, final String firstName, final String lastName,
 			final Boolean enabled, final UserRole roles, final String email) {
 
+		this();
 		PasswordEncoder pwEncoder = new BCryptPasswordEncoder(9);
-		this.roles = new HashSet<UserRole>();
-
 		this.username = username;
 		this.password = pwEncoder.encode(password);
 		this.firstName = firstName;
@@ -119,28 +140,12 @@ public class User implements Persistable<String>, Serializable {
 		this.roles = roles;
 	}
 
-	public User getCreateUser() {
-		return this.createUser;
-	}
-
-	public void setCreateUser(final User createUser) {
-		this.createUser = createUser;
-	}
-
 	public Date getCreateDate() {
 		return this.createDate;
 	}
 
 	public void setCreateDate(final Date createDate) {
 		this.createDate = createDate;
-	}
-
-	public User getUpdateUser() {
-		return this.updateUser;
-	}
-
-	public void setUpdateUser(final User updateUser) {
-		this.updateUser = updateUser;
 	}
 
 	public Date getUpdateDate() {
