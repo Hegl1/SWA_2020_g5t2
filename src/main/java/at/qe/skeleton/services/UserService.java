@@ -1,13 +1,12 @@
 package at.qe.skeleton.services;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import at.qe.skeleton.model.Bookmark;
+import at.qe.skeleton.model.Borrowed;
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.repositories.BookmarkRepository;
+import at.qe.skeleton.repositories.BorrowedRepository;
+import at.qe.skeleton.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,9 +15,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
-import at.qe.skeleton.repositories.UserRepository;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Service for accessing and manipulating user data.
@@ -33,6 +34,12 @@ public class UserService {
 
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	private BorrowedRepository borrowedRepository2;
+
+	@Autowired
+	private BookmarkRepository bookmarkRepository2;
 
 	/**
 	 * Returns a collection of all users.
@@ -78,8 +85,10 @@ public class UserService {
 	public User saveUser(final User user) {
 		if (user.isNew()) {
 			user.setCreateDate(new Date());
+//			user.setCreateUser(getAuthenticatedUser());
 		} else {
 			user.setUpdateDate(new Date());
+//			user.setUpdateUser(getAuthenticatedUser());
 			// if password was changed, then encrypt it again
 			Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2a?\\$\\d\\d\\$[./0-9A-Za-z]{53}");
 			if (BCRYPT_PATTERN.matcher(user.getPassword()).matches()) {
@@ -115,19 +124,12 @@ public class UserService {
 
 		for (String selected : newRolesString) {
 			switch (selected.toLowerCase()) {
-			case "librarian":
-				newRolesSet.add(UserRole.LIBRARIAN);
-				break;
-			case "admin":
-				newRolesSet.add(UserRole.ADMIN);
-				break;
-			case "customer":
-				newRolesSet.add(UserRole.CUSTOMER);
-				break;
-			default:
-				System.err.println(
-						"[Warning] UserService - changeUserRoles: Role \"" + selected + "\" not supported yet!");
-				return false;
+				case "librarian": 	newRolesSet.add(UserRole.LIBRARIAN); break;
+				case "admin": 		newRolesSet.add(UserRole.ADMIN); break;
+				case "customer": 	newRolesSet.add(UserRole.CUSTOMER); break;
+				default:
+					System.err.println("[Warning] UserService - changeUserRoles: Role \"" + selected + "\" not supported yet!");
+					return false;
 			}
 		}
 		user.setRoles(newRolesSet);
@@ -140,7 +142,7 @@ public class UserService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public User createUser(final String username, final String password, final String firstName, final String lastName,
-			final Boolean enabled, final UserRole roles, final String email)
+						   final Boolean enabled, final UserRole roles, final String email)
 			throws UnauthorizedActionException, UnallowedInputException {
 
 		if (this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN)
@@ -172,22 +174,37 @@ public class UserService {
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void deleteUser(final User user) throws UnauthorizedActionException {
 
-		// TODO: potential issue, that an Admin has less rights if he has the
-		// Librarian-Role as well
-		// this problem should not occur, if only one Role is allowed in the Constructor
-		// and Setter of the User
-
+		// TODO: potential issue, that an Admin has less rights if he has the Librarian-Role as well
+		// this problem should not occur, if only one Role is allowed in the Constructor and Setter of the User
+		FacesContext context = FacesContext.getCurrentInstance();
 		if (this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN)
 				&& user.getRoles().contains(UserRole.ADMIN)) {
-
-			throw new UnauthorizedActionException("Librarian may not delete Administrators!");
+			context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Librarians may not delete Administrators!",  "") );
+			throw new UnauthorizedActionException("Librarians may not delete Administrators!");
 
 		} else if (this.getAuthenticatedUser().getId().equals(user.getId())) {
-
+			context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Users may not delete themself!",  "") );
 			throw new UnauthorizedActionException("Users may not delete themself!");
 
 		} else {
-			this.userRepository.delete(user);
+			// Check for borrowed articles
+			List<Borrowed> still_borrowed = borrowedRepository2.findByUser(user);
+
+			if (still_borrowed.size() != 0) {
+				context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Can't delete user - some media is still borrowed",  "") );
+				throw new UnauthorizedActionException("User cannot be deleted: There is a Media that the user has not returned yet!");
+			} else {
+				// delete Bookmarks
+				List<Bookmark> still_bookmarked = bookmarkRepository2.findByUsername(user.getUsername());
+				for (Bookmark sbm : still_bookmarked){
+					context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Deleted the user's bookmark No.: " + sbm.getBookmarkID(),  "") );
+					bookmarkRepository2.delete(sbm);
+				}
+				//mailService.send "your account was deleted"
+				this.userRepository.delete(user);
+			}
+
+
 		}
 	}
 
@@ -195,6 +212,7 @@ public class UserService {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		return this.userRepository.findFirstByUsername(auth.getName());
 	}
+
 
 	/**
 	 * Custom Exceptions
@@ -215,5 +233,7 @@ public class UserService {
 			super(message);
 		}
 	}
+
+
 
 }
