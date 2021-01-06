@@ -48,6 +48,14 @@
                 <p:column headerText="Publishing Year" style="width: 8rem; text-align: center">
                     <h:outputText value="#{media.publishingYear}"/>
                 </p:column>
+
+                <p:column headerText="Delete" style="width: 6rem; text-align: center" rendered="#{sessionInfoBean.currentUserRoles == 'ADMIN'}" >
+                <p:commandButton action="#{mediaDetailController.doDeleteMedia(media)}" icon="fa fa-fw fa-trash" title="Löschen" update="mediaTable">
+                    <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
+
+                </p:commandButton>
+                </p:column>
+
                 <p:column headerText="Due date" style="width: 5rem; text-align: center" rendered="#{cc.attrs.context == 'borrowed'}">
                     <h:outputText value="#{borrowedListController.getBorrowedDueDate(row)}" >
                         <f:convertDateTime pattern="dd.MM.yyyy" />

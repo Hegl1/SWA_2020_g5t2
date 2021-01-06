@@ -1,13 +1,20 @@
 package at.qe.skeleton.ui.controllers;
 
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaType;
+import at.qe.skeleton.model.*;
+import at.qe.skeleton.services.BookmarkService;
+import at.qe.skeleton.services.BorrowService;
 import at.qe.skeleton.services.MediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -19,6 +26,12 @@ public class MediaDetailController implements Serializable {
 
     @Autowired
     MediaService mediaService;
+
+    @Autowired
+    BorrowService borrowService;
+
+    @Autowired
+    BookmarkService bookmarkService;
 
 
     /**
@@ -96,9 +109,49 @@ public class MediaDetailController implements Serializable {
      * Action to delete the currently displayed media.
      */
     public void doDeleteMedia(final Media media) {
-        this.mediaService.deleteMedia(media);
-        this.media = null;
+        FacesContext context = FacesContext.getCurrentInstance();
+        Collection<Borrowed> a1 = borrowService.getAllBorrowsByMedia(media);
+        if (a1.size() > 0){
+            System.out.println("\nThis media is still borrowed by x people: " + a1.size());
+            for (Borrowed a : a1) {
+                System.out.println("  by: " + a.getUser());
+                context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN, "This media is still borrowed by : " + a.getUser().getUsername(), ""));
+            }
+        } else {
+            System.out.println("\nnobody is borrowing it");
+        }
+
+        Collection<Bookmark> a2 = bookmarkService.getAllBookmarks();
+        List<User> a2_s = new ArrayList<User>();
+
+
+        for (Bookmark b : a2)
+            if(b.getMedia().getMediaID() == media.getMediaID())
+                a2_s.add(b.getUser());
+
+        if (a2_s.size() > 0){
+            System.out.println("\nThis media is still bookmarked by some people: ");
+            for (User u : a2_s){
+                System.out.println("  by: "+ u.getUsername());
+                context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN, "This media is still bookmarked by: "+ u.getUsername(),  "") );
+            }
+
+
+        } else {
+            System.out.println("\nnobody is bookmarking it");
+        }
+
+        // only delete if it is not borrowed or bookmarked
+        if (!(a1.size() > 0) && !(a2_s.size() > 0)){
+            this.mediaService.deleteMedia(media);
+            this.media = null;
+        }
+
+
     }
+
+
+
 
 
 
