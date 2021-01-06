@@ -46,10 +46,6 @@ public class UserServiceTest {
 			}
 			Assertions.assertEquals(current.getUpdateDate(), current.getCreateDate(),
 					"Create - and UpdateDate do not match at User \"" + current.getUsername() + "\"");
-			Assertions.assertNull(current.getUpdateUser(),
-					"updateUser is not null at \"" + current.getUsername() + "\"");
-			Assertions.assertNull(current.getCreateUser(),
-					"createUser is not null at \"" + current.getUsername() + "\"");
 		}
 	}
 

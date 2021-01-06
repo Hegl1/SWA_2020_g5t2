@@ -2,6 +2,13 @@ package at.qe.skeleton.model;
 
 import javax.persistence.Entity;
 
+/**
+ * Class that represents a Magazine. Extends the more general
+ * {@link at.qe.skeleton.model.Media}
+ * 
+ * @author Marcel Huber
+ *
+ */
 @Entity
 public class Magazine extends Media {
 
@@ -9,9 +16,9 @@ public class Magazine extends Media {
 
 	private String series;
 
-	public Magazine(final String title, final int publishingYear, final String language,
-					final int totalAvail, final MediaType mediaType, final String series) {
-		
+	public Magazine(final String title, final int publishingYear, final String language, final int totalAvail,
+			final MediaType mediaType, final String series) {
+
 		super(title, publishingYear, language, totalAvail, mediaType);
 		this.series = series;
 	}

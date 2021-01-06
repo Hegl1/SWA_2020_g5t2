@@ -1,13 +1,22 @@
 package at.qe.skeleton.model;
 
-import org.springframework.data.domain.Persistable;
+import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import java.io.Serializable;
 
+import org.springframework.data.domain.Persistable;
+
+/**
+ * Entity that relates media types with the corresponding maximum allowed
+ * borrowment times.
+ * 
+ * @author Marcel Huber
+ * @version 1.0
+ *
+ */
 @Entity
 public class MediaBorrowTime implements Serializable, Persistable<MediaType> {
 

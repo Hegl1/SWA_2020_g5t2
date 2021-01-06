@@ -25,42 +25,52 @@ import at.qe.skeleton.repositories.BorrowedRepository;
 import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
 import at.qe.skeleton.repositories.MediaRepository;
 import at.qe.skeleton.repositories.ReservedRepository;
-import at.qe.skeleton.repositories.UserRepository;
+
+/**
+ * Class that is used for the borrowing process, reservation process and
+ * automatic return of expired borrows.
+ * 
+ * @author Marcel Huber
+ * @version 1.0
+ *
+ */
 
 @Component
 @Scope("application")
 public class BorrowService implements CommandLineRunner {
 
+	/**
+	 * Constant that defines how much times elapses between the scannings for
+	 * expired borrow times.
+	 */
 	private static final long schedulingDelay = (long) 1e7;
 
 	@Autowired
-	BorrowedRepository borrowedRepository;
+	private BorrowedRepository borrowedRepository;
 
 	@Autowired
-	ReservedRepository reservedRepository;
+	private ReservedRepository reservedRepository;
 
 	@Autowired
-	MediaBorrowTimeRepository mediaBorrowTimeRepository;
+	private MediaBorrowTimeRepository mediaBorrowTimeRepository;
 
 	@Autowired
-	MailService mailService;
+	private MailService mailService;
 
 	@Autowired
-	MediaRepository mediaRepository;
+	private MediaRepository mediaRepository;
 
 	@Autowired
-	UserRepository userRepository;
-
-	@Autowired
-	UserService userService;
+	private UserService userService;
 
 	private Logger logger = LoggerFactory.getLogger(BorrowService.class);
 
 	/**
-	 * Method that borrows Media for a customer.
-	 *
-	 * @param mediaToBorrow media to borrow
-	 * @return true if it was successfully borrowed, else false
+	 * Method that constructs a Borrowed object and saves it in the database.
+	 * 
+	 * @param borrower      the user who borrows the media.
+	 * @param mediaToBorrow the media which gets borrowed by the user
+	 * @return true if borrowing was successfull, else false.
 	 */
 	public boolean borrowMedia(final User borrower, final Media mediaToBorrow) {
 
@@ -75,74 +85,152 @@ public class BorrowService implements CommandLineRunner {
 		}
 	}
 
+	/**
+	 * Method that constructs a Borrowed object and saves it in the database, uses
+	 * the authenticated user for Borrows user.
+	 * 
+	 * @param media the media to borro
+	 * @return true if borrowing was successfull, else false.
+	 */
 	public boolean borrowMediaForAuthenticatedUser(final Media media) {
 		User borrower = userService.loadCurrentUser();
 		return borrowMedia(borrower, media);
 	}
 
+	/**
+	 * Method that unborrows a media (remove the Borrowed object from the database).
+	 * 
+	 * @param borrowed the Borrowed object that should be removed from the database.
+	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void unBorrowMedia(final Borrowed borrowed) {
-		if (borrowed == null) {
-			return;
+
+		if (borrowed != null) {
+			borrowedRepository.delete(borrowed);
+			borrowed.getMedia().setCurBorrowed(borrowed.getMedia().getCurBorrowed() - 1);
+			mediaRepository.save(borrowed.getMedia());
+			Collection<Reserved> reservations = reservedRepository.findByMedia(borrowed.getMedia());
+
+			for (Reserved current : reservations) {
+				unreserveMedia(current);
+			}
 		}
 
-		borrowedRepository.delete(borrowed);
-		borrowed.getMedia().setCurBorrowed(borrowed.getMedia().getCurBorrowed() - 1);
-		mediaRepository.save(borrowed.getMedia());
-		Collection<Reserved> reservations = reservedRepository.findByMedia(borrowed.getMedia());
-
-		for (Reserved current : reservations) {
-			unreserveMedia(current);
-		}
 	}
 
+	/**
+	 * Method that unborrows a Media (remove the Borrowed object from the database).
+	 * 
+	 * @param borrower        user to unborrow the media for.
+	 * @param mediaToUnBorrow media that should be unborrowed.
+	 */
 	public void unBorrowMedia(final User borrower, final Media mediaToUnBorrow) {
 		unBorrowMedia(borrowedRepository.findFirstByUserAndMedia(borrower, mediaToUnBorrow));
 	}
 
+	/**
+	 * Method that unborrows a Media (remove the Borrowed object from the database)
+	 * for the currently authenticated user.
+	 * 
+	 * @param mediaToUnBorrow the media which should be unborrowed.
+	 */
 	public void unBorrowMediaForAuthenticatedUser(final Media mediaToUnBorrow) {
 		User user = userService.loadCurrentUser();
 		unBorrowMedia(user, mediaToUnBorrow);
 	}
 
+	/**
+	 * Method that retrieves all Borrowed objects from the database.
+	 * 
+	 * @return a Collection of all stored Borrowed objects.
+	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Borrowed> getAllBorrows() {
 		return borrowedRepository.findAll();
 	}
 
+	/**
+	 * Method that retrieves all Borrowed objects related to a certain user.
+	 * 
+	 * @param user the User to get the Borrowed objects for.
+	 * @return a Collection of all stored Borrowed objects for the given user.
+	 */
 	public Collection<Borrowed> getAllBorrowsByUser(final User user) {
 		return borrowedRepository.findByUser(user);
 	}
 
+	/**
+	 * Method that retrieves all Borrowed object related to the currently
+	 * authenticated user.
+	 * 
+	 * @return a Collection of all stored Borrowed objects for the given user.
+	 */
 	public Collection<Borrowed> getAllBorrowsByAuthenticatedUser() {
 		return getAllBorrowsByUser(userService.loadCurrentUser());
 	}
 
+	/**
+	 * Method that retrieves all Borrowed objects related to a certian media.
+	 * 
+	 * @param media the Media to get the Borrowed objects for.
+	 * @return a Collection of all stored Borrowed objects for the given media.
+	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Borrowed> getAllBorrowsByMedia(final Media media) {
 		return borrowedRepository.findByMedia(media);
 	}
 
+	/**
+	 * Method that retrieves one particular Borrowed object.
+	 * 
+	 * @param borrower the User that borrowed something
+	 * @param media    the Media that was borrowed
+	 * @return the Borrowed object representing the borrowing.
+	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Borrowed loadBorrowed(final User borrower, final Media media) {
 		return borrowedRepository.findFirstByUserAndMedia(borrower, media);
 	}
 
+	/**
+	 * Method that retrieves one particular borrow for the currently authenticated
+	 * user.
+	 * 
+	 * @param media the Media that was borrowed.
+	 * @return the Borrowed object representing the borrowing.
+	 */
 	public Borrowed loadBorrowedForAuthenticatedUser(final Media media) {
 		User borrower = userService.loadCurrentUser();
 		return loadBorrowed(borrower, media);
 	}
 
+	/**
+	 * Method that reserves a Media for a User
+	 * 
+	 * @param reserver       the User who wants to reserve a media.
+	 * @param mediaToReserve the Media which should be reserved.
+	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void reserveMedia(final User reserver, final Media mediaToReserve) {
 		Reserved res = new Reserved(reserver, mediaToReserve, new Date());
 		reservedRepository.save(res);
 	}
 
-	public void reserveMediaForAuthenticatedUser(final Media mediaToResMedia) {
-		reserveMedia(userService.loadCurrentUser(), mediaToResMedia);
+	/**
+	 * Method that reserves a Media for the currently authenticaed User.
+	 * 
+	 * @param mediaToReserve the Media which should be reserved.
+	 */
+	public void reserveMediaForAuthenticatedUser(final Media mediaToReserve) {
+		reserveMedia(userService.loadCurrentUser(), mediaToReserve);
 	}
 
+	/**
+	 * Method that unreserves a Media for a User. Automatically sends an email to
+	 * the user that reserved the Media.
+	 * 
+	 * @param reserved the reserved Object containing the user and the media.
+	 */
 	private void unreserveMedia(final Reserved reserved) {
 		StringBuilder bodyBuild = new StringBuilder();
 		Media targetMedia = reserved.getMedia();
@@ -159,30 +247,65 @@ public class BorrowService implements CommandLineRunner {
 		reservedRepository.delete(reserved);
 	}
 
+	/**
+	 * Method that retrieves all Reserved objects from the database.
+	 * 
+	 * @return a Collection of the Reserved objects.
+	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Reserved> getAllReserved() {
 		return reservedRepository.findAll();
 	}
 
+	/**
+	 * Method that retrieves all Reserved objects for a certain User.
+	 * 
+	 * @param user the user to get the Reserved objects for.
+	 * @return a Collection of the Reserved objects for the given user.
+	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Reserved> getAllReservedByUser(final User user) {
 		return reservedRepository.findByUser(user);
 	}
 
+	/**
+	 * Method that retrieves all Reserved objects of the currently authenticated
+	 * User.
+	 * 
+	 * @return a Collection of the Reserved objects for the given user.
+	 */
 	public Collection<Reserved> getAllReservedByAuthenticatedUser() {
 		return getAllReservedByUser(userService.loadCurrentUser());
 	}
 
+	/**
+	 * Method that retrieves all Reserved objects for a certain Media.
+	 * 
+	 * @param media the Media to get the Reserved obects for.
+	 * @return a Collection of the Reserved objects for the given media.
+	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<Reserved> getAllReservedByMedia(final Media media) {
 		return reservedRepository.findByMedia(media);
 	}
 
+	/**
+	 * Method that retrieves one particular Reserved object by user and media.
+	 * 
+	 * @param user  the user to get the Reserved object for.
+	 * @param media the media to get the Reserved object for.
+	 * @return the Reserved object related to the given user and media.
+	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Reserved loadReserved(final User user, final Media media) {
 		return reservedRepository.findByUserAndMedia(user, media);
 	}
 
+	/**
+	 * Method that checks for exceeded borrow times. Automatically returns Medias
+	 * and unreserves Reservations. Gets called by the spring scheduler
+	 * periodically.
+	 */
 	@Scheduled(fixedDelay = schedulingDelay, initialDelay = 5000)
 	public void checkBorrowTimeout() {
 		Map<MediaType, Integer> allowedBorrowTimes = getMediaBorrowTimesAsMap();
@@ -194,11 +317,18 @@ public class BorrowService implements CommandLineRunner {
 			if (diffInDays > allowedBorrowTimes.get(current.getMedia().getMediaType())) {
 				logger.info(
 						"Automatic return of media " + current.getMedia().getMediaID() + " due to time limitations");
+				// TODO: send email for automatic return
 				unBorrowMedia(current);
 			}
 		}
 	}
 
+	/**
+	 * Method that gets the maximum allowed borrow times for all media types.
+	 * 
+	 * @return a Map with MediaTypes as key and the associated allowed borrow time
+	 *         as value.
+	 */
 	private Map<MediaType, Integer> getMediaBorrowTimesAsMap() {
 		Map<MediaType, Integer> allowedBorrowTimes = new HashMap<>();
 		Collection<MediaBorrowTime> borrowTimes = mediaBorrowTimeRepository.findAll();
@@ -208,6 +338,10 @@ public class BorrowService implements CommandLineRunner {
 		return allowedBorrowTimes;
 	}
 
+	/**
+	 * Method that is only used to initialized the bean after project startup. Makes
+	 * the scheduler work from the start of the project.
+	 */
 	@Override
 	public void run(final String... args) throws Exception {
 		// used for initial loading of the component so scheduled task starts

@@ -1,10 +1,22 @@
 package at.qe.skeleton.model;
 
-import org.springframework.data.domain.Persistable;
-
-import javax.persistence.*;
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+
+import org.springframework.data.domain.Persistable;
+
+/**
+ * Entity that represents a bookmark.
+ * 
+ * @author Marcel Huber
+ * @version 1.0
+ */
 @Entity
 public class Bookmark implements Serializable, Persistable<Long> {
 
