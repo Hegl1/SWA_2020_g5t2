@@ -1,91 +1,272 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:composite="http://java.sun.com/jsf/composite"
-      xmlns:c="http://java.sun.com/jstl/core"
-      xmlns:p="http://primefaces.org/ui">
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:p="http://primefaces.org/ui">
 
-    <composite:interface>
-        <composite:attribute name="context" default="list" />
-        <composite:attribute name="mediaList" type="java.util.Collection" required="true" />
-    </composite:interface>
+<composite:interface>
+	<composite:attribute name="context" default="list" />
+	<composite:attribute name="mediaList" type="java.util.Collection"
+		required="true" />
+</composite:interface>
 
-    <composite:implementation>
-        <h:form id="mediaListForm">
-            <p:dataTable id="mediaTable" var="row" value="#{cc.attrs.mediaList}">
-                <!-- BEGIN: Sets the media variable according to the context -->
-                <c:choose>
-                    <c:when test="${cc.attrs.context == 'bookmarks'}">
-                        <c:set var="media" value="#{row.media}" />
-                    </c:when>
+<composite:implementation>
+	<h:form id="mediaListForm">
+		<p:dataTable id="mediaTable" var="row" value="#{cc.attrs.mediaList}">
 
-                    <c:when test="${cc.attrs.context == 'borrowed'}">
-                        <c:set var="media" value="#{row.media}" />
-                    </c:when>
+			<!-- BEGIN: Sets the media variable according to the context -->
+			<c:choose>
+				<c:when test="${cc.attrs.context == 'bookmarks'}">
+					<c:set var="media" value="#{row.media}" />
+				</c:when>
 
-                    <c:otherwise>
-                        <c:set var="media" value="#{row}" />
-                    </c:otherwise>
-                </c:choose>
-                <!-- END -->
+				<c:when test="${cc.attrs.context == 'borrowed'}">
+					<c:set var="media" value="#{row.media}" />
+				</c:when>
 
-                <p:column headerText="" style="width: 2rem; text-align: center">
-                    <p:commandButton update="@form:mediaListDialog" oncomplete="PF('mediaListDialog').show()" icon="fa fa-fw fa-info-circle" title="Show details">
-                        <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
-                    </p:commandButton>
-                </p:column>
-                <p:column headerText="Title">
-                    <h:outputText value="#{media.title}"/>
-                </p:column>
-                <p:column headerText="Type" style="width: 8rem; text-align: center">
-                    <h:outputText value="#{media.mediaTypeHuman}"/>
-                </p:column>
-                <p:column headerText="Language" style="width: 6rem; text-align: center">
-                    <h:outputText value="#{media.languageHuman}"/>
-                </p:column>
-                <p:column headerText="Publishing Year" style="width: 8rem; text-align: center">
-                    <h:outputText value="#{media.publishingYear}"/>
-                </p:column>
-                <p:column headerText="Due date" style="width: 5rem; text-align: center" rendered="#{cc.attrs.context == 'borrowed'}">
-                    <h:outputText value="#{borrowedListController.getBorrowedDueDate(row)}" >
-                        <f:convertDateTime pattern="dd.MM.yyyy" />
-                    </h:outputText>
-                </p:column>
-                <p:column headerText="Bookmark" style="width: 5rem; text-align: center" rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}">
-                    <p:commandButton icon="fa fa-fw fa-bookmark#{bookmarkService.isBookmarkedForAuthenticatedUser(media) ? '' : '-o'}" action="#{bookmarkService.toggleBookmark(media)}" title="Toggle bookmark" update="@form" />
-                </p:column>
-                <p:column headerText="Return" style="width: 5rem; text-align: center" rendered="#{cc.attrs.context == 'borrowed'}">
-                    <p:commandButton icon="fa fa-fw fa-times" action="#{borrowedListController.doUnBorrowMediaForAuthenticatedUser(media)}" title="Return media" update="@form" />
-                </p:column>
-            </p:dataTable>
+				<c:otherwise>
+					<c:set var="media" value="#{row}" />
+				</c:otherwise>
 
-            <p:dialog header="Detail" id="mediaListDialog" widgetVar="mediaListDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-                <p:outputPanel id="mediaData" rendered="#{not empty mediaDetailController.media}">
-                    <h:panelGrid columns="2" >
-                        <p:outputLabel for="mId" value="ID: " />
-                        <p:inputText style="width:250px" id="mId" value="#{mediaDetailController.media.mediaID}" disabled="true"/>
-                        <p:outputLabel for="mTitle" value="Title: " />
-                        <p:inputText style="width:250px" id="mTitle" value="#{mediaDetailController.media.title}" disabled="true"/>
-                        <p:outputLabel for="mType" value="Type: "  />
-                        <p:inputText style="width:250px" id="mType" value="#{mediaDetailController.media.mediaType}" disabled="true"/>
-                        <p:outputLabel for="mLan" value="Language: " />
-                        <p:inputText style="width:250px" id="mLan" value="#{mediaDetailController.media.language}" disabled="true"/>
-                        <p:outputLabel for="mPubYear" value="Publishing Year: " />
-                        <p:inputText style="width:250px" id="mPubYear" value="#{mediaDetailController.media.publishingYear}" disabled="true"/>
-                        <p:outputLabel for="mcurBor" value="Is currently borrowed? " />
-                        <p:inputText style="width:250px" id="mcurBor" value="#{mediaDetailController.media.curBorrowed}" disabled="true"/>
-                        <p:outputLabel for="mTotalAvail" value="Amount available: " />
-                        <p:inputText style="width:250px" id="mTotalAvail" value="#{mediaDetailController.media.totalAvail}" disabled="true"/>
+			</c:choose>
+			<!-- END -->
 
-                        <p:commandButton action="#{borrowedListController.doBorrowMediaForAuthenticatedUser(mediaDetailController.media)}" value="Borrow" id="borrowButton"  style="margin-right:20px;" icon="fa fa-fw fa-plus-square-o"
-                                         oncomplete="PF('mediaListDialog').hide()" update="@form:mediaTable" rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}">
-                        </p:commandButton>
+			<p:column headerText="" style="width: 2rem; text-align: center">
+				<p:commandButton update="@form:mediaListDialog"
+					oncomplete="PF('mediaListDialog').show()"
+					icon="fa fa-fw fa-info-circle" title="Show details">
+					<f:setPropertyActionListener value="#{media}"
+						target="#{mediaDetailController.media}" />
+				</p:commandButton>
+			</p:column>
+			<p:column headerText="Title">
+				<h:outputText value="#{media.title}" />
+			</p:column>
+			<p:column headerText="Type" style="width: 8rem; text-align: center">
+				<h:outputText value="#{media.mediaTypeHuman}" />
+			</p:column>
+			<p:column headerText="Language"
+				style="width: 6rem; text-align: center">
+				<h:outputText value="#{media.languageHuman}" />
+			</p:column>
+			<p:column headerText="Publishing Year"
+				style="width: 8rem; text-align: center">
+				<h:outputText value="#{media.publishingYear}" />
+			</p:column>
+			<p:column headerText="Due date"
+				style="width: 5rem; text-align: center"
+				rendered="#{cc.attrs.context == 'borrowed'}">
+				<h:outputText
+					value="#{borrowedListController.getBorrowedDueDate(row)}">
+					<f:convertDateTime pattern="dd.MM.yyyy" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Bookmark"
+				style="width: 5rem; text-align: center"
+				rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}">
+				<p:commandButton
+					icon="fa fa-fw fa-bookmark#{bookmarkService.isBookmarkedForAuthenticatedUser(media) ? '' : '-o'}"
+					action="#{bookmarkService.toggleBookmark(media)}"
+					title="Toggle bookmark" update="@form" />
+			</p:column>
+			<p:column headerText="Return" style="width: 5rem; text-align: center"
+				rendered="#{cc.attrs.context == 'borrowed'}">
+				<p:commandButton icon="fa fa-fw fa-times"
+					action="#{borrowedListController.doUnBorrowMediaForAuthenticatedUser(media)}"
+					title="Return media" update="@form" />
+			</p:column>
+			<p:column style="width: 5rem; text-align: center"
+				rendered="#{cc.attrs.context == 'mediaAdmin'}">
+				<p:commandButton update="@form:mediaEditDialog"
+					oncomplete="PF('mediaEditDialog').show()" icon="fa fa-fw fa-edit"
+					title="Edit">
+					<!-- @form -->
+					<f:setPropertyActionListener value="#{media}"
+						target="#{mediaDetailController.media}" />
+				</p:commandButton>
+				<p:commandButton update="@form"
+					action="#{mediaDetailController.doDeleteMedia}"
+					icon="fa fa-fw fa-trash" title="Delete">
+					<f:setPropertyActionListener value="#{media}"
+						target="#{mediaDetailController.media}" />
+					<p:confirm header="Delete media"
+						message="Do you want to delete the media?" icon="ui-icon-alert" />
+				</p:commandButton>
+			</p:column>
+			
+			<!-- Buttons for create media -->
+			<f:facet name="header" rendered="#{cc.attrs.context == 'mediaAdmin'}">
+				<p:commandButton update="@form:mediaCreateBookDialog"
+					oncomplete="PF('mediaCreateBookDialog').show()" icon="ui-icon-plus"
+					title="Create book" value="Create book">
+					<f:setPropertyActionListener value="#{media}"
+						target="#{createMediaBean.media}" />
+				</p:commandButton>
+			</f:facet>
+			<f:facet name="header" rendered="#{cc.attrs.context == 'mediaAdmin'}">
+				<p:commandButton update="@form"
+					oncomplete="PF('mediaCreateAudiobookDialog').show()"
+					icon="ui-icon-plus" title="Create Audiobook"
+					value="Create Audiobook"></p:commandButton>
+			</f:facet>
+			<f:facet name="header" rendered="#{cc.attrs.context == 'mediaAdmin'}">
+				<p:commandButton update="@form"
+					oncomplete="PF('mediaCreateMagazinDialog').show()"
+					icon="ui-icon-plus" title="Create Magazin" value="Create Magazin"></p:commandButton>
+			</f:facet>
+			<f:facet name="header" rendered="#{cc.attrs.context == 'mediaAdmin'}">
+				<p:commandButton update="@form"
+					oncomplete="PF('mediaCreateVideoDialog').show()"
+					icon="ui-icon-plus" title="Create Video" value="Create Video"></p:commandButton>
+			</f:facet>
+			
+			
 
-                    </h:panelGrid>
-                </p:outputPanel>
-            </p:dialog>
-        </h:form>
-    </composite:implementation>
+		</p:dataTable>
+
+		<!-- For Editing -->
+		<p:dialog header="Edit Media" id="mediaEditDialog"
+			widgetVar="mediaEditDialog" modal="true" showEffect="fade"
+			hideEffect="fade" resizable="false">
+			<p:outputPanel id="mediaEditData"
+				rendered="#{not empty mediaDetailController.media}">
+				<p:separator />
+				<h:panelGrid columns="2">
+					<p:outputLabel for="mediaID" value="Media ID: " />
+					<p:inputText id="mediaID"
+						value="#{mediaDetailController.media.mediaID}" />
+					<p:outputLabel for="title" value="Title: " />
+					<p:inputText id="title"
+						value="#{mediaDetailController.media.title}" />
+					<p:outputLabel for="mediaType" value="Type: " />
+					<p:inputText id="mediaType" disabled="true"
+						value="#{mediaDetailController.media.mediaType}" />
+					<p:outputLabel for="language" value="Language (DE or EN): " />
+					<p:inputText id="language"
+						value="#{mediaDetailController.media.language}" />
+					<p:outputLabel for="publishingYear" value="Publishing Year: " />
+					<p:inputText id="publishingYear"
+						value="#{mediaDetailController.media.publishingYear}" />
+					<p:outputLabel for="curBorrowed" value="Is currently Borrowed: " />
+					<p:inputText id="curBorrowed"
+						value="#{mediaDetailController.media.curBorrowed}" />
+					<p:outputLabel for="totalAvail" value="Total Available: " />
+					<p:inputText id="totalAvail"
+						value="#{mediaDetailController.media.totalAvail}" />
+
+				</h:panelGrid>
+
+				<p:separator />
+				<h:panelGrid columns="3">
+					<p:commandButton value="Save"
+						action="#{mediaDetailController.doSaveMedia()}"
+						oncomplete="PF('mediaEditDialog').hide()"
+						update="@form:mediaTable">
+					</p:commandButton>
+					<p:commandButton value="Reload"
+						action="#{mediaDetailController.doReloadMedia()}"
+						update="@form:mediaEditData" />
+					<p:commandButton value="Cancel"
+						onclick="PF('mediaEditDialog').hide()" />
+				</h:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+
+		<!-- delete Dialog -->
+		<p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
+			width="300">
+			<p:commandButton value="Yes" type="button"
+				styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+			<p:commandButton value="No" type="button"
+				styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		</p:confirmDialog>
+
+		<!-- Create Book Dialog -->
+		<p:dialog header="Create book" id="mediaCreateBookDialog"
+			widgetVar="mediaCreateBookDialog" modal="true" showEffect="fade"
+			hideEffect="fade" resizable="false">
+			<p:outputPanel id="mediaCreateBook">
+
+				<h:panelGrid columns="2">
+					<p:outputLabel for="mediaID2" value="Media ID: " />
+					<p:inputText id="mediaID2" value="#{createMediaBean.mediaID}" />
+					<p:outputLabel for="title2" value="Title: " />
+					<p:inputText id="title2" value="#{createMediaBean.title}" />
+					<p:outputLabel for="publishingDate2" value="Published Year: " />
+					<p:inputText id="publishingDate2"
+						value="#{createMediaBean.publishingDate}" />
+					<p:outputLabel for="language2" value="Language:  " />
+					<p:inputText id="language2" value="#{createMediaBean.language}" />
+					<p:outputLabel for="totalAvail2" value="totalAvail: " />
+					<p:inputText id="totalAvail2" value="#{createMediaBean.totalAvail}" />
+					<p:outputLabel for="mediaType2" value="mediaType: " />
+					<p:inputText id="mediaType2" value="#{createMediaBean.mediaType}" />
+					<p:outputLabel for="author2" value="Author: " />
+					<p:inputText id="author2" value="#{createMediaBean.author}" />
+					<p:outputLabel for="ISBN2" value="ISBN: " />
+					<p:inputText id="ISBN2" value="#{createMediaBean.ISBN}" />
+				</h:panelGrid>
+
+				<p:separator />
+				<h:panelGrid columns="3">
+					<p:commandButton value="Save"
+						action="#{createMediaBean.doCreateBook(title, publishingDate, language, totalAvail, mediaType, author, ISBN)}"
+						oncomplete="PF('mediaCreateBookDialog').hide()"
+						update="@form:mediaTable">
+					</p:commandButton>
+					<p:commandButton value="Cancel"
+						onclick="PF('mediaCreateBookDialog').hide()" />
+				</h:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+
+
+		<!-- Edit Dialog -->
+		<p:dialog header="Detail" id="mediaListDialog"
+			widgetVar="mediaListDialog" modal="true" showEffect="fade"
+			hideEffect="fade" resizable="false">
+			<p:outputPanel id="mediaData"
+				rendered="#{not empty mediaDetailController.media}">
+				<h:panelGrid columns="2">
+					<p:outputLabel for="mId" value="ID: " />
+					<p:inputText style="width:250px" id="mId"
+						value="#{mediaDetailController.media.mediaID}" disabled="true" />
+					<p:outputLabel for="mTitle" value="Title: " />
+					<p:inputText style="width:250px" id="mTitle"
+						value="#{mediaDetailController.media.title}" disabled="true" />
+					<p:outputLabel for="mType" value="Type: " />
+					<p:inputText style="width:250px" id="mType"
+						value="#{mediaDetailController.media.mediaType}" disabled="true" />
+					<p:outputLabel for="mLan" value="Language: " />
+					<p:inputText style="width:250px" id="mLan"
+						value="#{mediaDetailController.media.language}" disabled="true" />
+					<p:outputLabel for="mPubYear" value="Publishing Year: " />
+					<p:inputText style="width:250px" id="mPubYear"
+						value="#{mediaDetailController.media.publishingYear}"
+						disabled="true" />
+					<p:outputLabel for="mcurBor" value="Is currently borrowed? " />
+					<p:inputText style="width:250px" id="mcurBor"
+						value="#{mediaDetailController.media.curBorrowed}" disabled="true" />
+					<p:outputLabel for="mTotalAvail" value="Amount available: " />
+					<p:inputText style="width:250px" id="mTotalAvail"
+						value="#{mediaDetailController.media.totalAvail}" disabled="true" />
+
+					<p:commandButton
+						action="#{borrowedListController.doBorrowMediaForAuthenticatedUser(mediaDetailController.media)}"
+						value="Borrow" id="borrowButton" style="margin-right:20px;"
+						icon="fa fa-fw fa-plus-square-o"
+						oncomplete="PF('mediaListDialog').hide()"
+						update="@form:mediaTable"
+						rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}">
+					</p:commandButton>
+
+				</h:panelGrid>
+			</p:outputPanel>
+		</p:dialog>
+	</h:form>
+</composite:implementation>
 </html>
