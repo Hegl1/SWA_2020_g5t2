@@ -49,8 +49,9 @@
                     <h:outputText value="#{media.publishingYear}"/>
                 </p:column>
 
+<!--            temporary place for the delete button-->
                 <p:column headerText="Delete" style="width: 6rem; text-align: center" rendered="#{sessionInfoBean.currentUserRoles == 'ADMIN'}" >
-                <p:commandButton action="#{mediaDetailController.doDeleteMedia(media)}" icon="fa fa-fw fa-trash" title="Löschen" update="mediaTable">
+                <p:commandButton id="mDelBut" onclick="PF('dataChangeDlg').show()" action="#{mediaDetailController.orderDeleteMedia(media)}" icon="fa fa-fw fa-trash" title="Löschen" update="mediaTable">
                     <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
 
                 </p:commandButton>

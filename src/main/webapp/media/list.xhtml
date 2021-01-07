@@ -5,9 +5,10 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
-                template="/WEB-INF/templates/main.xhtml">
-    <ui:define name="content">
+                template="/WEB-INF/templates/main.xhtml" >
+    <ui:define name="content" >
         <style type="text/css">
+
             #mediaTable tr{
                 transition: background 0.2s;
             }
@@ -16,7 +17,7 @@
             }
         </style>
 
-        <p:messages for="asMessage" />
+        <p:messages for="asMessage" closable="false" showDetail="true" />
         <p:growl for="asGrowl" closable="true" showDetail="true" showSummary="true" redisplay="true">
             <p:autoUpdate />
         </p:growl>
@@ -47,6 +48,22 @@
             </p:accordionPanel>
         </h:form>
 
-        <lib:MediaList mediaList="#{mediaListController.media}" context="list"></lib:MediaList>
+
+        <lib:MediaList id="newid01" mediaList="#{mediaListController.media}" context="list"></lib:MediaList>
+
+
+<!--    this window is shown when the delete button is activated-->
+        <p:blockUI widgetVar="dataChangeDlg" trigger="newid01"  block=":newid01" >
+            <h:panelGrid  bgcolor="white"  >
+                <h:outputText value="Loading &lt;br /&gt; Please wait 20 seconds until a pop up message appears. &lt;br /&gt;
+                The media is still bookmarked by somebody and will be deleted. &lt;br /&gt;
+                In addition current users that had bookmarked it will be sent an email." escape="false" />
+
+            </h:panelGrid>
+        </p:blockUI>
+
+
     </ui:define>
+
 </ui:composition>
+
