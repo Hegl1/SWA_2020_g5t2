@@ -226,6 +226,33 @@ public class BorrowService implements CommandLineRunner {
 	}
 
 	/**
+	 * Removes a reservation of the media for the authenticated user
+	 *
+	 * @param media the media
+	 */
+	public void removeReservationForAuthenticatedUser(final Media media){
+		User user = userService.loadCurrentUser();
+
+		Reserved r = reservedRepository.findFirstByUserAndMedia(user, media);
+
+		if(r != null){
+			reservedRepository.delete(r);
+		}
+	}
+
+	/**
+	 * Returns whether the authenticated user has reserved this media or not
+	 *
+	 * @param media the media to search for
+	 * @return true, if he has reserved it, false otherwise
+	 */
+	public boolean isReservedForAuthenticatedUser(final Media media){
+		User user = userService.loadCurrentUser();
+
+		return reservedRepository.findFirstByUserAndMedia(user, media) != null;
+	}
+
+	/**
 	 * Method that unreserves a Media for a User. Automatically sends an email to
 	 * the user that reserved the Media.
 	 * 
@@ -290,6 +317,14 @@ public class BorrowService implements CommandLineRunner {
 	}
 
 	/**
+	 * Returns the amount of reservations made for a certain media
+	 *
+	 * @param media the media to search for
+	 * @return the count of reservations made
+	 */
+	public int getReservationCountForMedia(final Media media) { return reservedRepository.getReservationCountForMedia(media.getMediaID()); }
+
+	/**
 	 * Method that retrieves one particular Reserved object by user and media.
 	 * 
 	 * @param user  the user to get the Reserved object for.
@@ -298,7 +333,7 @@ public class BorrowService implements CommandLineRunner {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Reserved loadReserved(final User user, final Media media) {
-		return reservedRepository.findByUserAndMedia(user, media);
+		return reservedRepository.findFirstByUserAndMedia(user, media);
 	}
 
 	/**

@@ -103,7 +103,7 @@ public class MediaService {
      */
 
     public Collection<Media> filterMediaByTitle(Collection<Media> filteredMedia, String title) {
-        return filteredMedia.stream().filter(x -> x.getTitle().indexOf(title) != -1).collect(Collectors.toCollection(ArrayList::new));
+        return filteredMedia.stream().filter(x -> x.getTitle().toLowerCase().indexOf(title) != -1).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public Collection<Media> filterMediaByAvailability(Collection<Media> filteredMedia, boolean isAvailable) {
