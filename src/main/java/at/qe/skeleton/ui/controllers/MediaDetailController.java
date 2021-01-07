@@ -120,4 +120,19 @@ public class MediaDetailController implements Serializable {
         this.mediaService.deleteMedia(media);
         this.media = null;
     }
+
+    /**
+     * Converts a length in seconds to a nicely readable string in the format:
+     * "[hours]h [minutes]m [seconds]s"
+     *
+     * @param length The length in seconds to convert
+     * @return the formatted string
+     */
+    public String convertLength(final int length) {
+        int seconds = length % 60;
+        int minutes = ((int) length / 60) % 60;
+        int hours = ((int) length / 60) / 60;
+
+        return hours + "h " + minutes + "m " + seconds + "s";
+    }
 }

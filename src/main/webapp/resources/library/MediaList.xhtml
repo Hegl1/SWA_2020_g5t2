@@ -101,7 +101,7 @@
                                 <h:outputText value="#{mediaDetailController.mediaAudioBook.speaker}" />
 
                                 <h:outputText value="Length" styleClass="mediaDetailDialogHeaderCol" />
-                                <h:outputText value="#{mediaDetailController.mediaAudioBook.length}" />
+                                <h:outputText value="#{mediaDetailController.convertLength(mediaDetailController.mediaAudioBook.length)}" />
 
                                 <h:outputText value="Author" styleClass="mediaDetailDialogHeaderCol" />
                                 <h:outputText value="#{mediaDetailController.mediaAudioBook.author}" />
@@ -112,7 +112,7 @@
 
                             <c:when test="${mediaDetailController.media.mediaType == 'VIDEO'}">
                                 <h:outputText value="Length" styleClass="mediaDetailDialogHeaderCol" />
-                                <h:outputText value="#{mediaDetailController.mediaVideo.length}" />
+                                <h:outputText value="#{mediaDetailController.convertLength(mediaDetailController.mediaVideo.length)}" />
                             </c:when>
 
                             <c:when test="${mediaDetailController.media.mediaType == 'MAGAZINE'}">
@@ -120,16 +120,39 @@
                                 <h:outputText value="#{mediaDetailController.mediaMagazine.series}" />
                             </c:when>
                         </c:choose>
-
-                        <p:commandButton
-                                action="#{borrowedListController.doBorrowMediaForAuthenticatedUser(mediaDetailController.media)}"
-                                value="Borrow"
-                                id="borrowButton"
-                                icon="fa fa-fw fa-plus-square-o"
-                                oncomplete="PF('mediaDetailDialog').hide()"
-                                update="@form:mediaTable"
-                                rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}" />
                     </h:panelGrid>
+
+                    <h:panelGrid columns="2" style="margin-bottom: 10px">
+                        <h:outputText value="Total exemplars" styleClass="mediaDetailDialogHeaderCol" />
+                        <h:outputText value="#{mediaDetailController.media.totalAvail}" />
+
+                        <h:outputText value="Available" styleClass="mediaDetailDialogHeaderCol" />
+                        <h:outputText value="#{mediaDetailController.media.totalAvail - mediaDetailController.media.curBorrowed}" />
+
+                        <h:outputText value="Reserved" styleClass="mediaDetailDialogHeaderCol" />
+                        <h:outputText value="#{reservedController.getReservationCountForMedia(mediaDetailController.media)}" />
+                    </h:panelGrid>
+
+                    <p:commandButton
+                            action="#{borrowedListController.doBorrowMediaForAuthenticatedUser(mediaDetailController.media)}"
+                            value="Borrow"
+                            id="borrowButton"
+                            icon="fa fa-fw fa-plus-square-o"
+                            oncomplete="PF('mediaDetailDialog').hide()"
+                            update="@form:mediaTable"
+                            rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}"
+                            disabled="#{(mediaDetailController.media.totalAvail - mediaDetailController.media.curBorrowed) == 0}"
+                    />
+                    <p:commandButton
+                            action="#{reservedController.toggleReservationForAuthenticatedUser(mediaDetailController.media)}"
+                            value="#{reservedController.isReservedForAuthenticatedUser(mediaDetailController.media) ? 'Unreserve' : 'Reserve'}"
+                            id="reserveButton"
+                            icon="fa fa-fw fa-#{reservedController.isReservedForAuthenticatedUser(mediaDetailController.media) ? 'minus' : 'plus'}-square-o"
+                            oncomplete="PF('mediaDetailDialog').hide()"
+                            update="@form:mediaTable"
+                            rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}"
+                            disabled="#{(mediaDetailController.media.totalAvail - mediaDetailController.media.curBorrowed) > 0}"
+                    />
                 </p:outputPanel>
             </p:dialog>
         </h:form>
