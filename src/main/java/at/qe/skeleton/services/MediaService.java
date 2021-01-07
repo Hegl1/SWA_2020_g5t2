@@ -162,6 +162,10 @@ public class MediaService {
      * Filter Media by property
      */
 
+    public Collection<Media> filterMediaByTitle(Collection<Media> filteredMedia, String title) {
+        return filteredMedia.stream().filter(x -> x.getTitle().indexOf(title) != -1).collect(Collectors.toCollection(ArrayList::new));
+    }
+
     public Collection<Media> filterMediaByAvailability(Collection<Media> filteredMedia, boolean isAvailable) {
         return filteredMedia.stream().filter(x -> isAvailable ? x.getTotalAvail() > 0 : x.getTotalAvail() == 0).collect(Collectors.toCollection(ArrayList::new));
     }
@@ -172,6 +176,10 @@ public class MediaService {
 
     public Collection<Media> filterMediaByType(Collection<Media> filteredMedia, final MediaType mediaType) {
         return filteredMedia.stream().filter(x -> x.getMediaType().equals(mediaType)).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public Collection<Media> filterMediaByTitle(String title) {
+        return filterMediaByTitle(this.getAllMedia(), title);
     }
 
     public Collection<Media> filterMediaByAvailability(boolean isAvailable) {
