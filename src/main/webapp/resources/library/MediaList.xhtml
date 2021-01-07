@@ -54,7 +54,7 @@
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Bookmark" style="width: 5rem; text-align: center" rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}">
-                    <p:commandButton icon="fa fa-fw fa-bookmark#{bookmarkService.isBookmarkedForAuthenticatedUser(media) ? '' : '-o'}" action="#{bookmarkService.toggleBookmark(media)}" title="Toggle bookmark" update="@form" />
+                    <p:commandButton icon="fa fa-fw fa-bookmark#{bookmarkController.isBookmarkedForAuthenticatedUser(media) ? '' : '-o'}" action="#{bookmarkController.toggleBookmark(media)}" title="Toggle bookmark" update="@form" />
                 </p:column>
                 <p:column headerText="Return" style="width: 5rem; text-align: center" rendered="#{cc.attrs.context == 'borrowed'}">
                     <p:commandButton icon="fa fa-fw fa-times" action="#{borrowedListController.doUnBorrowMediaForAuthenticatedUser(media)}" title="Return media" update="@form" />
