@@ -1,5 +1,7 @@
 package at.qe.skeleton.ui.beans;
 
+import at.qe.skeleton.model.AudioBook;
+import at.qe.skeleton.model.Book;
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.MediaType;
 import at.qe.skeleton.services.MediaService;
@@ -42,7 +44,7 @@ public class SearchMediaBean implements Serializable {
     }
 
     public void setSearch(final String search) {
-        this.search = search == null ? null : search.trim();
+        this.search = search == null ? null : search.trim().toLowerCase();
 
         if(this.search == ""){
             this.search = null;
