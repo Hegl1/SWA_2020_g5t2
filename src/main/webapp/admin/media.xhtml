@@ -1,22 +1,60 @@
 
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:p="http://primefaces.org/ui"
-	xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
-	template="/WEB-INF/templates/main.xhtml">
-	<ui:define name="content">
-		<style type="text/css">
-#mediaTable tr {
-	transition: background 0.2s;
-}
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
+                template="/WEB-INF/templates/main.xhtml">
+    <ui:define name="content">
+        <style type="text/css">
+            #mediaTable tr{
+                transition: background 0.2s;
+            }
+            #mediaTable tr:hover{
+                background: rgba(0, 0, 0, 0.1);
+            }
+        </style>
 
-#mediaTable tr:hover {
-	background: rgba(0, 0, 0, 0.1);
-}
-</style>
+        <p:messages for="asMessage" />
+        <p:growl for="asGrowl" closable="true" showDetail="true" showSummary="true" redisplay="true">
+            <p:autoUpdate />
+        </p:growl>
 
+        <h:form id="filter" style="margin-bottom: 15px">
+            <p:accordionPanel activeIndex="-2">
+                <p:tab title="Search">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="@next" value="Search:" />
+                        <p:inputText id="title_filter" value="" />
+
+                        <p:outputLabel for="@next" value="Type:" />
+                        <p:selectOneMenu id="type_filter" value="">
+                            <f:selectItem itemLabel="Any" itemValue="" />
+                            <f:selectItem itemLabel="Book" itemValue="BOOK" />
+                            <f:selectItem itemLabel="Audiobook" itemValue="AUDIOBOOK" />
+                            <f:selectItem itemLabel="Video" itemValue="VIDEO" />
+                            <f:selectItem itemLabel="Magazine" itemValue="MAGAZINE" />
+                        </p:selectOneMenu>
+
+                        <p:outputLabel for="@next" value="Language:" />
+                        <p:selectOneMenu id="language_filter" value="" dynamic="true">
+                            <f:selectItem itemLabel="Any" itemValue="" />
+                            <f:selectItems value="#{mediaListController.allLanguages}" />
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                </p:tab>
+            </p:accordionPanel>
+        </h:form>
+
+        <lib:MediaList mediaList="#{mediaListController.media}" context="mediaAdmin"></lib:MediaList>
+        
+    </ui:define>
+</ui:composition>
+
+
+
+<!--  
 		<p:messages for="asMessage" />
 		<p:growl for="asGrowl" closable="true" showDetail="true"
 			showSummary="true" redisplay="true">
@@ -27,6 +65,9 @@
 			<p:dataTable id="mediaTable" var="media"
 				value="#{mediaListController.media}">
 				<f:facet name="header">
+					   <p:commandButton update=":mediaForm:mediaAddDialog"
+						oncomplete="PF('mediaAddDialog').show()" icon="ui-icon-plus"
+						title="Create new Media" value="Create new Media"></p:commandButton>
 				</f:facet>
 				<p:column headerText="ID">
 					<h:outputText value="#{media.mediaID}" />
@@ -50,7 +91,8 @@
 						<f:setPropertyActionListener value="#{media}"
 							target="#{mediaDetailController.media}" />
 					</p:commandButton>
-					<p:commandButton action="#{mediaDetailController.doDeleteMedia(media)}"
+					<p:commandButton
+						action="#{mediaDetailController.doDeleteMedia(media)}"
 						icon="fa fa-fw fa-trash" title="Delete"
 						update=":mediaForm:mediaTable">
 						<f:setPropertyActionListener value="#{media}"
@@ -60,10 +102,10 @@
 							icon="ui-icon-alert" />
 					</p:commandButton>
 				</p:column>
-			</p:dataTable>
+			</p:dataTable>  -->
 
 			<!-- Edit Media Dialog-->
-			<p:dialog header="Edit Media" id="mediaEditDialog"
+			<!--<p:dialog header="Edit Media" id="mediaEditDialog"
 				widgetVar="mediaEditDialog" modal="true" showEffect="fade"
 				hideEffect="fade" resizable="false">
 				<p:outputPanel id="mediaData"
@@ -108,17 +150,67 @@
 							onclick="PF('mediaEditDialog').hide()" />
 					</h:panelGrid>
 				</p:outputPanel>
-			</p:dialog>
+			</p:dialog> -->
 
-			<!-- delete Dialog-->
+			<!-- delete Dialog
 			<p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
 				width="300">
 				<p:commandButton value="Yes" type="button"
 					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
 				<p:commandButton value="No" type="button"
 					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
-			</p:confirmDialog>
+			</p:confirmDialog> -->
 
+			<!--  New AudioBook Dialog -->
+			   <!--  <p:dialog header="Create new AudioBook" id="mediaAddDialog"
+				widgetVar="mediaAddDialog" modal="true" showEffect="fade"
+				hideEffect="fade" resizable="false">
+				<p:outputPanel id="regMediaData"
+					rendered="#{not empty mediaDetailController.media}">
+					<h:panelGrid columns="2">
+					
+					 
+						<p:outputLabel for="title" value="Title: " />
+						<p:inputText id="title"
+							value="#{mediaDetailController.media.title}" />
+						<p:outputLabel for="publishingDate" value="Publishing Year: " />
+						<p:inputText id="publishingDate"
+							value="#{mediaDetailController.media.publishingDate}" />
+						<p:outputLabel for="language" value="Language: " />
+						<p:inputText id="language"
+							value="#{mediaDetailController.media.language}" />
+						<p:outputLabel for="totalAvail" value="Total Available: " />
+						<p:inputText id="totalAvail"
+							value="#{mediaDetailController.media.totalAvail}" />
+						<p:outputLabel for="mediaType" value="Type: " />
+						<p:inputText id="mediaType"
+							value="#{mediaDetailController.media.mediaType}" />
+						<p:outputLabel for="speaker" value="Speaker: " />
+						<p:inputText id="speaker"
+							value="#{mediaDetailController.media.speaker}" />
+						<p:outputLabel for="length" value="Length: " />
+						<p:inputText id="length"
+							value="#{mediaDetailController.media.length}" />
+						<p:outputLabel for="author" value="Author: " />
+						<p:inputText id="author"
+							value="#{mediaDetailController.media.author}" />
+						<p:outputLabel for="ISBN" value="ISBN: " />
+						<p:inputText id="ISBN" value="#{mediaDetailController.media.ISBN}" /> 
+
+						</p:selectManyButton>
+					</h:panelGrid>
+				</p:outputPanel>
+				<h:panelGrid columns="2">
+					<p:commandButton value="Create"
+						action="#{mediaDetailController.media.doSaveMedia()}"
+						oncomplete="PF('mediaAddDialog').hide()"
+						update=":mediaForm:mediaTable" />
+					<p:commandButton value="Cancel"
+						onclick="PF('mediaAddDialog').hide()" />
+				</h:panelGrid> 
+			</p:dialog> -->
+<!--  
 		</h:form>
 	</ui:define>
 </ui:composition>
+-->
