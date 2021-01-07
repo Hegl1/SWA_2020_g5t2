@@ -95,7 +95,7 @@ public class MediaDetailController implements Serializable {
     /**
      * Action to delete the currently displayed media.
      */
-    public void doDeleteMedia(final Media media) {
+    public void doDeleteMedia() {
         this.mediaService.deleteMedia(media);
         this.media = null;
     }
