@@ -97,34 +97,6 @@
 						message="Do you want to delete the media?" icon="ui-icon-alert" />
 				</p:commandButton>
 			</p:column>
-			
-			<!-- Buttons for create media -->
-			<f:facet name="header" rendered="#{cc.attrs.context == 'mediaAdmin'}">
-				<p:commandButton update="@form:mediaCreateBookDialog"
-					oncomplete="PF('mediaCreateBookDialog').show()" icon="ui-icon-plus"
-					title="Create book" value="Create book">
-					<f:setPropertyActionListener value="#{media}"
-						target="#{createMediaBean.media}" />
-				</p:commandButton>
-			</f:facet>
-			<f:facet name="header" rendered="#{cc.attrs.context == 'mediaAdmin'}">
-				<p:commandButton update="@form"
-					oncomplete="PF('mediaCreateAudiobookDialog').show()"
-					icon="ui-icon-plus" title="Create Audiobook"
-					value="Create Audiobook"></p:commandButton>
-			</f:facet>
-			<f:facet name="header" rendered="#{cc.attrs.context == 'mediaAdmin'}">
-				<p:commandButton update="@form"
-					oncomplete="PF('mediaCreateMagazinDialog').show()"
-					icon="ui-icon-plus" title="Create Magazin" value="Create Magazin"></p:commandButton>
-			</f:facet>
-			<f:facet name="header" rendered="#{cc.attrs.context == 'mediaAdmin'}">
-				<p:commandButton update="@form"
-					oncomplete="PF('mediaCreateVideoDialog').show()"
-					icon="ui-icon-plus" title="Create Video" value="Create Video"></p:commandButton>
-			</f:facet>
-			
-			
 
 		</p:dataTable>
 
@@ -184,46 +156,6 @@
 			<p:commandButton value="No" type="button"
 				styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
 		</p:confirmDialog>
-
-		<!-- Create Book Dialog -->
-		<p:dialog header="Create book" id="mediaCreateBookDialog"
-			widgetVar="mediaCreateBookDialog" modal="true" showEffect="fade"
-			hideEffect="fade" resizable="false">
-			<p:outputPanel id="mediaCreateBook">
-
-				<h:panelGrid columns="2">
-					<p:outputLabel for="mediaID2" value="Media ID: " />
-					<p:inputText id="mediaID2" value="#{createMediaBean.mediaID}" />
-					<p:outputLabel for="title2" value="Title: " />
-					<p:inputText id="title2" value="#{createMediaBean.title}" />
-					<p:outputLabel for="publishingDate2" value="Published Year: " />
-					<p:inputText id="publishingDate2"
-						value="#{createMediaBean.publishingDate}" />
-					<p:outputLabel for="language2" value="Language:  " />
-					<p:inputText id="language2" value="#{createMediaBean.language}" />
-					<p:outputLabel for="totalAvail2" value="totalAvail: " />
-					<p:inputText id="totalAvail2" value="#{createMediaBean.totalAvail}" />
-					<p:outputLabel for="mediaType2" value="mediaType: " />
-					<p:inputText id="mediaType2" value="#{createMediaBean.mediaType}" />
-					<p:outputLabel for="author2" value="Author: " />
-					<p:inputText id="author2" value="#{createMediaBean.author}" />
-					<p:outputLabel for="ISBN2" value="ISBN: " />
-					<p:inputText id="ISBN2" value="#{createMediaBean.ISBN}" />
-				</h:panelGrid>
-
-				<p:separator />
-				<h:panelGrid columns="3">
-					<p:commandButton value="Save"
-						action="#{createMediaBean.doCreateBook(title, publishingDate, language, totalAvail, mediaType, author, ISBN)}"
-						oncomplete="PF('mediaCreateBookDialog').hide()"
-						update="@form:mediaTable">
-					</p:commandButton>
-					<p:commandButton value="Cancel"
-						onclick="PF('mediaCreateBookDialog').hide()" />
-				</h:panelGrid>
-			</p:outputPanel>
-		</p:dialog>
-
 
 		<!-- Edit Dialog -->
 		<p:dialog header="Detail" id="mediaListDialog"
