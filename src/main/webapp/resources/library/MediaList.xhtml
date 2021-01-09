@@ -181,7 +181,7 @@
                     <p:separator />
                     <h:panelGrid columns="2">
                         <p:outputLabel for="mediaID" value="Media ID: " />
-                        <p:inputText id="mediaID"
+                        <p:inputText disabled="true" id="mediaID"
                                      value="#{mediaDetailController.media.mediaID}" />
                         <p:outputLabel for="title" value="Title: " />
                         <p:inputText id="title"
@@ -195,12 +195,35 @@
                         <p:outputLabel for="publishingYear" value="Publishing Year: " />
                         <p:inputText id="publishingYear"
                                      value="#{mediaDetailController.media.publishingYear}" />
-                        <p:outputLabel for="curBorrowed" value="Is currently Borrowed: " />
-                        <p:inputText id="curBorrowed"
-                                     value="#{mediaDetailController.media.curBorrowed}" />
                         <p:outputLabel for="totalAvail" value="Total Available: " />
                         <p:inputText id="totalAvail"
                                      value="#{mediaDetailController.media.totalAvail}" />
+                        <c:choose>
+                            <c:when test="${mediaDetailController.media.mediaType == 'BOOK'}">
+                                <p:outputLabel for="@next" value="Author: " />
+                                <p:inputText value="#{mediaDetailController.media.author}" />
+                                <p:outputLabel for="@next" value="ISBN: " />
+                                <p:inputText value="#{mediaDetailController.media.ISBN}" />
+                            </c:when>
+                            <c:when test="${mediaDetailController.media.mediaType == 'AUDIOBOOK'}">
+                                <p:outputLabel for="@next" value="Speaker: " />
+                                <p:inputText value="#{mediaDetailController.media.speaker}" />
+                                <p:outputLabel for="@next" value="Length: " />
+                                <p:inputText value="#{mediaDetailController.media.length}" />
+                                <p:outputLabel for="@next" value="Author: " />
+                                <p:inputText value="#{mediaDetailController.media.author}" />
+                                <p:outputLabel for="@next" value="ISBN: " />
+                                <p:inputText value="#{mediaDetailController.media.ISBN}" />
+                            </c:when>
+                            <c:when test="${mediaDetailController.media.mediaType == 'MAGAZINE'}">
+                                <p:outputLabel for="@next" value="Series: " />
+                                <p:inputText value="#{mediaDetailController.media.series}" />
+                            </c:when>
+                            <c:when test="${mediaDetailController.media.mediaType == 'VIDEO'}">
+                                <p:outputLabel for="@next" value="Length: " />
+                                <p:inputText value="#{mediaDetailController.media.length}" />
+                            </c:when>
+                        </c:choose>
 
                     </h:panelGrid>
 
