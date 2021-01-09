@@ -5,50 +5,9 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
-	template="/WEB-INF/templates/main.xhtml">
+	template="/WEB-INF/templates/main.xhtml"
+	xmlns:c="http://java.sun.com/jstl/core">
 	<ui:define name="content">
-		<style type="text/css">
-#mediaTable tr {
-	transition: background 0.2s;
-}
-
-#mediaTable tr:hover {
-	background: rgba(0, 0, 0, 0.1);
-}
-</style>
-
-		<p:messages for="asMessage" />
-		<p:growl for="asGrowl" closable="true" showDetail="true"
-			showSummary="true" redisplay="true">
-			<p:autoUpdate />
-		</p:growl>
-
-		<h:form id="filter" style="margin-bottom: 15px">
-			<p:accordionPanel activeIndex="-2">
-				<p:tab title="Search">
-					<h:panelGrid columns="2">
-						<p:outputLabel for="@next" value="Search:" />
-						<p:inputText id="title_filter" value="" />
-
-						<p:outputLabel for="@next" value="Type:" />
-						<p:selectOneMenu id="type_filter" value="">
-							<f:selectItem itemLabel="Any" itemValue="" />
-							<f:selectItem itemLabel="Book" itemValue="BOOK" />
-							<f:selectItem itemLabel="Audiobook" itemValue="AUDIOBOOK" />
-							<f:selectItem itemLabel="Video" itemValue="VIDEO" />
-							<f:selectItem itemLabel="Magazine" itemValue="MAGAZINE" />
-						</p:selectOneMenu>
-
-						<p:outputLabel for="@next" value="Language:" />
-						<p:selectOneMenu id="language_filter" value="" dynamic="true">
-							<f:selectItem itemLabel="Any" itemValue="" />
-							<f:selectItems value="#{mediaListController.allLanguages}" />
-						</p:selectOneMenu>
-					</h:panelGrid>
-				</p:tab>
-			</p:accordionPanel>
-		</h:form>
-
 
 		<p:messages for="asMessage" />
 		<p:growl for="asGrowl" closable="true" showDetail="true"
@@ -63,198 +22,113 @@
 
 						<!-- Buttons for create media -->
 						<f:facet name="header">
-							<p:commandButton update=":createMedia:mediaCreateBookDialog"
-								oncomplete="PF('mediaCreateBookDialog').show()"
-								icon="ui-icon-plus" title="Create book" value="Create book">
-								<f:setPropertyActionListener value="#{media}"
-									target="#{createMediaBean.media}" />
+							<p:commandButton update=":createMedia:mediaCreateMediaDialog"
+								oncomplete="PF('mediaCreateMediaDialog').show()"
+								icon="fa fa-fw fa-plus" title="Create book" value="Create book">
+								<f:setPropertyActionListener value="BOOK"
+									target="#{createMediaBean.mediaType}" />
 							</p:commandButton>
 						</f:facet>
 						<f:facet name="header">
-							<p:commandButton update=":createMedia:mediaCreateAudiobookDialog"
-								oncomplete="PF('mediaCreateAudiobookDialog').show()"
-								icon="ui-icon-plus" title="Create Audiobook"
-								value="Create Audiobook"></p:commandButton>
+							<p:commandButton update=":createMedia:mediaCreateMediaDialog"
+								oncomplete="PF('mediaCreateMediaDialog').show()"
+								icon="fa fa-fw fa-plus" title="Create Audiobook"
+								value="Create Audiobook">
+								<f:setPropertyActionListener value="AUDIOBOOK"
+									target="#{createMediaBean.mediaType}" />
+							</p:commandButton>
 						</f:facet>
 						<f:facet name="header">
-							<p:commandButton update="@form"
-								oncomplete="PF('mediaCreateMagazinDialog').show()"
-								icon="ui-icon-plus" title="Create Magazin"
-								value="Create Magazin"></p:commandButton>
+							<p:commandButton update=":createMedia:mediaCreateMediaDialog"
+								oncomplete="PF('mediaCreateMediaDialog').show()"
+								icon="fa fa-fw fa-plus" title="Create Magazine"
+								value="Create Magazine">
+								<f:setPropertyActionListener value="MAGAZINE"
+									target="#{createMediaBean.mediaType}" />
+							</p:commandButton>
 						</f:facet>
 						<f:facet name="header">
-							<p:commandButton update="@form"
-								oncomplete="PF('mediaCreateVideoDialog').show()"
-								icon="ui-icon-plus" title="Create Video" value="Create Video"></p:commandButton>
+							<p:commandButton update=":createMedia:mediaCreateMediaDialog"
+								oncomplete="PF('mediaCreateMediaDialog').show()"
+								icon="fa fa-fw fa-plus" title="Create Video" value="Create Video">
+								<f:setPropertyActionListener value="VIDEO"
+									target="#{createMediaBean.mediaType}" />
+							</p:commandButton>
 						</f:facet>
 					</h:panelGrid>
 				</p:tab>
 			</p:accordionPanel>
 
-			<!-- Create AudioBook Dialog -->
-			<p:dialog header="Create book" id="mediaCreateAudiobookDialog"
-				widgetVar="mediaCreateAudiobookDialog" modal="true" showEffect="fade"
+
+
+			<!-- Create Media Dialog -->
+			<p:dialog header="Create media" id="mediaCreateMediaDialog"
+				widgetVar="mediaCreateMediaDialog" modal="true" showEffect="fade"
 				hideEffect="fade" resizable="false">
-				<p:outputPanel id="mediaCreateAudiobook">
+				<p:outputPanel id="mediaCreateMedia">
 
 					<h:panelGrid columns="2">
-						<p:outputLabel for="mediaID3" value="Media ID: " />
-						<p:inputText id="mediaID3" value="#{createMediaBean.mediaID}" />
-						<p:outputLabel for="title3" value="Title: " />
-						<p:inputText id="title3" value="#{createMediaBean.title}" />
-						<p:outputLabel for="publishingDate3" value="Published Year: " />
-						<p:inputText id="publishingDate3"
+						<p:outputLabel for="@next" value="Title: " />
+						<p:inputText value="#{createMediaBean.title}" />
+						<p:outputLabel for="@next" value="Published Year: " />
+						<p:inputText
 							value="#{createMediaBean.publishingDate}" />
-						<p:outputLabel for="language3" value="Language:  " />
-						<p:inputText id="language3" value="#{createMediaBean.language}" />
-						<p:outputLabel for="totalAvail3" value="totalAvail: " />
-						<p:inputText id="totalAvail3"
+						<p:outputLabel for="@next" value="Language:  " />
+						<p:inputText value="#{createMediaBean.language}" />
+						<p:outputLabel for="@next" value="totalAvail: " />
+						<p:inputText
 							value="#{createMediaBean.totalAvail}" />
-						<p:outputLabel for="mediaType3" value="mediaType: " />
-						<p:inputText id="mediaType3" value="#{createMediaBean.mediaType}" />
-						<p:outputLabel for="speaker3" value="Speaker: " />
-						<p:inputText id="speaker3" value="#{createMediaBean.speaker}" />
-						<p:outputLabel for="length3" value="Length: " />
-						<p:inputText id="length3" value="#{createMediaBean.length}" />
-						<p:outputLabel for="author3" value="Author: " />
-						<p:inputText id="author3" value="#{createMediaBean.author}" />
-						<p:outputLabel for="ISBN3" value="ISBN: " />
-						<p:inputText id="ISBN3" value="#{createMediaBean.ISBN}" />
+						<p:outputLabel for="@next" value="mediaType: " />
+						<p:inputText value="#{createMediaBean.mediaType}" />
+
+
+						<c:choose>
+							<c:when test="${createMediaBean.mediaType == 'BOOK'}">
+								<p:outputLabel for="@next" value="Author: " />
+								<p:inputText value="#{createMediaBean.author}" />
+								<p:outputLabel for="@next" value="ISBN: " />
+								<p:inputText value="#{createMediaBean.ISBN}" />
+							</c:when>
+							<c:when test="${createMediaBean.mediaType == 'AUDIOBOOK'}">
+								<p:outputLabel for="@next" value="Speaker: " />
+								<p:inputText value="#{createMediaBean.speaker}" />
+								<p:outputLabel for="@next" value="Length: " />
+								<p:inputText value="#{createMediaBean.length}" />
+								<p:outputLabel for="@next" value="Author: " />
+								<p:inputText value="#{createMediaBean.author}" />
+								<p:outputLabel for="@next" value="ISBN: " />
+								<p:inputText value="#{createMediaBean.ISBN}" />
+							</c:when>
+							<c:when test="${createMediaBean.mediaType == 'MAGAZINE'}">
+								<p:outputLabel for="@next" value="Series: " />
+								<p:inputText value="#{createMediaBean.series}" />
+							</c:when>
+							<c:when test="${createMediaBean.mediaType == 'VIDEO'}">
+								<p:outputLabel for="@next" value="Length: " />
+								<p:inputText value="#{createMediaBean.length}" />
+							</c:when>
+						</c:choose>
 					</h:panelGrid>
 
 					<p:separator />
 					<h:panelGrid columns="3">
 						<p:commandButton value="Save"
-							action="#{createMediaBean.doCreateAudioBook(title, publishingDate, language, totalAvail, mediaType, speaker, length, author, ISBN)}"
-							oncomplete="PF('mediaCreateAudiobookDialog').hide()">
-							<!-- update="@form:mediaTable">  -->
+							action="#{createMediaBean.doCreateMedia()}"
+							oncomplete="PF('mediaCreateMediaDialog').hide()"
+							update=":mediaListWrapper">
 						</p:commandButton>
 						<p:commandButton value="Cancel"
-							onclick="PF('mediaCreateAudiobookDialog').hide()" />
-					</h:panelGrid>
-				</p:outputPanel>
-			</p:dialog>
-			
-			<!-- Create Book Dialog -->
-			<p:dialog header="Create book" id="mediaCreateBookDialog"
-				widgetVar="mediaCreateBookDialog" modal="true" showEffect="fade"
-				hideEffect="fade" resizable="false">
-				<p:outputPanel id="mediaCreateBook">
-
-					<h:panelGrid columns="2">
-						<p:outputLabel for="mediaID2" value="Media ID: " />
-						<p:inputText id="mediaID2" value="#{createMediaBean.mediaID}" />
-						<p:outputLabel for="title2" value="Title: " />
-						<p:inputText id="title2" value="#{createMediaBean.title}" />
-						<p:outputLabel for="publishingDate2" value="Published Year: " />
-						<p:inputText id="publishingDate2"
-							value="#{createMediaBean.publishingDate}" />
-						<p:outputLabel for="language2" value="Language:  " />
-						<p:inputText id="language2" value="#{createMediaBean.language}" />
-						<p:outputLabel for="totalAvail2" value="totalAvail: " />
-						<p:inputText id="totalAvail2"
-							value="#{createMediaBean.totalAvail}" />
-						<p:outputLabel for="mediaType2" value="mediaType: " />
-						<p:inputText id="mediaType2" value="#{createMediaBean.mediaType}" />
-						<p:outputLabel for="author2" value="Author: " />
-						<p:inputText id="author2" value="#{createMediaBean.author}" />
-						<p:outputLabel for="ISBN2" value="ISBN: " />
-						<p:inputText id="ISBN2" value="#{createMediaBean.ISBN}" />
-					</h:panelGrid>
-
-					<p:separator />
-					<h:panelGrid columns="3">
-						<p:commandButton value="Save"
-							action="#{createMediaBean.doCreateBook(title, publishingDate, language, totalAvail, mediaType, author, ISBN)}"
-							oncomplete="PF('mediaCreateBookDialog').hide()">
-							<!-- update="@form:mediaTable">  -->
-						</p:commandButton>
-						<p:commandButton value="Cancel"
-							onclick="PF('mediaCreateBookDialog').hide()" />
-					</h:panelGrid>
-				</p:outputPanel>
-			</p:dialog>
-			
-			<!-- Create magazin Dialog -->
-			<p:dialog header="Create magazin" id="mediaCreateMagazinDialog"
-				widgetVar="mediaCreateMagazinDialog" modal="true" showEffect="fade"
-				hideEffect="fade" resizable="false">
-				<p:outputPanel id="mediaCreateMagazin">
-
-					<h:panelGrid columns="2">
-						<p:outputLabel for="mediaID4" value="Media ID: " />
-						<p:inputText id="mediaID4" value="#{createMediaBean.mediaID}" />
-						<p:outputLabel for="title4" value="Title: " />
-						<p:inputText id="title4" value="#{createMediaBean.title}" />
-						<p:outputLabel for="publishingDate4" value="Published Year: " />
-						<p:inputText id="publishingDate4"
-							value="#{createMediaBean.publishingDate}" />
-						<p:outputLabel for="language4" value="Language:  " />
-						<p:inputText id="language4" value="#{createMediaBean.language}" />
-						<p:outputLabel for="totalAvail4" value="totalAvail: " />
-						<p:inputText id="totalAvail4"
-							value="#{createMediaBean.totalAvail}" />
-						<p:outputLabel for="mediaType4" value="mediaType: " />
-						<p:inputText id="mediaType4" value="#{createMediaBean.mediaType}" />
-						<p:outputLabel for="series4" value="Series: " />
-						<p:inputText id="series4" value="#{createMediaBean.series}" />
-					</h:panelGrid>
-
-					<p:separator />
-					<h:panelGrid columns="3">
-						<p:commandButton value="Save"
-							action="#{createMediaBean.doCreateMagazine(title, publishingDate, language, totalAvail, mediaType, series)}"
-							oncomplete="PF('mediaCreateMagazinDialog').hide()">
-							<!-- update="@form:mediaTable">  -->
-						</p:commandButton>
-						<p:commandButton value="Cancel"
-							onclick="PF('mediaCreateMagazinDialog').hide()" />
-					</h:panelGrid>
-				</p:outputPanel>
-			</p:dialog>
-			
-			<!-- Create video Dialog -->
-			<p:dialog header="Create video" id="mediaCreateVideoDialog"
-				widgetVar="mediaCreateVideoDialog" modal="true" showEffect="fade"
-				hideEffect="fade" resizable="false">
-				<p:outputPanel id="mediaCreateVideo">
-
-					<h:panelGrid columns="2">
-						<p:outputLabel for="mediaID5" value="Media ID: " />
-						<p:inputText id="mediaID5" value="#{createMediaBean.mediaID}" />
-						<p:outputLabel for="title5" value="Title: " />
-						<p:inputText id="title5" value="#{createMediaBean.title}" />
-						<p:outputLabel for="publishingDate5" value="Published Year: " />
-						<p:inputText id="publishingDate5"
-							value="#{createMediaBean.publishingDate}" />
-						<p:outputLabel for="language5" value="Language:  " />
-						<p:inputText id="language5" value="#{createMediaBean.language}" />
-						<p:outputLabel for="totalAvail5" value="totalAvail: " />
-						<p:inputText id="totalAvail5"
-							value="#{createMediaBean.totalAvail}" />
-						<p:outputLabel for="mediaType5" value="mediaType: " />
-						<p:inputText id="mediaType5" value="#{createMediaBean.mediaType}" />
-						<p:outputLabel for="length5" value="Length: " />
-						<p:inputText id="length5" value="#{createMediaBean.length}" />
-					</h:panelGrid>
-
-					<p:separator />
-					<h:panelGrid columns="3">
-						<p:commandButton value="Save"
-							action="#{createMediaBean.doCreateVideo(title, publishingDate, language, totalAvail, mediaType, length)}"
-							oncomplete="PF('mediaCreateMagazinDialog').hide()">
-							<!-- update="@form:mediaTable">  -->
-						</p:commandButton>
-						<p:commandButton value="Cancel"
-							onclick="PF('mediaCreateMagazinDialog').hide()" />
+							onclick="PF('mediaCreateMediaDialog').hide()" />
 					</h:panelGrid>
 				</p:outputPanel>
 			</p:dialog>
 
 		</h:form>
 
-		<lib:MediaList mediaList="#{mediaListController.media}"
-			context="mediaAdmin"></lib:MediaList>
+		<h:panelGroup id="mediaListWrapper" layout="block">
+			<lib:MediaList mediaList="#{mediaListController.media}"
+				context="mediaAdmin"></lib:MediaList>
+		</h:panelGroup>
 
 	</ui:define>
 </ui:composition>

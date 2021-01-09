@@ -1,22 +1,12 @@
 package at.qe.skeleton.ui.beans;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.MediaType;
 import at.qe.skeleton.services.MediaService;
 
@@ -32,18 +22,11 @@ public class CreateMediaBean implements Serializable {
 	@Autowired
 	private MediaService mediaService;
 
-	private Media media;
-
-	private List<String> selectedMediaTypes;
-
-	private Long mediaID;
 	private String title;
 	private int publishingDate;
 	private String language;
 	private int totalAvail;
-	private int curBorrowed;
-	@Enumerated(EnumType.STRING)
-	private MediaType mediaType;
+	private String mediaType;
 
 	// For book
 	private String author;
@@ -58,90 +41,50 @@ public class CreateMediaBean implements Serializable {
 	// For Video
 	private int length;
 
-	/*
-	 * @PostConstruct public void init() { this.media = new Media(); }
+	/**
+	 * Create different Medias.
 	 */
 
-	@PreAuthorize("hasAuthority('ADMIN')")
-	public void saveMedia() {
+	public void doCreateAudioBook() {
 
-		//setMediaTypes();
-		mediaService.saveMedia(media);
-
-		FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_INFO, "Changes saved!", "");
-		FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
+		this.mediaService.createAudioBook(title, publishingDate, language, totalAvail, MediaType.AUDIOBOOK, speaker,
+				length, author, ISBN);
+		// this.doReloadMedia();
 	}
 
-	private void setMediaTypes() {
-		Set<MediaType> mediaType = new HashSet<>();
+	public void doCreateBook() {
 
-		for (String selected : selectedMediaTypes) {
-			switch (selected) {
-			case "video":
-				mediaType.add(MediaType.VIDEO);
-				break;
-			case "book":
-				mediaType.add(MediaType.BOOK);
-				break;
-			case "audiobook":
-				mediaType.add(MediaType.AUDIOBOOK);
-				break;
-			case "magazin":
-				mediaType.add(MediaType.MAGAZINE);
-				break;
-			default:
-				System.err.println(
-						"[Warning] CreateMediaBean - setMediaTypes: Role \"" + selected + "\" not supported yet!"); // TODO:
-																													// add
-																													// logger
-			}
+		this.mediaService.createBook(title, publishingDate, language, totalAvail, MediaType.BOOK, author, ISBN);
+		// this.doReloadMedia();
+	}
+
+	public void doCreateMagazine() {
+
+		this.mediaService.createMagazine(title, publishingDate, language, totalAvail, MediaType.MAGAZINE, series);
+		// this.doReloadMedia();
+	}
+
+	public void doCreateVideo() {
+
+		this.mediaService.createVideo(title, publishingDate, language, totalAvail, MediaType.VIDEO, length);
+		// this.doReloadMedia();
+	}
+
+	public void doCreateMedia() {
+		switch (mediaType) {
+		case "VIDEO":
+			doCreateVideo();
+			break;
+		case "BOOK":
+			doCreateBook();
+			break;
+		case "AUDIOBOOK":
+			doCreateAudioBook();
+			break;
+		case "MAGAZINE":
+			doCreateMagazine();
+			break;
 		}
-	}
-	
-    /**
-     * Create different Medias.
-     */
-
-    public void doCreateAudioBook(final String title, final int publishingDate, final String language,
-                                  final int totalAvail, final MediaType mediaType, final String speaker,
-                                  final int length, final String author, final String ISBN) {
-
-        this.mediaService.createAudioBook(title, publishingDate, language, totalAvail, mediaType, speaker, length, author, ISBN);
-        // this.doReloadMedia();
-    }
-
-    public void doCreateBook(final String title, final int publishingDate, final String language, final int totalAvail,
-                             final MediaType mediaType, final String author, final String ISBN) {
-
-        this.mediaService.createBook(title, publishingDate, language, totalAvail, mediaType, author, ISBN);
-        // this.doReloadMedia();
-    }
-
-    public void doCreateMagazine(final String title, final int publishingDate, final String language,
-                                 final int totalAvail, final MediaType mediaType, final String series) {
-
-        this.mediaService.createMagazine(title, publishingDate, language, totalAvail, mediaType, series);
-        // this.doReloadMedia();
-    }
-
-    public void doCreateVideo(final String title, final int publishingDate, final String language,
-                              final int totalAvail, final MediaType mediaType, final int length) {
-
-        this.mediaService.createVideo(title, publishingDate, language, totalAvail, mediaType, length);
-        // this.doReloadMedia();
-    }
-
-
-	public Media getMedia() {
-		return media;
-	}
-
-	public void setMedia(Media media) {
-		this.media = media;
-	}
-
-	public List<String> getSelectedMediaTypes() {
-		return selectedMediaTypes;
 	}
 
 	public void setSelectedMediaTypes(List<String> selectedMediaTypes) {
@@ -153,14 +96,6 @@ public class CreateMediaBean implements Serializable {
 
 	public void setMediaService(MediaService mediaService) {
 		this.mediaService = mediaService;
-	}
-
-	public Long getMediaID() {
-		return mediaID;
-	}
-
-	public void setMediaID(Long mediaID) {
-		this.mediaID = mediaID;
 	}
 
 	public String getTitle() {
@@ -195,19 +130,11 @@ public class CreateMediaBean implements Serializable {
 		this.totalAvail = totalAvail;
 	}
 
-	public int getCurBorrowed() {
-		return curBorrowed;
-	}
-
-	public void setCurBorrowed(int curBorrowed) {
-		this.curBorrowed = curBorrowed;
-	}
-
-	public MediaType getMediaType() {
+	public String getMediaType() {
 		return mediaType;
 	}
 
-	public void setMediaType(MediaType mediaType) {
+	public void setMediaType(String mediaType) {
 		this.mediaType = mediaType;
 	}
 
