@@ -1,7 +1,6 @@
 package at.qe.skeleton.ui.controllers;
 
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaType;
+import at.qe.skeleton.model.*;
 import at.qe.skeleton.services.MediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -41,6 +40,29 @@ public class MediaDetailController implements Serializable {
      */
     public Media getMedia() { return media; }
 
+    public Book getMediaBook() {
+        if(media == null || media.getMediaType() != MediaType.BOOK) return null;
+
+        return (Book) media;
+    }
+
+    public AudioBook getMediaAudioBook() {
+        if(media == null || media.getMediaType() != MediaType.AUDIOBOOK) return null;
+
+        return (AudioBook) media;
+    }
+
+    public Video getMediaVideo() {
+        if(media == null || media.getMediaType() != MediaType.VIDEO) return null;
+
+        return (Video) media;
+    }
+
+    public Magazine getMediaMagazine() {
+        if(media == null || media.getMediaType() != MediaType.MAGAZINE) return null;
+
+        return (Magazine) media;
+    }
 
     /**
      * Action to force a reload of the currently displayed media.
@@ -91,7 +113,6 @@ public class MediaDetailController implements Serializable {
         // this.doReloadMedia();
     }
 
-
     /**
      * Action to delete the currently displayed media.
      */
@@ -100,6 +121,18 @@ public class MediaDetailController implements Serializable {
         this.media = null;
     }
 
+    /**
+     * Converts a length in seconds to a nicely readable string in the format:
+     * "[hours]h [minutes]m [seconds]s"
+     *
+     * @param length The length in seconds to convert
+     * @return the formatted string
+     */
+    public String convertLength(final int length) {
+        int seconds = length % 60;
+        int minutes = ((int) length / 60) % 60;
+        int hours = ((int) length / 60) / 60;
 
-
+        return hours + "h " + minutes + "m " + seconds + "s";
+    }
 }

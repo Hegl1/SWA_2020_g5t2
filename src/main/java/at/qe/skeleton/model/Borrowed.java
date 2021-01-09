@@ -1,11 +1,26 @@
 package at.qe.skeleton.model;
 
-import org.springframework.data.domain.Persistable;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.springframework.data.domain.Persistable;
+
+/**
+ * 
+ * Entity that represents a Borrowing.
+ * 
+ * @author Marcel Huber
+ * @version 1.0
+ */
 @Entity
 public class Borrowed implements Serializable, Persistable<Long> {
 
@@ -25,10 +40,20 @@ public class Borrowed implements Serializable, Persistable<Long> {
 	@Temporal(TemporalType.DATE)
 	private Date borrowDate;
 
+	/**
+	 * Default constructor.
+	 */
 	public Borrowed() {
 
 	}
 
+	/**
+	 * Construcotr that sets all the fields.
+	 * 
+	 * @param user  the user to borrow a media.
+	 * @param media the media to be borrowed.
+	 * @param date  the time the media was borrowed.
+	 */
 	public Borrowed(final User user, final Media media, final Date date) {
 		this();
 		this.user = user;

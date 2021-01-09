@@ -144,13 +144,34 @@ public class BookmarkService {
         }
 	}
 
-	public void toggleBookmark(final Media media) {
-		User myUser = userService.loadCurrentUser();
+	/**
+	 * Toggles the bookmarking state of the given media for the authenticated user
+	 *
+	 * @param media the media to add or to remove as/from one's own bookmarks
+	 * @return true, if the media is now bookmarked, false otherwise
+	 */
+	public boolean toggleBookmark(final Media media) {
+
 
 		if(this.isBookmarkedForAuthenticatedUser(media)){
-			this.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(myUser, media));
+			this.deleteBookmark(this.getBookmarkForAuthenticatedUserByMedia(media));
+
+			return false;
 		}else{
 			this.addBookmark(media);
+
+			return true;
 		}
+	}
+
+	/**
+	 * Returns the bookmark for the given media for the authenticated user
+	 * @param media the media to search for
+	 * @return the found bookmark
+	 */
+	public Bookmark getBookmarkForAuthenticatedUserByMedia(Media media){
+		User myUser = userService.loadCurrentUser();
+
+		return bookmarkRepository.findFirstByUserAndMedia(myUser, media);
 	}
 }
