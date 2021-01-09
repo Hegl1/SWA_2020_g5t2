@@ -57,7 +57,7 @@ public class AudioBook extends Media {
 		this.speaker = speaker;
 	}
 
-	public long getLength() {
+	public int getLength() {
 		return this.length;
 	}
 
