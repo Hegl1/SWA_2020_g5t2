@@ -1,65 +1,99 @@
 package at.qe.skeleton.tests;
 
-import java.util.Collection;
 
+import java.util.Collection;
+import java.util.Optional;
+
+import at.qe.skeleton.services.MediaService;
+import at.qe.skeleton.ui.beans.ContextMocker;
+import at.qe.skeleton.ui.beans.SessionInfoBean;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-
 import at.qe.skeleton.model.Bookmark;
 import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.repositories.BookmarkRepository;
 import at.qe.skeleton.services.BookmarkService;
 
+import javax.faces.context.FacesContext;
+
+
+
 @RunWith(SpringJUnit4ClassRunner.class)
+
 @SpringBootTest
 @WebAppConfiguration
 public class BookmarkTest {
 
 	@Autowired
-	private BookmarkRepository bookmarkRepository;
+	BookmarkService bookmarkService;
 
-	@MockBean
-	private BookmarkService bookmarkService;
+	@Autowired
+	MediaService mediaService;
 
-	@MockBean
-	private Media media1;
+	@Autowired
+	SessionInfoBean sessionInfoBean;
 
-// BookmarkService
 	@Test
-	@WithMockUser(username = "customer1", authorities = { "CUSTOMER" })
+	@WithMockUser(username = "customer2", authorities = { "CUSTOMER" })
 	public void bookmarkAddTest() {
 
+		// ignore FacesContext Messages that some our the services use during test
+		FacesContext context = ContextMocker.mockFacesContext();
+
+		System.out.println("The initial size of bookmarked items is 1 (see data.sql) ");
+		Collection<Bookmark> bcoll_sql = bookmarkService.getAllBookmarks();
+
 		System.out.println("> add 1 media and check if the size has increased from 0 to 1");
-
-		media1.setMediaType(MediaType.BOOK);
-		media1.setMediaID(1);
-		media1.setTitle("A Test Book");
-
+		Media media1 = mediaService.loadMedia(4L);
 		bookmarkService.addBookmark(media1);
-		Collection<Bookmark> bcoll = bookmarkRepository.findAll();
 
-		System.out.println(">> These entries are in the Bookmark Table:");
-		for (Bookmark bookmark : bcoll) {
+		Collection<Bookmark> bcoll_new = bookmarkService.getAllBookmarks();
+
+		System.out.println(">> These entries are in the starting SQL Bookmark Table:");
+		for (Bookmark bookmark0 : bcoll_sql) {
+			System.out.println(">> Bookmark ID: " + bookmark0.getBookmarkID() + ", Media: " + bookmark0.getMedia()
+					+ ", User: " + bookmark0.getUser() + " <<");
+		}
+
+		System.out.println(">> These entries are in the new Bookmark Table:");
+		for (Bookmark bookmark : bcoll_new) {
 			System.out.println(">> Bookmark ID: " + bookmark.getBookmarkID() + ", Media: " + bookmark.getMedia()
 					+ ", User: " + bookmark.getUser() + " <<");
 		}
 
-		Assertions.assertEquals(bcoll.size(), 1);
+		Assertions.assertEquals(bcoll_sql.size()+1,bcoll_new.size());
 
-		System.out.println(
-				"> Trying to add again. In intellij the customer user gets the message 'already booked'. In this test I see if the size has stayed at 1");
-
-		bookmarkService.addBookmark(media1);
-		Assertions.assertEquals(bcoll.size(), 1);
 		System.out.println(">> Worked.");
+
+	}
+
+	@Test
+	@WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
+	public void bookmarkRemoveTest() {
+
+		// ignore FacesContext Messages that some our the services use during test
+		FacesContext context = ContextMocker.mockFacesContext();
+
+		System.out.println("The initial size of bookmarked items is 1 (see data.sql) ");
+		Collection<Bookmark> bcoll_sql = bookmarkService.getAllBookmarks();
+
+		System.out.println("In data.sql there is a bookmark entry for user 'csauer' with bookmarkid=1 and mediaId=2");
+		Collection<Bookmark> bcoll_sql_start = bookmarkService.getBookmarksByUser(sessionInfoBean.getCurrentUser());
+		Optional<Bookmark> firstElement = bcoll_sql_start.stream().findFirst();
+		bookmarkService.loadBookmark(firstElement.get().getBookmarkID());
+
+		System.out.println("Deleting the first bookmark in the collection");
+		bookmarkService.deleteBookmark(firstElement.get());
+
+		Collection<Bookmark> bcoll_sql_end = bookmarkService.getBookmarksByUser(sessionInfoBean.getCurrentUser());
+
+		Assertions.assertEquals(bcoll_sql_start.size()-1,bcoll_sql_end.size());
+		System.out.println(">> Done.");
 
 	}
 
