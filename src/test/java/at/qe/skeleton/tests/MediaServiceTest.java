@@ -96,12 +96,6 @@ public class MediaServiceTest {
     }
 
     @Test
-    @DirtiesContext
-    public void testSearchMediaByTitle() {
-        Assertions.assertEquals(3L, this.mediaService.searchMediaByTitle("Playboy").getId());
-    }
-
-    @Test
     public void testGetAllMedia() {
         Collection<Media> allMedia = this.mediaService.getAllMedia();
         Assertions.assertEquals(4, allMedia.size());
