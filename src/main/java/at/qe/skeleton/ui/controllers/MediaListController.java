@@ -32,14 +32,6 @@ public class MediaListController implements Serializable {
 
 
     /**
-     * Search in Media by Title
-     */
-    public Media doSearchMediaByTitle(final String title) {
-        return this.mediaService.searchMediaByTitle(title);
-    }
-
-
-    /**
      * Filter a Collection of Media by different properties.
      */
 

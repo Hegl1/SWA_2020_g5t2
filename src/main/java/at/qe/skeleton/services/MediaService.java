@@ -91,14 +91,6 @@ public class MediaService {
 
 
     /**
-     * Search in Media by title.
-     */
-    public Media searchMediaByTitle(String title) {
-        return this.mediaRepository.findFirstByTitle(title);
-    }
-
-
-    /**
      * Filter Media by property
      */
 
