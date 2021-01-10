@@ -7,29 +7,15 @@
                 xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name="content">
-        <style type="text/css">
-            #mediaTable tr{
-                transition: background 0.2s;
-            }
-            #mediaTable tr:hover{
-                background: rgba(0, 0, 0, 0.1);
-            }
-        </style>
-
-        <p:messages for="asMessage" />
-        <p:growl for="asGrowl" closable="true" showDetail="true" showSummary="true" redisplay="true">
-            <p:autoUpdate />
-        </p:growl>
-
         <h:form id="filter" style="margin-bottom: 15px">
             <p:accordionPanel activeIndex="-2">
-                <p:tab title="Search">
-                    <h:panelGrid columns="2">
-                        <p:outputLabel for="@next" value="Search:" />
-                        <p:inputText id="title_filter" value="" />
+                <p:tab title="Search &amp; filter">
+                    <h:panelGrid columns="2" style="margin-bottom: 10px">
+                        <p:outputLabel for="@next" value="Search title:" />
+                        <p:inputText id="title_filter" value="#{searchMediaBean.search}" />
 
                         <p:outputLabel for="@next" value="Type:" />
-                        <p:selectOneMenu id="type_filter" value="">
+                        <p:selectOneMenu id="type_filter" value="#{searchMediaBean.filterType}">
                             <f:selectItem itemLabel="Any" itemValue="" />
                             <f:selectItem itemLabel="Book" itemValue="BOOK" />
                             <f:selectItem itemLabel="Audiobook" itemValue="AUDIOBOOK" />
@@ -38,15 +24,39 @@
                         </p:selectOneMenu>
 
                         <p:outputLabel for="@next" value="Language:" />
-                        <p:selectOneMenu id="language_filter" value="" dynamic="true">
+                        <p:selectOneMenu id="language_filter" value="#{searchMediaBean.filterLanguage}" dynamic="true">
                             <f:selectItem itemLabel="Any" itemValue="" />
                             <f:selectItems value="#{mediaListController.allLanguages}" />
                         </p:selectOneMenu>
+
+                        <p:outputLabel for="@next" value="Availability:" />
+                        <p:selectOneMenu id="available_filter" value="#{searchMediaBean.filterAvailable}">
+                            <f:selectItem itemLabel="Any" itemValue="" />
+                            <f:selectItem itemLabel="Available" itemValue="YES" />
+                            <f:selectItem itemLabel="Not available" itemValue="NO" />
+                        </p:selectOneMenu>
                     </h:panelGrid>
+                    <p:commandButton
+                            icon="fa fa-fw fa-search"
+                            value="Search"
+                            action="#{searchMediaBean.doFilter}"
+                            update=":mediaListWrapper" />
+                    <p:commandButton
+                            icon="fa fa-fw fa-times"
+                            value="Clear search"
+                            action="#{searchMediaBean.doResetFilter}"
+                            update=":mediaListWrapper @form" />
                 </p:tab>
             </p:accordionPanel>
         </h:form>
 
-        <lib:MediaList mediaList="#{mediaListController.media}" context="list"></lib:MediaList>
+        <h:panelGroup id="mediaListWrapper" layout="block">
+            <lib:MediaList mediaList="#{searchMediaBean.results}" context="list" id="mediaList"></lib:MediaList>
+        </h:panelGroup>
+
+        <p:messages for="asMessage" />
+        <p:growl for="asGrowl" closable="true" showDetail="true" showSummary="true" redisplay="true">
+            <p:autoUpdate />
+        </p:growl>
     </ui:define>
 </ui:composition>

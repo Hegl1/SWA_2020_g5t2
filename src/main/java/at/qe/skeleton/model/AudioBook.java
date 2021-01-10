@@ -2,6 +2,13 @@ package at.qe.skeleton.model;
 
 import javax.persistence.Entity;
 
+/**
+ * Class that represents an AudioBook. Extends the more general
+ * {@link at.qe.skeleton.model.Media}
+ * 
+ * @author Marcel Huber
+ *
+ */
 @Entity
 public class AudioBook extends Media {
 
@@ -12,9 +19,8 @@ public class AudioBook extends Media {
 	private String author;
 	private String ISBN;
 
-	public AudioBook(final String title, final int publishingYear, final String language,
-					 final int totalAvail, final MediaType mediaType, final String speaker,
-					 final int length, final String author, final String ISBN) {
+	public AudioBook(final String title, final int publishingYear, final String language, final int totalAvail,
+			final MediaType mediaType, final String speaker, final int length, final String author, final String ISBN) {
 
 		super(title, publishingYear, language, totalAvail, mediaType);
 		this.speaker = speaker;
@@ -51,7 +57,7 @@ public class AudioBook extends Media {
 		this.speaker = speaker;
 	}
 
-	public long getLength() {
+	public int getLength() {
 		return this.length;
 	}
 

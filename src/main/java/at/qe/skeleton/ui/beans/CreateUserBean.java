@@ -1,94 +1,104 @@
 package at.qe.skeleton.ui.beans;
 
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
-import at.qe.skeleton.services.UserService;
-import net.bytebuddy.utility.RandomString;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Component;
+
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.services.UndoRedoService;
+import at.qe.skeleton.services.UserService;
+import net.bytebuddy.utility.RandomString;
+
 @Component
 @Scope("view")
 public class CreateUserBean implements Serializable {
 
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	@Autowired
-    private UserService userService;
+	private UserService userService;
 
-    private User user;
+	@Autowired
+	private UndoRedoService undoRedoService;
 
-    private List<String> selectedUserRoles;
+	private User user;
 
-    @PostConstruct
-    public void init() {
-        this.user = new User();
-    }
+	private List<String> selectedUserRoles;
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public void saveUser() {
-        RandomString passwordGen = new RandomString(8);
+	@PostConstruct
+	public void init() {
+		this.user = new User();
+	}
 
-        String password = passwordGen.nextString();
-        user.setPassword(password);
-        user.setEnabled(true);
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public void saveUser() {
+		RandomString passwordGen = new RandomString(8);
 
-        setUserRoles();
-        userService.saveUser(user);
+		String password = passwordGen.nextString();
+		user.setPassword(password);
+		user.setEnabled(true);
 
-        FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_INFO, "Changes saved!",  "" );
-        FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
-    }
+		setUserRoles();
+		userService.saveUser(user);
+		undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.SAVE_USER));
 
-    private void setUserRoles() {
-        Set<UserRole> userRole = new HashSet<>();
+		FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_INFO, "Changes saved!", "");
+		FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
+	}
 
-        for (String selected : selectedUserRoles) {
-            switch (selected) {
-                case "librarian":
-                    userRole.add(UserRole.LIBRARIAN);
-                    break;
-                case "admin":
-                    userRole.add(UserRole.ADMIN);
-                    break;
-                case "customer":
-                	userRole.add(UserRole.CUSTOMER);
-                	break;
-                default:
-                    System.err.println("[Warning] CreateUserBean - setUserRoles: Role \"" + selected + "\" not supported yet!"); // TODO: add logger
-            }
-        }
+	private void setUserRoles() {
+		Set<UserRole> userRole = new HashSet<>();
 
-        user.setRoles(userRole);
-    }
+		for (String selected : selectedUserRoles) {
+			switch (selected) {
+			case "librarian":
+				userRole.add(UserRole.LIBRARIAN);
+				break;
+			case "admin":
+				userRole.add(UserRole.ADMIN);
+				break;
+			case "customer":
+				userRole.add(UserRole.CUSTOMER);
+				break;
+			default:
+				System.err.println(
+						"[Warning] CreateUserBean - setUserRoles: Role \"" + selected + "\" not supported yet!"); // TODO:
+																													// add
+																													// logger
+			}
+		}
 
-    public User getUser() {
-        return user;
-    }
+		user.setRoles(userRole);
+	}
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+	public User getUser() {
+		return user;
+	}
 
-    public List<String> getSelectedUserRoles() {
-        return selectedUserRoles;
-    }
+	public void setUser(final User user) {
+		this.user = user;
+	}
 
-    public void setSelectedUserRoles(List<String> selectedUserRoles) {
-        this.selectedUserRoles = selectedUserRoles;
-    }
+	public List<String> getSelectedUserRoles() {
+		return selectedUserRoles;
+	}
+
+	public void setSelectedUserRoles(final List<String> selectedUserRoles) {
+		this.selectedUserRoles = selectedUserRoles;
+	}
 
 }
