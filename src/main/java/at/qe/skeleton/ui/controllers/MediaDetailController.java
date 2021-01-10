@@ -136,12 +136,6 @@ public class MediaDetailController implements Serializable {
         // this.doReloadMedia();
     }
 
-    public void orderDeleteMedia(final Media media) {
-
-        // a loading message is shown, as the deleting and mail sending process can take up to 20 seconds
-        doDeleteMedia(media);
-        PrimeFaces.current().executeScript("PF('dataChangeDlg').hide()");
-    }
 
     /**
      * Action to delete the currently displayed media.
@@ -149,8 +143,26 @@ public class MediaDetailController implements Serializable {
     public void doDeleteMedia() {
         this.mediaService.deleteMedia(media);
         this.media = null;
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted - in Controller",  "") );
     }
-    public void doDeleteMedia(final Media media) {
+
+    /**
+     * Intermediate function to close the loading window while safe deleting
+     */
+    public void orderASafeDelete(final Media media) {
+
+        // a loading message is shown, as the deleting and mail sending process can take up to 20 seconds
+        doSafeDeleteMedia(media);
+        PrimeFaces.current().executeScript("PF('dataChangeDlg').hide()");
+    }
+
+    /**
+     * Safe delete - check if borrowings and bookmarks exist to a given media
+     * if borrowings exist: do not delete
+     * if bookmarks exist: delete them and notify with growl Messages and send email
+     */
+    public void doSafeDeleteMedia(final Media media) {
 
         // Step 1: Check if the media is still borrowed
         FacesContext context = FacesContext.getCurrentInstance();
@@ -190,6 +202,7 @@ public class MediaDetailController implements Serializable {
 
             System.out.println("\nMedia was deleted finally.");
             MediaAlreadyDeleted = 1;
+            context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Please reload the page.", ""));
 
         } else {
             System.out.println("\nnobody is bookmarking it");
@@ -199,6 +212,7 @@ public class MediaDetailController implements Serializable {
         if ((!(a1.size() > 0) && (MediaAlreadyDeleted == 0))) {
             this.mediaService.deleteMedia(media);
             this.media = null;
+            context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Please reload the page.", ""));
         }
     }
     /**

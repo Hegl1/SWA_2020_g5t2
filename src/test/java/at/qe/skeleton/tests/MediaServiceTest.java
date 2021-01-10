@@ -2,6 +2,7 @@ package at.qe.skeleton.tests;
 
 import at.qe.skeleton.model.*;
 import at.qe.skeleton.services.MediaService;
+import at.qe.skeleton.ui.beans.ContextMocker;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
@@ -13,6 +14,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import javax.faces.context.FacesContext;
 import java.util.Collection;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -112,6 +114,8 @@ public class MediaServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testDeleteMedia() {
+        // ignore FacesContext Messages that the mediaservice delete function uses
+        FacesContext context = ContextMocker.mockFacesContext();
         Media toDeleteMedia = this.mediaService.loadMedia(4L);
         Assertions.assertNotNull(toDeleteMedia);
         this.mediaService.deleteMedia(toDeleteMedia);

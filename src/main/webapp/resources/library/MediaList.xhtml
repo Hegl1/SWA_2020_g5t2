@@ -60,13 +60,7 @@
                     <h:outputText value="#{media.publishingYear}"/>
                 </p:column>
 
-<!--            temporary place for the delete button-->
-                <p:column headerText="Delete" style="width: 6rem; text-align: center" rendered="#{sessionInfoBean.currentUserRoles == 'ADMIN'}" >
-                <p:commandButton id="mDelBut" onclick="PF('dataChangeDlg').show()" action="#{mediaDetailController.orderDeleteMedia(media)}" icon="fa fa-fw fa-trash" title="Löschen" update="mediaTable">
-                    <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
 
-                </p:commandButton>
-                </p:column>
 
                 <p:column headerText="Due date" style="width: 5rem; text-align: center" rendered="#{cc.attrs.context == 'borrowed'}">
                     <h:outputText value="#{borrowedListController.getBorrowedDueDate(row)}" >
@@ -79,7 +73,7 @@
                 <p:column headerText="Return" style="width: 5rem; text-align: center" rendered="#{cc.attrs.context == 'borrowed'}">
                     <p:commandButton icon="fa fa-fw fa-times" action="#{borrowedListController.doUnBorrowMediaForAuthenticatedUser(media)}" title="Return media" update="@form" />
                 </p:column>
-                <p:column style="width: 5rem; text-align: center"
+                <p:column style="width: 10rem; text-align: center"
                           rendered="#{cc.attrs.context == 'mediaAdmin'}">
                     <p:commandButton update="@form:mediaEditDialog"
                                      oncomplete="PF('mediaEditDialog').show()" icon="fa fa-fw fa-edit"
@@ -95,6 +89,13 @@
                         <p:confirm header="Delete media"
                                    message="Do you want to delete the media?" icon="ui-icon-alert" />
                     </p:commandButton>
+<!--                safe delete (check if borrowings or bookmarks exist) -->
+                    <p:column headerText="Safe delete" style="width: 6rem; text-align: center" rendered="#{sessionInfoBean.currentUserRoles == 'ADMIN'}" >
+                    <p:commandButton id="mDelBut" onclick="PF('dataChangeDlg').show()" action="#{mediaDetailController.orderASafeDelete(media)}" icon="fa fa-fw fa-eraser" title="Delete safely" >
+                        <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
+
+                    </p:commandButton>
+                    </p:column>
                 </p:column>
             </p:dataTable>
 

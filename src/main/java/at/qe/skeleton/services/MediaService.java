@@ -147,7 +147,7 @@ public class MediaService {
     public void deleteMedia(final Media media) {
         this.mediaRepository.delete(media);
         FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted.",  "") );
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted - in Service",  "") );
     }
 
 }
