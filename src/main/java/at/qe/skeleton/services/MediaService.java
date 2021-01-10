@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -144,6 +146,8 @@ public class MediaService {
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
     public void deleteMedia(final Media media) {
         this.mediaRepository.delete(media);
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted - in Service",  "") );
     }
 
 }

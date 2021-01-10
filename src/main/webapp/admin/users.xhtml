@@ -7,9 +7,10 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
-        <p:messages for="asMessage" />
+
         <p:growl for="asGrowl" closable="true"  showDetail="=true" showSummary="true" redisplay="true"  >  <p:autoUpdate /> </p:growl>
         <h:form id="userForm">
+            <p:messages for="asMessage" closable="true" showDetail="=true" showSummary="true" redisplay="true" > <p:autoUpdate /> </p:messages>
             <p:dataTable id="usersTable" var="user" value="#{userListController.users}">
                 <f:facet name="header">
                     <p:commandButton update=":userForm:userAddDialog" oncomplete="PF('userAddDialog').show()" icon="ui-icon-plus" title="Neuen Benutzer erstellen" value="Neuen Benutzer erstellen"></p:commandButton>
@@ -65,10 +66,10 @@
                             <f:selectItem itemLabel="Administrator" itemValue="admin" />
                             <f:selectItem itemLabel="Kunde" itemValue="customer" />
                         </p:selectManyButton>
-                        
-                        
-                        
-                        
+
+
+
+
                     </h:panelGrid>
                     <p:separator />
                     <h:panelGrid columns="2">
@@ -78,7 +79,7 @@
                     <p:separator />
                     <h:panelGrid columns="3">
                         <p:commandButton value="Speichern" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update=":userForm:usersTable">
-                        	<f:actionListener binding="#{userDetailController.changeUserRoles()}" />
+                            <f:actionListener binding="#{userDetailController.changeUserRoles()}" />
                         </p:commandButton>
                         <p:commandButton value="Neu Laden" action="#{userDetailController.doReloadUser()}" update=":userForm:userData"/>
                         <p:commandButton value="Abbrechen" onclick="PF('userEditDialog').hide()"/>
@@ -92,7 +93,7 @@
                 <p:commandButton value="Nein" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
             </p:confirmDialog>
 
-            <!-- New User Dialog --> 
+            <!-- New User Dialog -->
             <p:dialog header="Erstelle einen neuen Benutzer" id="userAddDialog" widgetVar="userAddDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="regUserData" rendered="#{not empty createUserBean.user}">
                     <h:panelGrid columns="2">
@@ -104,7 +105,7 @@
                         <p:inputText id="regUsername" value="#{createUserBean.user.username}"/>
                         <p:outputLabel for="regEmail" value="E-Mail: " />
                         <p:inputText id="regEmail" value="#{createUserBean.user.email}"/>
-						<h:outputText value="Benutzerrechte:" />
+                        <h:outputText value="Benutzerrechte:" />
                         <p:selectManyButton value="#{createUserBean.selectedUserRoles}">
                             <f:selectItem itemLabel="Bibliothekar" itemValue="librarian" />
                             <f:selectItem itemLabel="Administrator" itemValue="admin" />
