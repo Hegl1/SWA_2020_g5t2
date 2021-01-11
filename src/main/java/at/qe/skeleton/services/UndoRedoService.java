@@ -114,6 +114,24 @@ public class UndoRedoService {
 	}
 
 	/**
+	 * Method that checks whether an undo action is available.
+	 * 
+	 * @return true if an action is available, else false.
+	 */
+	public boolean isUndoActionAvailable() {
+		return !unDoQueue.isEmpty();
+	}
+
+	/**
+	 * Method that checks whether an redo action is available.
+	 * 
+	 * @return true if an action is available, else false.
+	 */
+	public boolean isRedoActionAvailable() {
+		return !reDoQueue.isEmpty();
+	}
+
+	/**
 	 * Method that creates an ActionItem.
 	 * 
 	 * @param borrow the Borrowed which is used in the action,
