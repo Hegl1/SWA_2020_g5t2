@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.MediaType;
 import at.qe.skeleton.services.MediaService;
+import at.qe.skeleton.services.UndoRedoService;
 
 @Component
 @Scope("view")
@@ -21,6 +23,9 @@ public class CreateMediaBean implements Serializable {
 
 	@Autowired
 	private MediaService mediaService;
+
+	@Autowired
+	private UndoRedoService undoRedoService;
 
 	private String title;
 	private int publishingDate;
@@ -47,26 +52,33 @@ public class CreateMediaBean implements Serializable {
 
 	public void doCreateAudioBook() {
 
-		this.mediaService.createAudioBook(title, publishingDate, language, totalAvail, MediaType.AUDIOBOOK, speaker,
-				length, author, ISBN);
+		Media media = this.mediaService.createAudioBook(title, publishingDate, language, totalAvail,
+				MediaType.AUDIOBOOK, speaker, length, author, ISBN);
+		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
 	public void doCreateBook() {
 
-		this.mediaService.createBook(title, publishingDate, language, totalAvail, MediaType.BOOK, author, ISBN);
+		Media media = this.mediaService.createBook(title, publishingDate, language, totalAvail, MediaType.BOOK, author,
+				ISBN);
+		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
 	public void doCreateMagazine() {
 
-		this.mediaService.createMagazine(title, publishingDate, language, totalAvail, MediaType.MAGAZINE, series);
+		Media media = this.mediaService.createMagazine(title, publishingDate, language, totalAvail, MediaType.MAGAZINE,
+				series);
+		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
 	public void doCreateVideo() {
 
-		this.mediaService.createVideo(title, publishingDate, language, totalAvail, MediaType.VIDEO, length);
+		Media media = this.mediaService.createVideo(title, publishingDate, language, totalAvail, MediaType.VIDEO,
+				length);
+		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
@@ -87,14 +99,14 @@ public class CreateMediaBean implements Serializable {
 		}
 	}
 
-	public void setSelectedMediaTypes(List<String> selectedMediaTypes) {
+	public void setSelectedMediaTypes(final List<String> selectedMediaTypes) {
 	}
 
 	public MediaService getMediaService() {
 		return mediaService;
 	}
 
-	public void setMediaService(MediaService mediaService) {
+	public void setMediaService(final MediaService mediaService) {
 		this.mediaService = mediaService;
 	}
 
@@ -102,7 +114,7 @@ public class CreateMediaBean implements Serializable {
 		return title;
 	}
 
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		this.title = title;
 	}
 
@@ -110,7 +122,7 @@ public class CreateMediaBean implements Serializable {
 		return publishingDate;
 	}
 
-	public void setPublishingDate(int publishingYear) {
+	public void setPublishingDate(final int publishingYear) {
 		this.publishingDate = publishingYear;
 	}
 
@@ -118,7 +130,7 @@ public class CreateMediaBean implements Serializable {
 		return language;
 	}
 
-	public void setLanguage(String language) {
+	public void setLanguage(final String language) {
 		this.language = language;
 	}
 
@@ -126,7 +138,7 @@ public class CreateMediaBean implements Serializable {
 		return totalAvail;
 	}
 
-	public void setTotalAvail(int totalAvail) {
+	public void setTotalAvail(final int totalAvail) {
 		this.totalAvail = totalAvail;
 	}
 
@@ -134,7 +146,7 @@ public class CreateMediaBean implements Serializable {
 		return mediaType;
 	}
 
-	public void setMediaType(String mediaType) {
+	public void setMediaType(final String mediaType) {
 		this.mediaType = mediaType;
 	}
 
@@ -142,7 +154,7 @@ public class CreateMediaBean implements Serializable {
 		return author;
 	}
 
-	public void setAuthor(String author) {
+	public void setAuthor(final String author) {
 		this.author = author;
 	}
 
@@ -150,7 +162,7 @@ public class CreateMediaBean implements Serializable {
 		return ISBN;
 	}
 
-	public void setISBN(String iSBN) {
+	public void setISBN(final String iSBN) {
 		ISBN = iSBN;
 	}
 
@@ -158,7 +170,7 @@ public class CreateMediaBean implements Serializable {
 		return speaker;
 	}
 
-	public void setSpeaker(String speaker) {
+	public void setSpeaker(final String speaker) {
 		this.speaker = speaker;
 	}
 
@@ -166,7 +178,7 @@ public class CreateMediaBean implements Serializable {
 		return series;
 	}
 
-	public void setSeries(String series) {
+	public void setSeries(final String series) {
 		this.series = series;
 	}
 
@@ -174,7 +186,7 @@ public class CreateMediaBean implements Serializable {
 		return length;
 	}
 
-	public void setLength(int length) {
+	public void setLength(final int length) {
 		this.length = length;
 	}
 

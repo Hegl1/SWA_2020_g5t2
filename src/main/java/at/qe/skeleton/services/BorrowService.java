@@ -217,6 +217,15 @@ public class BorrowService implements CommandLineRunner {
 	}
 
 	/**
+	 * Method that reserves a Media for a User
+	 * 
+	 * @param reserved Reserved object to save.
+	 */
+	public void reserveMedia(final Reserved reserved) {
+		reservedRepository.save(reserved);
+	}
+
+	/**
 	 * Method that reserves a Media for the currently authenticaed User.
 	 * 
 	 * @param mediaToReserve the Media which should be reserved.
@@ -230,12 +239,12 @@ public class BorrowService implements CommandLineRunner {
 	 *
 	 * @param media the media
 	 */
-	public void removeReservationForAuthenticatedUser(final Media media){
+	public void removeReservationForAuthenticatedUser(final Media media) {
 		User user = userService.loadCurrentUser();
 
 		Reserved r = reservedRepository.findFirstByUserAndMedia(user, media);
 
-		if(r != null){
+		if (r != null) {
 			reservedRepository.delete(r);
 		}
 	}
@@ -246,7 +255,7 @@ public class BorrowService implements CommandLineRunner {
 	 * @param media the media to search for
 	 * @return true, if he has reserved it, false otherwise
 	 */
-	public boolean isReservedForAuthenticatedUser(final Media media){
+	public boolean isReservedForAuthenticatedUser(final Media media) {
 		User user = userService.loadCurrentUser();
 
 		return reservedRepository.findFirstByUserAndMedia(user, media) != null;
@@ -322,7 +331,9 @@ public class BorrowService implements CommandLineRunner {
 	 * @param media the media to search for
 	 * @return the count of reservations made
 	 */
-	public int getReservationCountForMedia(final Media media) { return reservedRepository.getReservationCountForMedia(media.getMediaID()); }
+	public int getReservationCountForMedia(final Media media) {
+		return reservedRepository.getReservationCountForMedia(media.getMediaID());
+	}
 
 	/**
 	 * Method that retrieves one particular Reserved object by user and media.
