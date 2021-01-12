@@ -1,12 +1,14 @@
 package at.qe.skeleton.ui.controllers;
 
 import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.Reserved;
 import at.qe.skeleton.services.BorrowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * Controller for the borrowed list view.
@@ -73,5 +75,9 @@ public class ReservedController implements Serializable {
      */
     public boolean isReservedForAuthenticatedUser(final Media media) {
         return borrowService.isReservedForAuthenticatedUser(media);
+    }
+
+    public Collection<Reserved> getReservedList() {
+        return borrowService.getAllReservedByAuthenticatedUser();
     }
 }
