@@ -40,6 +40,8 @@ public class MediaBorrowTime implements Serializable, Persistable<MediaType> {
 	}
 
 	public void setAllowedBorrowTime(final int allowedBorrowTime) {
+		if(allowedBorrowTime <= 0) return;
+
 		this.allowedBorrowTime = allowedBorrowTime;
 	}
 

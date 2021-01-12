@@ -35,7 +35,7 @@ public class ReservedController implements Serializable {
     }
 
     /**
-     * Method that reserves a Media for the currently authenticaed User.
+     * Method that reserves a Media for the currently authenticated User.
      *
      * @param media the Media which should be reserved.
      */
