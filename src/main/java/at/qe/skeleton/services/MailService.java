@@ -50,7 +50,11 @@ public class MailService {
 		msg.setFrom("swa.grp.5.2@gmail.com");
 		msg.setSubject(messageSubject);
 		msg.setText(messageContent);
-		mailSender.send(msg);
+		Runnable runner = () -> {
+			mailSender.send(msg);
+		};
+		Thread sender = new Thread(runner);
+		sender.start();
 	}
 
 	/**
@@ -77,7 +81,11 @@ public class MailService {
 			FileSystemResource attachment = new FileSystemResource(new File(path));
 			msgHelper.addAttachment(attachmentName, attachment);
 
-			mailSender.send(msg);
+			Runnable runner = () -> {
+				mailSender.send(msg);
+			};
+			Thread sender = new Thread(runner);
+			sender.start();
 		} catch (MessagingException e) {
 			logger.error("Error while constructing the msgHelper in MailService, no mail sent.");
 		}
