@@ -46,6 +46,10 @@ public class BorrowForUserController implements Serializable {
      * INFO: The username is used, since primefaces seamed to have a problem with setting an object
      */
     public void borrowForUser() {
+        if(username == null){
+            return;
+        }
+
         User u = userService.loadUser(username);
 
         FacesContext context = FacesContext.getCurrentInstance();

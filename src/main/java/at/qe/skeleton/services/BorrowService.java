@@ -74,7 +74,7 @@ public class BorrowService implements CommandLineRunner {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public boolean borrowMedia(final User borrower, final Media mediaToBorrow) {
-		if (mediaToBorrow.getTotalAvail() <= mediaToBorrow.getCurBorrowed() || borrower == null) {
+		if (!mediaToBorrow.getAvailable() || borrower == null) {
 			return false;
 		} else {
 			mediaToBorrow.setCurBorrowed(mediaToBorrow.getCurBorrowed() + 1);

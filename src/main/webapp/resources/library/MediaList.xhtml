@@ -46,13 +46,13 @@
                 <p:column headerText="Title">
                     <h:outputText value="#{media.title}"/>
                 </p:column>
-                <p:column headerText="Type" style="width: 8rem; text-align: center">
+                <p:column headerText="Type" style="width: 5rem; text-align: center">
                     <h:outputText value="#{media.mediaTypeHuman}"/>
                 </p:column>
                 <p:column headerText="Language" style="width: 6rem; text-align: center">
                     <h:outputText value="#{media.languageHuman}"/>
                 </p:column>
-                <p:column headerText="Publishing Year" style="width: 8rem; text-align: center">
+                <p:column headerText="Publishing Year" style="width: 7rem; text-align: center">
                     <h:outputText value="#{media.publishingYear}"/>
                 </p:column>
                 <p:column headerText="Availability" style="width: 6rem; text-align: center" rendered="#{cc.attrs.context != 'borrowed' and cc.attrs.context != 'adminUserBorrowings'}">
@@ -74,7 +74,7 @@
                 <p:column headerText="Return for user" style="width: 7rem; text-align: center" rendered="#{cc.attrs.context == 'adminUserBorrowings'}">
                     <p:commandButton icon="fa fa-fw fa-times" action="#{userBorrowedListController.doUnBorrowForUser(row)}" title="Return media" update="@form" />
                 </p:column>
-                <p:column style="width: 10rem; text-align: center"
+                <p:column style="width: 6rem; text-align: center"
                           rendered="#{cc.attrs.context == 'mediaAdmin'}">
                     <p:commandButton update="@form:mediaEditDialog"
                                      oncomplete="PF('mediaEditDialog').show()" icon="fa fa-fw fa-edit"
@@ -98,7 +98,10 @@
                     </p:commandButton>
                 </p:column>
 
-                <p:column headerText="Borrow for user" style="width: 7rem; text-align: center" rendered="#{cc.attrs.context == 'list' and sessionInfoBean.currentUserRoles != 'CUSTOMER'}">
+                <p:column
+                        headerText="Borrow for user"
+                        style="width: 7rem; text-align: center"
+                        rendered="#{(cc.attrs.context == 'list' or cc.attrs.context == 'mediaAdmin') and sessionInfoBean.currentUserRoles != 'CUSTOMER'}">
                     <p:commandButton update="@form:borrowForUserDialog" oncomplete="PF('borrowForUserDialog').show()" icon="fa fa-fw fa-user-plus" title="Borrow for user" disabled="#{!media.available}">
                         <f:setPropertyActionListener value="#{media}" target="#{borrowForUserController.media}" />
                     </p:commandButton>
