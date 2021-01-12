@@ -134,23 +134,6 @@ public class MediaDetailController implements Serializable {
 				new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted - in Controller", ""));
 	}
 
-    /**
-     * Action to save the currently displayed media.
-     */
-    public void doSaveMedia() {
-        this.media = this.mediaService.saveMedia(this.media);
-    }
-
-    /**
-     * Action to delete the currently displayed media.
-     */
-    public void doDeleteMedia() {
-        this.mediaService.deleteMedia(media);
-        this.media = null;
-        FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted - in Controller",  "") );
-    }
-
 	/**
 	 * Intermediate function to close the loading window while safe deleting
 	 */
