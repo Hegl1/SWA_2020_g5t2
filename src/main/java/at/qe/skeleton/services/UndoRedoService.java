@@ -1,6 +1,7 @@
 package at.qe.skeleton.services;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Deque;
 
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import at.qe.skeleton.model.Bookmark;
 import at.qe.skeleton.model.Borrowed;
 import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.Reserved;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.UserService.UnauthorizedActionException;
@@ -35,7 +37,7 @@ import at.qe.skeleton.services.UserService.UnauthorizedActionException;
 @Component
 @Scope("session")
 public class UndoRedoService {
-	// TODO: document the rest
+
 	/**
 	 * Double ended Queue that holds ActionItems to undo. Is basically used as a
 	 * stack.
@@ -111,6 +113,24 @@ public class UndoRedoService {
 		if (action != null) {
 			action.performRedoAction();
 		}
+	}
+
+	/**
+	 * Method that checks whether an undo action is available.
+	 * 
+	 * @return true if an action is available, else false.
+	 */
+	public boolean isUndoActionAvailable() {
+		return !unDoQueue.isEmpty();
+	}
+
+	/**
+	 * Method that checks whether an redo action is available.
+	 * 
+	 * @return true if an action is available, else false.
+	 */
+	public boolean isRedoActionAvailable() {
+		return !reDoQueue.isEmpty();
 	}
 
 	/**
@@ -334,7 +354,8 @@ public class UndoRedoService {
 			if (type.equals(ActionType.SAVE_BOOKMARK)) {
 				bookmarkService.addBookmark(bookmark.getMedia());
 			} else if (type.equals(ActionType.DELETE_BOOKMARK)) {
-				bookmarkService.deleteBookmark(bookmark);
+				bookmarkService.deleteBookmark(
+						bookmarkService.getBookmarkByUserAndMedia(bookmark.getUser(), bookmark.getMedia()));
 			} else {
 				logger.error("Error while redoing bookmark action, wrong action type");
 			}
@@ -421,10 +442,17 @@ public class UndoRedoService {
 		 */
 		protected Media afterEditMedia;
 
+		protected Collection<Reserved> reserveList;
+
+		protected Collection<Bookmark> bookMarkList;
+
 		protected MediaAction(final Media media, final ActionType type) {
 			this.beforeEditMedia = media;
 			this.type = type;
 			this.afterEditMedia = null;
+			if (type.equals(ActionType.DELETE_MEDIA)) {
+				saveMetaInfo();
+			}
 		}
 
 		protected MediaAction(final Media beforeEditMedia, final Media afterEditMedia, final ActionType type) {
@@ -435,9 +463,12 @@ public class UndoRedoService {
 		@Override
 		void performUndoAction() {
 			if (type.equals(ActionType.SAVE_MEDIA)) {
+				saveMetaInfo();
 				mediaService.deleteMedia(beforeEditMedia);
 			} else if (type.equals(ActionType.DELETE_MEDIA)) {
 				mediaService.saveMedia(beforeEditMedia);
+				beforeEditMedia = (mediaService.loadMediaByLanguageTypeYearTitle(beforeEditMedia));
+				restoreMetaInfo();
 			} else if (type.equals(ActionType.EDIT_MEDIA)) {
 				mediaService.saveMedia(beforeEditMedia);
 			} else {
@@ -448,8 +479,10 @@ public class UndoRedoService {
 		@Override
 		void performRedoAction() {
 			if (type.equals(ActionType.SAVE_MEDIA)) {
-				mediaService.saveMedia(beforeEditMedia);
+				restoreMetaInfo();
+				beforeEditMedia = mediaService.saveMedia(beforeEditMedia);
 			} else if (type.equals(ActionType.DELETE_MEDIA)) {
+				bookmarkService.getBookmarkByMedia(beforeEditMedia).forEach(bookmarkService::deleteBookmark);
 				mediaService.deleteMedia(beforeEditMedia);
 			} else if (type.equals(ActionType.EDIT_MEDIA)) {
 				mediaService.saveMedia(afterEditMedia);
@@ -457,6 +490,20 @@ public class UndoRedoService {
 				logger.error("Error while redoing media action, wrong action type");
 			}
 
+		}
+
+		private void saveMetaInfo() {
+			bookMarkList = bookmarkService.getBookmarkByMedia(beforeEditMedia);
+			reserveList = borrowService.getAllReservedByMedia(beforeEditMedia);
+		}
+
+		private void restoreMetaInfo() {
+			for (Bookmark current : bookMarkList) {
+				bookmarkService.addBookmark(current.getUser(), beforeEditMedia);
+			}
+			for (Reserved current : reserveList) {
+				borrowService.reserveMedia(current.getUser(), beforeEditMedia);
+			}
 		}
 
 	}
