@@ -4,6 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
       >
 
     <h:head>
@@ -46,6 +47,11 @@
                 z-index: 100;
             }
 
+            #header .current{
+                font-weight: bold;
+                border-bottom: 2px solid #005eff !important;
+            }
+
             #content{
                 padding: 20px 10px 10px 10px;
 
@@ -61,6 +67,10 @@
 
             #footer .inside{
                 padding: 10px;
+            }
+
+            h2{
+                margin-top: 0;
             }
         </style>
     </h:head>
@@ -85,6 +95,12 @@
             </div>
 
         </div>
+
+        <p:messages for="asMessage" />
+        <p:growl for="asGrowl" closable="true" showDetail="true"
+                 showSummary="true" redisplay="true">
+            <p:autoUpdate />
+        </p:growl>
 
     </h:body>
 </html>

@@ -25,7 +25,11 @@
         </style>
 
         <h:form id="mediaListForm">
-            <p:dataTable id="mediaTable" var="row" value="#{cc.attrs.mediaList}">
+            <p:dataTable
+                    id="mediaTable" var="row" value="#{cc.attrs.mediaList}"
+                    paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                    currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                    paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
                 <!-- BEGIN: Sets the media variable according to the context -->
                 <c:choose>
                     <c:when test="${['bookmarks','borrowed','adminUserBorrowings', 'reservations'].contains(cc.attrs.context)}">

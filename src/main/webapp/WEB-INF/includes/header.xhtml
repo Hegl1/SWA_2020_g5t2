@@ -13,26 +13,35 @@
             </h1>
             <h:form>
                 <p:menubar style="border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 0">
-                    <p:menuitem value="List media" icon="fa fa-fw fa-list" url="/media/list.xhtml"/>
+                    <p:menuitem value="List media" icon="fa fa-fw fa-list" url="/media/list.xhtml"
+                                class="#{view.viewId eq '/media/list.xhtml' ? 'current' : ''}" />
 
                     <c:choose>
                         <c:when test="${sessionInfoBean.loggedIn}">
-                            <p:menuitem value="Borrowed" icon="fa fa-fw fa-briefcase" url="/customer/borrowed.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
-                            <p:menuitem value="Bookmarks" icon="fa fa-fw fa-bookmark" url="/customer/bookmarks.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
-                            <p:menuitem value="Reservations" icon="fa fa-fw fa-tag" url="/customer/reservations.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
+                            <p:menuitem value="Borrowed" icon="fa fa-fw fa-briefcase" url="/customer/borrowed.xhtml"
+                                        class="#{view.viewId eq '/customer/borrowed.xhtml' ? 'current' : ''}"
+                                        rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
+                            <p:menuitem value="Bookmarks" icon="fa fa-fw fa-bookmark" url="/customer/bookmarks.xhtml"
+                                        class="#{view.viewId eq '/customer/bookmarks.xhtml' ? 'current' : ''}"
+                                        rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
+                            <p:menuitem value="Reservations" icon="fa fa-fw fa-tag" url="/customer/reservations.xhtml"
+                                        class="#{view.viewId eq '/customer/reservations.xhtml' ? 'current' : ''}"
+                                        rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
 
-                            <p:submenu label="Admin" icon="fa fa-fw fa-star" rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}">
+                            <p:submenu label="Admin" icon="fa fa-fw fa-star"
+                                       class="#{['/admin/users.xhtml', '/admin/media.xhtml'].contains(view.viewId) ? 'current' : ''}"
+                                       rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}">
                                 <p:menuitem value="Manage User" icon="fa fa-fw fa-user-plus" url="/admin/users.xhtml" rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}"/>
                                 <p:menuitem value="Manage media" icon="fa fa-fw fa-list" url="/admin/media.xhtml"/>
                             </p:submenu>
-                            <p:submenu label="User" icon="fa fa-fw fa-user">
+                            <p:submenu label="User" icon="fa fa-fw fa-user" class="#{view.viewId eq '/secured/user_settings.xhtml' ? 'current' : ''}">
                                 <p:menuitem value="Settings" icon="fa fa-fw fa-cog" url="/secured/user_settings.xhtml"/>
                                 <p:menuitem value="Logout" icon="fa fa-fw fa-sign-out" url="/logout"/>
                             </p:submenu>
                         </c:when>
 
                         <c:otherwise>
-                            <p:menuitem value="Login" icon="fa fa-fw fa-sign-in" url="/login.xhtml"/>
+                            <p:menuitem value="Login" icon="fa fa-fw fa-sign-in" url="/login.xhtml" class="#{view.viewId eq '/login.xhtml' ? 'current' : ''}"/>
                         </c:otherwise>
                     </c:choose>
                 </p:menubar>

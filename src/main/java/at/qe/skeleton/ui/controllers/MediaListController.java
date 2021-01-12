@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Locale;
 
 /**
  * Controller for the Media list view.
@@ -16,49 +17,34 @@ import java.util.Collection;
 @Component
 @Scope("view")
 public class MediaListController implements Serializable {
-
     @Autowired
     MediaService mediaService;
 
-
     /**
-     * Returns a Collection of all Media.
+     * Returns a collection of all media
+     *
+     * @return the media collection
      */
     public Collection<Media> getMedia() {
         return this.mediaService.getAllMedia();
     }
 
+    /**
+     * Returns a collection of all languages used in the database
+     *
+     * @return the language collection
+     */
     public Collection<String> getAllLanguages() { return this.mediaService.getAllLanguages(); }
 
 
     /**
-     * Filter a Collection of Media by different properties.
+     * Converts the ISO 3166-1 alpha-2 language code into a human-readable
+     * language
+     *
+     * @return the converted language string
      */
-
-    public Collection<Media> doFilterMediaByAvailability(final Collection<Media> mediaList, final boolean isAvailable) {
-        return this.mediaService.filterMediaByAvailability(mediaList, isAvailable);
+    public String convertLanguageHuman(final String language){
+        Locale l = new Locale(language);
+        return l.getDisplayLanguage();
     }
-
-    public Collection<Media> doFilterMediaByLanguage(final Collection<Media> mediaList, final String language) {
-        return this.mediaService.filterMediaByLanguage(mediaList, language);
-    }
-
-    public Collection<Media> doFilterMediaByType(final Collection<Media> mediaList, final MediaType mediaType) {
-        return this.mediaService.filterMediaByType(mediaList, mediaType);
-    }
-
-    public Collection<Media> doFilterMediaByAvailability(final boolean isAvailable) {
-        return this.mediaService.filterMediaByAvailability(isAvailable);
-    }
-
-    public Collection<Media> doFilterMediaByLanguage(final String language) {
-        return this.mediaService.filterMediaByLanguage(language);
-    }
-
-    public Collection<Media> doFilterMediaByType(final MediaType mediaType) {
-        return this.mediaService.filterMediaByType(mediaType);
-    }
-
-
-
 }

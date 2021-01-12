@@ -7,12 +7,7 @@
 	template="/WEB-INF/templates/main.xhtml"
 	xmlns:c="http://java.sun.com/jstl/core">
 	<ui:define name="content">
-
-		<p:messages for="asMessage" />
-		<p:growl for="asGrowl" closable="true" showDetail="true"
-			showSummary="true" redisplay="true">
-			<p:autoUpdate />
-		</p:growl>
+		<h2>Admin media</h2>
 
 		<h:form id="createMedia" style="margin-bottom: 15px">
 			<p:accordionPanel activeIndex="-2">
@@ -121,7 +116,6 @@
 					</h:panelGrid>
 				</p:outputPanel>
 			</p:dialog>
-
 		</h:form>
 
 		<h:panelGroup id="mediaListWrapper" layout="block">

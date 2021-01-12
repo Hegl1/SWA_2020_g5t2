@@ -4,12 +4,7 @@
                 xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
-        Reservations
-
-        <p:messages for="asMessage" />
-        <p:growl for="asGrowl" closable="true" showDetail="true" showSummary="true" redisplay="true">
-            <p:autoUpdate />
-        </p:growl>
+        <h2>Reservations</h2>
 
         <lib:MediaList mediaList="#{reservedController.reservedList}" context="reservations" />
     </ui:define>
