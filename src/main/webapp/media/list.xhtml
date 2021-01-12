@@ -28,7 +28,7 @@
                         <p:outputLabel for="@next" value="Language:" />
                         <p:selectOneMenu id="language_filter" value="#{searchMediaBean.filterLanguage}" dynamic="true">
                             <f:selectItem itemLabel="Any" itemValue="" />
-                            <f:selectItems value="#{mediaListController.allLanguages}" />
+                            <f:selectItems value="#{mediaListController.allLanguages}" var="lang" itemValue="#{lang}" itemLabel="#{mediaListController.convertLanguageHuman(lang)}" />
                         </p:selectOneMenu>
 
                         <p:outputLabel for="@next" value="Availability:" />
