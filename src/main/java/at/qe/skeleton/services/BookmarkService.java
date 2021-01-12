@@ -194,4 +194,8 @@ public class BookmarkService {
 		bookmarkRepository.save(bookmark);
 	}
 
+	public Bookmark getBookmarkByUserAndMedia(final User user, final Media media) {
+		return this.bookmarkRepository.findFirstByUserAndMedia(user, media);
+	}
+
 }

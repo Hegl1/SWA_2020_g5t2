@@ -354,7 +354,8 @@ public class UndoRedoService {
 			if (type.equals(ActionType.SAVE_BOOKMARK)) {
 				bookmarkService.addBookmark(bookmark.getMedia());
 			} else if (type.equals(ActionType.DELETE_BOOKMARK)) {
-				bookmarkService.deleteBookmark(bookmark);
+				bookmarkService.deleteBookmark(
+						bookmarkService.getBookmarkByUserAndMedia(bookmark.getUser(), bookmark.getMedia()));
 			} else {
 				logger.error("Error while redoing bookmark action, wrong action type");
 			}
