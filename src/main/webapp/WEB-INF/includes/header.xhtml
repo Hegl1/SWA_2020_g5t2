@@ -19,6 +19,7 @@
                         <c:when test="${sessionInfoBean.loggedIn}">
                             <p:menuitem value="Borrowed" icon="fa fa-fw fa-briefcase" url="/customer/borrowed.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
                             <p:menuitem value="Bookmarks" icon="fa fa-fw fa-bookmark" url="/customer/bookmarks.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
+                            <p:menuitem value="Reservations" icon="fa fa-fw fa-tag" url="/customer/reservations.xhtml" rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
 
                             <p:submenu label="Admin" icon="fa fa-fw fa-star" rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}">
                                 <p:menuitem value="Manage User" icon="fa fa-fw fa-user-plus" url="/admin/users.xhtml" rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}"/>

@@ -1,12 +1,16 @@
 package at.qe.skeleton.ui.controllers;
 
 import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.Reserved;
 import at.qe.skeleton.services.BorrowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * Controller for the borrowed list view.
@@ -38,7 +42,8 @@ public class ReservedController implements Serializable {
     public void doReserveMediaForAuthenticatedUser(final Media media){
         borrowService.reserveMediaForAuthenticatedUser(media);
 
-        // TODO: add growl message
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was reserved", ""));
     }
 
     /**
@@ -49,7 +54,8 @@ public class ReservedController implements Serializable {
     public void doRemoveReservationForAuthenticatedUser(final Media media){
         borrowService.removeReservationForAuthenticatedUser(media);
 
-        // TODO: add growl message
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Reservation was cancelled", ""));
     }
 
     /**
@@ -73,5 +79,9 @@ public class ReservedController implements Serializable {
      */
     public boolean isReservedForAuthenticatedUser(final Media media) {
         return borrowService.isReservedForAuthenticatedUser(media);
+    }
+
+    public Collection<Reserved> getReservedList() {
+        return borrowService.getAllReservedByAuthenticatedUser();
     }
 }
