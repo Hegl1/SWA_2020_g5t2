@@ -1,12 +1,12 @@
 package at.qe.skeleton.services;
 
-import at.qe.skeleton.model.Bookmark;
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.model.*;
 import at.qe.skeleton.repositories.BookmarkRepository;
 import at.qe.skeleton.repositories.BorrowedRepository;
+import at.qe.skeleton.repositories.ReservedRepository;
 import at.qe.skeleton.repositories.UserRepository;
+import at.qe.skeleton.ui.controllers.BorrowedListController;
+import at.qe.skeleton.ui.controllers.ReservedController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,6 +41,15 @@ public class UserService {
 
 	@Autowired
 	private BookmarkRepository bookmarkRepository2;
+
+
+
+	@Autowired
+	private ReservedRepository reservedRepository;
+
+
+	@Autowired
+	MailService mailService;
 
 	/**
 	 * Returns a collection of all users.
@@ -225,7 +234,17 @@ public class UserService {
 					context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Deleted the user's bookmark No.: " + sbm.getBookmarkID(),  "") );
 					bookmarkRepository2.delete(sbm);
 				}
-				//mailService.send "your account was deleted"
+				// delete Reservations
+				Collection<Reserved> res = new ArrayList<Reserved>();
+				res = reservedRepository.findByUser(user);
+				if(res.size() > 0){
+					for (Reserved r : res) {
+						if (r.getUser() == user){
+							reservedRepository.delete(r);
+						}
+					}
+				}
+				mailService.sendMail(user.getEmail(), "Your account has been removed", "Hello, your account was deleted by administrative personnel.");
 				this.userRepository.delete(user);
 			}
 

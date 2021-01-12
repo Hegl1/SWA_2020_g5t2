@@ -54,6 +54,9 @@ public class MediaDetailController implements Serializable {
 	@Autowired
 	UndoRedoService undoRedoService;
 
+	@Autowired
+	ReservedController reservedController;
+
 	/**
 	 * Attribute to cache the currently displayed media
 	 */
@@ -195,6 +198,14 @@ public class MediaDetailController implements Serializable {
 									+ media.getMediaType() + ", Language: " + media.getLanguage() + ", Publishing Year: "
 									+ media.getPublishingYear());
 				}
+				// last but not least: remove reservations
+				if(reservedController.getReservationCountForMedia(media) > 0);
+				for (User u : a2_s) {
+					if(reservedController.isReservedForSpecialUser(media, u)){
+						reservedController.doRemoveReservationForSpecificUser(media, u);
+					}
+				}
+
 				undoRedoService.addAction(deleteAction);
 				this.mediaService.deleteMedia(media);
 				this.media = null;
