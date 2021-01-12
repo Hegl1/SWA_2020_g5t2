@@ -168,54 +168,49 @@ public class MediaDetailController implements Serializable {
 			}
 		} else {
 			System.out.println("\nnobody is borrowing it");
-		}
 
-		// Step 2: Get a list of users that bookmarked this media eventually
-		Collection<Bookmark> a2 = bookmarkService.getAllBookmarks();
-		List<User> a2_s = new ArrayList<User>();
-		for (Bookmark b : a2) {
-			if (b.getMedia().getMediaID() == media.getMediaID()) {
-				a2_s.add(b.getUser());
+			// Step 2: Get a list of users that bookmarked this media eventually
+			Collection<Bookmark> a2 = bookmarkService.getBookmarkByMedia(media);
+			List<User> a2_s = new ArrayList<User>();
+			for (Bookmark b : a2) {
+				if (b.getMedia().getMediaID() == media.getMediaID()) {
+					a2_s.add(b.getUser());
+				}
 			}
-		}
 
-		// Step 3: If the media is not borrowed and only bookmarked: Delete the media
-		// and bookmark entries and notify users
-		int MediaAlreadyDeleted;
-		MediaAlreadyDeleted = 0;
-		if (a2_s.size() > 0) {
+			// Step 3: If the media is not borrowed and only bookmarked: Delete the media
+			// and bookmark entries and notify users
+			if (a2_s.size() > 0) {
 
-			System.out.println("\nThis media is still bookmarked by some people: ");
+				System.out.println("\nThis media is still bookmarked by some people: ");
+				for (User u : a2_s) {
+					bookmarkService.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(u, media));
+				}
+				for (User u : a2_s) {
+					System.out.println("  by: " + u.getUsername());
+					context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN,
+							"This media is still bookmarked by: " + u.getUsername(), ""));
+					mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
+							"The following Media is not available anymore: Title: " + media.getTitle() + ", Type: "
+									+ media.getMediaType() + ", Language: " + media.getLanguage() + ", Publishing Year: "
+									+ media.getPublishingYear());
+				}
+				undoRedoService.addAction(deleteAction);
+				this.mediaService.deleteMedia(media);
+				this.media = null;
 
-			for (User u : a2_s) {
-				System.out.println("  by: " + u.getUsername());
-				context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN,
-						"This media is still bookmarked by: " + u.getUsername(), ""));
-				bookmarkService.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(u, media));
-				mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
-						"The following Media is not available anymore: Title: " + media.getTitle() + ", Type: "
-								+ media.getMediaType() + ", Language: " + media.getLanguage() + ", Publishing Year: "
-								+ media.getPublishingYear());
+				System.out.println("\nMedia was deleted finally.");
+				context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Please reload the page.", ""));
+
+			} else {
+				System.out.println("\nnobody is bookmarking it");
+
+				// Step 4: Delete the media only if it has not been borrowed by somebody
+				undoRedoService.addAction(deleteAction);
+				this.mediaService.deleteMedia(media);
+				this.media = null;
+				context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Please reload the page.", ""));
 			}
-			undoRedoService.addAction(deleteAction);
-			this.mediaService.deleteMedia(media);
-			this.media = null;
-
-			System.out.println("\nMedia was deleted finally.");
-			MediaAlreadyDeleted = 1;
-			context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Please reload the page.", ""));
-
-		} else {
-			System.out.println("\nnobody is bookmarking it");
-		}
-
-		// Step 4: Delete the media only if it has not been borrowed by somebody and was
-		// not deleted in step 3
-		if ((!(a1.size() > 0) && (MediaAlreadyDeleted == 0))) {
-			undoRedoService.addAction(deleteAction);
-			this.mediaService.deleteMedia(media);
-			this.media = null;
-			context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Please reload the page.", ""));
 		}
 	}
 
