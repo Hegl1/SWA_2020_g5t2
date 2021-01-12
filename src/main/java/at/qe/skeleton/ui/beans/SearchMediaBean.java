@@ -1,7 +1,5 @@
 package at.qe.skeleton.ui.beans;
 
-import at.qe.skeleton.model.AudioBook;
-import at.qe.skeleton.model.Book;
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.MediaType;
 import at.qe.skeleton.services.MediaService;
@@ -33,10 +31,6 @@ public class SearchMediaBean implements Serializable {
     @PostConstruct
     public void init() {
         this.results = mediaService.getAllMedia();
-    }
-
-    public void setResults(final Collection<Media> results) {
-        this.results = results;
     }
 
     public String getSearch() {

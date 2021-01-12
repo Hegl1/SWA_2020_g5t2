@@ -1,5 +1,3 @@
-<?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
@@ -9,9 +7,37 @@
     <ui:define name ="content">
         <h2>Admin users</h2>
 
+        <h:form id="filter" style="margin-bottom: 15px">
+            <p:accordionPanel activeIndex="-2">
+                <p:tab title="Search">
+                    <h:panelGrid columns="2" style="margin-bottom: 10px">
+                        <p:outputLabel for="@next" value="Search username:" />
+                        <p:inputText value="#{searchUserBean.search}" />
+
+                        <p:outputLabel for="@next" value="Role:" />
+                        <p:selectOneMenu value="#{searchUserBean.filterRole}">
+                            <f:selectItem itemLabel="Any" itemValue="" />
+                            <f:selectItem itemLabel="Customer" itemValue="CUSTOMER" />
+                            <f:selectItem itemLabel="Librarian" itemValue="LIBRARIAN" noSelectionOption="true" />
+                            <f:selectItem itemLabel="Admin" itemValue="ADMIN" />
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                    <p:commandButton
+                            icon="fa fa-fw fa-search"
+                            value="Search"
+                            action="#{searchUserBean.doFilter}"
+                            update=":userForm" />
+                    <p:commandButton
+                            icon="fa fa-fw fa-times"
+                            value="Clear search"
+                            action="#{searchUserBean.doResetFilter}"
+                            update=":userForm @form" />
+                </p:tab>
+            </p:accordionPanel>
+        </h:form>
+
         <h:form id="userForm">
-            <p:messages for="asMessage" closable="true" showDetail="=true" showSummary="true" redisplay="true" > <p:autoUpdate /> </p:messages>
-            <p:dataTable id="usersTable" var="user" value="#{userListController.users}">
+            <p:dataTable id="usersTable" var="user" value="#{searchUserBean.results}">
                 <f:facet name="header">
                     <p:commandButton update=":userForm:userAddDialog" oncomplete="PF('userAddDialog').show()" icon="ui-icon-plus" title="Neuen Benutzer erstellen" value="Neuen Benutzer erstellen"></p:commandButton>
                 </f:facet>

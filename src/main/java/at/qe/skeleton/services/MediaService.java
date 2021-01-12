@@ -1,24 +1,17 @@
 package at.qe.skeleton.services;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Collectors;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-
+import at.qe.skeleton.model.*;
+import at.qe.skeleton.repositories.MediaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.AudioBook;
-import at.qe.skeleton.model.Book;
-import at.qe.skeleton.model.Magazine;
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.model.Video;
-import at.qe.skeleton.repositories.MediaRepository;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Service for accessing and manipulating media data.
@@ -99,7 +92,7 @@ public class MediaService {
 	 */
 
 	public Collection<Media> filterMediaByTitle(final Collection<Media> filteredMedia, final String title) {
-		return filteredMedia.stream().filter(x -> x.getTitle().toLowerCase().indexOf(title) != -1)
+		return filteredMedia.stream().filter(x -> x.getTitle().toLowerCase().contains(title))
 				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
