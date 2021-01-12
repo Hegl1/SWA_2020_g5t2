@@ -20,6 +20,7 @@ import javax.faces.context.FacesContext;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Service for accessing and manipulating user data.
@@ -48,6 +49,23 @@ public class UserService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<User> getAllUsers() {
+		return this.userRepository.findAll();
+	}
+
+	/**
+	 * For admins: returns a collection of all users
+	 * For librarians: returns a collection of all customers
+	 *
+	 * @return the collection of users
+	 */
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+	public Collection<User> getAllUsersForAuthority() {
+		User currentUser = this.getAuthenticatedUser();
+
+		if(currentUser.hasRole("LIBRARIAN")){
+			return this.userRepository.findByRole(UserRole.CUSTOMER);
+		}
+
 		return this.userRepository.findAll();
 	}
 
@@ -220,6 +238,44 @@ public class UserService {
 		return this.userRepository.findFirstByUsername(auth.getName());
 	}
 
+	/**
+	 * Filters a collection of users by the given username
+	 *
+	 * @param filteredUser the collection of users to be filtered
+	 * @param username the username to filter by
+	 *
+	 * @return the filtered collection of users
+	 */
+	public Collection<User> filterUserByUsername(final Collection<User> filteredUser, final String username) {
+		return filteredUser.stream().filter(x -> x.getUsername().toLowerCase().contains(username))
+				.collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	/**
+	 * Filters a collection of users by the given email
+	 *
+	 * @param filteredUser the collection of users to be filtered
+	 * @param email the email to filter by
+	 *
+	 * @return the filtered collection of users
+	 */
+	public Collection<User> filterUserByEmail(final Collection<User> filteredUser, final String email) {
+		return filteredUser.stream().filter(x -> x.getEmail().toLowerCase().contains(email))
+				.collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	/**
+	 * Filters a collection of users by the given user-role
+	 *
+	 * @param filteredUser the collection of users to be filtered
+	 * @param role the role to filter by (given as string)
+	 *
+	 * @return the filtered collection of users
+	 */
+	public Collection<User> filterUserByRole(final Collection<User> filteredUser, final String role) {
+		return filteredUser.stream().filter(x -> x.hasRole(role))
+				.collect(Collectors.toCollection(ArrayList::new));
+	}
 
 	/**
 	 * Custom Exceptions
