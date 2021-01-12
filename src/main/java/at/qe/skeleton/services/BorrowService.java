@@ -72,9 +72,9 @@ public class BorrowService implements CommandLineRunner {
 	 * @param mediaToBorrow the media which gets borrowed by the user
 	 * @return true if borrowing was successfull, else false.
 	 */
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public boolean borrowMedia(final User borrower, final Media mediaToBorrow) {
-
-		if (mediaToBorrow.getTotalAvail() <= mediaToBorrow.getCurBorrowed()) {
+		if (mediaToBorrow.getTotalAvail() <= mediaToBorrow.getCurBorrowed() || borrower == null) {
 			return false;
 		} else {
 			mediaToBorrow.setCurBorrowed(mediaToBorrow.getCurBorrowed() + 1);
@@ -104,7 +104,6 @@ public class BorrowService implements CommandLineRunner {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void unBorrowMedia(final Borrowed borrowed) {
-
 		if (borrowed != null) {
 			borrowedRepository.delete(borrowed);
 			borrowed.getMedia().setCurBorrowed(borrowed.getMedia().getCurBorrowed() - 1);
@@ -124,6 +123,7 @@ public class BorrowService implements CommandLineRunner {
 	 * @param borrower        user to unborrow the media for.
 	 * @param mediaToUnBorrow media that should be unborrowed.
 	 */
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void unBorrowMedia(final User borrower, final Media mediaToUnBorrow) {
 		unBorrowMedia(borrowedRepository.findFirstByUserAndMedia(borrower, mediaToUnBorrow));
 	}
@@ -157,6 +157,14 @@ public class BorrowService implements CommandLineRunner {
 	 */
 	public Collection<Borrowed> getAllBorrowsByUser(final User user) {
 		return borrowedRepository.findByUser(user);
+	}
+
+	public Collection<Borrowed> getAllBorrowsByUsername(final String username){
+		User u = userService.loadUser(username);
+
+		if(u == null) return null;
+
+		return borrowedRepository.findByUser(u);
 	}
 
 	/**

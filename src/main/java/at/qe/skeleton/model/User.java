@@ -136,6 +136,16 @@ public class User implements Persistable<String>, Serializable {
 		return this.roles;
 	}
 
+	public boolean hasRole(String role){
+		switch(role){
+			case "ADMIN": return getRoles().contains(UserRole.ADMIN);
+			case "CUSTOMER": return getRoles().contains(UserRole.CUSTOMER);
+			case "LIBRARIAN": return getRoles().contains(UserRole.LIBRARIAN);
+		}
+
+		return false;
+	}
+
 	public void setRoles(final Set<UserRole> roles) {
 		this.roles = roles;
 	}

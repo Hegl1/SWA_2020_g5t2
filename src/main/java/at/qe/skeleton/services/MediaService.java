@@ -103,8 +103,8 @@ public class MediaService {
     public Collection<Media> filterMediaByAvailability(Collection<Media> filteredMedia, boolean isAvailable) {
         return filteredMedia.stream().filter(x ->
                 isAvailable ?
-                        (x.getTotalAvail() - x.getCurBorrowed()) > 0 :
-                        (x.getTotalAvail() - x.getCurBorrowed()) == 0).collect(Collectors.toCollection(ArrayList::new));
+                        x.getAvailable() :
+                        !x.getAvailable()).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public Collection<Media> filterMediaByLanguage(Collection<Media> filteredMedia, final String language) {

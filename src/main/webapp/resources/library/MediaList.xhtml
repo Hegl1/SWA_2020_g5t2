@@ -28,11 +28,7 @@
             <p:dataTable id="mediaTable" var="row" value="#{cc.attrs.mediaList}">
                 <!-- BEGIN: Sets the media variable according to the context -->
                 <c:choose>
-                    <c:when test="${cc.attrs.context == 'bookmarks'}">
-                        <c:set var="media" value="#{row.media}" />
-                    </c:when>
-
-                    <c:when test="${cc.attrs.context == 'borrowed'}">
+                    <c:when test="${cc.attrs.context == 'bookmarks' || cc.attrs.context == 'borrowed' || cc.attrs.context == 'adminUserBorrowings'}">
                         <c:set var="media" value="#{row.media}" />
                     </c:when>
 
@@ -43,7 +39,7 @@
                 <!-- END -->
 
                 <p:column headerText="" style="width: 2rem; text-align: center">
-                    <p:commandButton update="@form:mediaDetailDialog" oncomplete="PF('mediaDetailDialog').show()" icon="fa fa-fw fa-info-circle" title="Show details">
+                    <p:commandButton update="@form" oncomplete="PF('mediaDetailDialog').show()" icon="fa fa-fw fa-info-circle" title="Show details">
                         <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
                     </p:commandButton>
                 </p:column>
@@ -59,8 +55,9 @@
                 <p:column headerText="Publishing Year" style="width: 8rem; text-align: center">
                     <h:outputText value="#{media.publishingYear}"/>
                 </p:column>
-
-
+                <p:column headerText="Availability" style="width: 6rem; text-align: center" rendered="#{cc.attrs.context != 'borrowed' and cc.attrs.context != 'adminUserBorrowings'}">
+                    <h:outputText value="#{media.available ? 'Available' : 'Not available'}" style="color: #{media.available ? '#36b516' : '#ff0000'}"/>
+                </p:column>
 
                 <p:column headerText="Due date" style="width: 5rem; text-align: center" rendered="#{cc.attrs.context == 'borrowed'}">
                     <h:outputText value="#{borrowedListController.getBorrowedDueDate(row)}" >
@@ -72,6 +69,10 @@
                 </p:column>
                 <p:column headerText="Return" style="width: 5rem; text-align: center" rendered="#{cc.attrs.context == 'borrowed'}">
                     <p:commandButton icon="fa fa-fw fa-times" action="#{borrowedListController.doUnBorrowMediaForAuthenticatedUser(media)}" title="Return media" update="@form" />
+                </p:column>
+
+                <p:column headerText="Return for user" style="width: 7rem; text-align: center" rendered="#{cc.attrs.context == 'adminUserBorrowings'}">
+                    <p:commandButton icon="fa fa-fw fa-times" action="#{userBorrowedListController.doUnBorrowForUser(row)}" title="Return media" update="@form" />
                 </p:column>
                 <p:column style="width: 10rem; text-align: center"
                           rendered="#{cc.attrs.context == 'mediaAdmin'}">
@@ -89,16 +90,22 @@
                         <p:confirm header="Delete media"
                                    message="Do you want to delete the media?" icon="ui-icon-alert" />
                     </p:commandButton>
-<!--                safe delete (check if borrowings or bookmarks exist) -->
-                    <p:column headerText="Safe delete" style="width: 6rem; text-align: center" rendered="#{sessionInfoBean.currentUserRoles == 'ADMIN'}" >
                     <p:commandButton id="mDelBut" onclick="PF('dataChangeDlg').show()" action="#{mediaDetailController.orderASafeDelete(media)}" icon="fa fa-fw fa-eraser" title="Delete safely" >
                         <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
 
+                        <p:confirm header="Delete media"
+                                   message="Do you want to delete the media?" icon="ui-icon-alert" />
                     </p:commandButton>
-                    </p:column>
+                </p:column>
+
+                <p:column headerText="Borrow for user" style="width: 7rem; text-align: center" rendered="#{cc.attrs.context == 'list' and sessionInfoBean.currentUserRoles != 'CUSTOMER'}">
+                    <p:commandButton update="@form:borrowForUserDialog" oncomplete="PF('borrowForUserDialog').show()" icon="fa fa-fw fa-user-plus" title="Borrow for user" disabled="#{!media.available}">
+                        <f:setPropertyActionListener value="#{media}" target="#{borrowForUserController.media}" />
+                    </p:commandButton>
                 </p:column>
             </p:dataTable>
 
+            <!-- Detail dialog -->
             <p:dialog header="Detail" id="mediaDetailDialog" widgetVar="mediaDetailDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="mediaData" rendered="#{not empty mediaDetailController.media}">
                     <h:panelGrid columns="2" style="margin-bottom: 10px">
@@ -168,7 +175,7 @@
                             oncomplete="PF('mediaDetailDialog').hide()"
                             update="@form:mediaTable"
                             rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}"
-                            disabled="#{(mediaDetailController.media.totalAvail - mediaDetailController.media.curBorrowed) == 0}"
+                            disabled="#{!mediaDetailController.media.available}"
                     />
                     <p:commandButton
                             action="#{reservedController.toggleReservationForAuthenticatedUser(mediaDetailController.media)}"
@@ -178,11 +185,12 @@
                             oncomplete="PF('mediaDetailDialog').hide()"
                             update="@form:mediaTable"
                             rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed'}"
-                            disabled="#{(mediaDetailController.media.totalAvail - mediaDetailController.media.curBorrowed) > 0}"
+                            disabled="#{mediaDetailController.media.available}"
                     />
                 </p:outputPanel>
             </p:dialog>
-            <!-- Edit Dialog -->
+
+            <!-- Edit dialog -->
             <p:dialog header="Edit Media" id="mediaEditDialog"
                       widgetVar="mediaEditDialog" modal="true" showEffect="fade"
                       hideEffect="fade" resizable="false">
@@ -253,7 +261,7 @@
                 </p:outputPanel>
             </p:dialog>
 
-            <!-- delete Dialog -->
+            <!-- Delete dialog -->
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
                              width="300">
                 <p:commandButton value="Yes" type="button"
@@ -261,6 +269,28 @@
                 <p:commandButton value="No" type="button"
                                  styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
             </p:confirmDialog>
+
+            <!-- Borrow for user dialog -->
+            <p:dialog header="Borrow for user" id="borrowForUserDialog" widgetVar="borrowForUserDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                <p:outputPanel rendered="#{not empty borrowForUserController.media}">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="@next" value="User: " />
+                        <p:selectOneMenu value="#{borrowForUserController.username}" filter="true">
+                            <f:selectItem itemLabel="" itemValue="" />
+                            <f:selectItems value="#{borrowForUserController.userList}" var="user" itemLabel="#{user.username}" itemValue="#{user.username}" />
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+
+                    <p:commandButton
+                            action="#{borrowForUserController.borrowForUser()}"
+                            value="Borrow for selected user"
+                            id="borrowForUserButton"
+                            icon="fa fa-fw fa-plus-square-o"
+                            oncomplete="PF('borrowForUserDialog').hide()"
+                            update="@form:mediaTable"
+                    />
+                </p:outputPanel>
+            </p:dialog>
         </h:form>
     </composite:implementation>
 </html>

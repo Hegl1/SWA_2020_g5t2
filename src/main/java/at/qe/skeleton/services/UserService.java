@@ -57,7 +57,6 @@ public class UserService {
 	 * @param username the username to search for
 	 * @return the user with the given username
 	 */
-	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN') or principal.username eq #username")
 	public User loadUser(final String username) {
 		return this.userRepository.findFirstByUsername(username);
 	}
@@ -70,6 +69,14 @@ public class UserService {
 	public User loadCurrentUser() {
 		return loadUser(getAuthenticatedUser().getUsername());
 	}
+
+	/**
+	 * Loads all customers from the database
+	 *
+	 * @return the list of customers
+	 */
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+	public List<User> loadCustomers() { return this.userRepository.findByRole(UserRole.CUSTOMER); }
 
 	/**
 	 * Saves the user. This method will also set {@link User#createDate} for new
