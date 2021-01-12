@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -40,7 +42,8 @@ public class ReservedController implements Serializable {
     public void doReserveMediaForAuthenticatedUser(final Media media){
         borrowService.reserveMediaForAuthenticatedUser(media);
 
-        // TODO: add growl message
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was reserved", ""));
     }
 
     /**
@@ -51,7 +54,8 @@ public class ReservedController implements Serializable {
     public void doRemoveReservationForAuthenticatedUser(final Media media){
         borrowService.removeReservationForAuthenticatedUser(media);
 
-        // TODO: add growl message
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Reservation was cancelled", ""));
     }
 
     /**

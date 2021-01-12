@@ -108,7 +108,7 @@
                 </p:column>
 
                 <p:column headerText="Cancel" style="width: 5rem; text-align: center" rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context == 'reservations'}">
-                    <p:commandButton icon="fa fa-fw fa-times" action="#{reservedController.doRemoveReservationForAuthenticatedUser(media)}" title="Toggle bookmark" update="@form" />
+                    <p:commandButton icon="fa fa-fw fa-times" action="#{reservedController.doRemoveReservationForAuthenticatedUser(media)}" title="Cancel reservation" update="@form" />
                 </p:column>
             </p:dataTable>
 
@@ -186,7 +186,7 @@
                     />
                     <p:commandButton
                             action="#{reservedController.toggleReservationForAuthenticatedUser(mediaDetailController.media)}"
-                            value="#{reservedController.isReservedForAuthenticatedUser(mediaDetailController.media) ? 'Unreserve' : 'Reserve'}"
+                            value="#{reservedController.isReservedForAuthenticatedUser(mediaDetailController.media) ? 'Cancel reservation' : 'Reserve'}"
                             id="reserveButton"
                             icon="fa fa-fw fa-#{reservedController.isReservedForAuthenticatedUser(mediaDetailController.media) ? 'minus' : 'plus'}-square-o"
                             oncomplete="PF('mediaDetailDialog').hide()"
