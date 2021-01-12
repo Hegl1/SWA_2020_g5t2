@@ -103,13 +103,12 @@ public class MediaService {
 				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
-	public Collection<Media> filterMediaByAvailability(final Collection<Media> filteredMedia,
-			final boolean isAvailable) {
-		return filteredMedia.stream()
-				.filter(x -> isAvailable ? (x.getTotalAvail() - x.getCurBorrowed()) > 0
-						: (x.getTotalAvail() - x.getCurBorrowed()) == 0)
-				.collect(Collectors.toCollection(ArrayList::new));
-	}
+    public Collection<Media> filterMediaByAvailability(Collection<Media> filteredMedia, boolean isAvailable) {
+        return filteredMedia.stream().filter(x ->
+                isAvailable ?
+                        x.getAvailable() :
+                        !x.getAvailable()).collect(Collectors.toCollection(ArrayList::new));
+    }
 
 	public Collection<Media> filterMediaByLanguage(final Collection<Media> filteredMedia, final String language) {
 		return filteredMedia.stream().filter(x -> x.getLanguage().equalsIgnoreCase(language))
@@ -161,3 +160,4 @@ public class MediaService {
 	}
 
 }
+

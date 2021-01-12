@@ -38,6 +38,9 @@
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                         <p:confirm header="Nutzer entfernen" message="Soll dieser Benutzer wirklich unwiderruflich gelöscht werden?" icon="ui-icon-alert" />
                     </p:commandButton>
+                    <p:linkButton outcome="/admin/userBorrowings" icon="fa fa-fw fa-briefcase" title="Edit borrowings for user" rendered="#{user.hasRole('CUSTOMER')}">
+                        <f:param name="username" value="#{user.username}" />
+                    </p:linkButton>
                 </p:column>
             </p:dataTable>
 

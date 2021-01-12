@@ -98,6 +98,12 @@ public abstract class Media implements Persistable<Long>, Serializable {
 		return this.language;
 	}
 
+	/**
+	 * Converts the ISO 3166-1 alpha-2 language code into a human-readable
+	 * language
+	 *
+	 * @return the converted language string
+	 */
 	public String getLanguageHuman() {
 		Locale l = new Locale(this.language);
 		return l.getDisplayLanguage();
@@ -119,6 +125,12 @@ public abstract class Media implements Persistable<Long>, Serializable {
 		return this.mediaType;
 	}
 
+	/**
+	 * Converts the media type into a formatted, human-readable
+	 * string (first letter uppercase, the rest lower case)
+	 *
+	 * @return the converted media type
+	 */
 	public String getMediaTypeHuman() {
 		return this.mediaType.toString().substring(0, 1).toUpperCase()
 				+ this.mediaType.toString().substring(1).toLowerCase();
@@ -146,4 +158,10 @@ public abstract class Media implements Persistable<Long>, Serializable {
 		return this.mediaID == null;
 	}
 
+	/**
+	 * Checks whether the media is currently available (totalAvail > currently borrowed)
+	 *
+	 * @return true if there are copies available, false otherwise
+	 */
+	public boolean getAvailable() { return totalAvail - curBorrowed > 0; }
 }
