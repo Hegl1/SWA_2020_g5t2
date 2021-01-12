@@ -252,6 +252,19 @@ public class UserService {
 	}
 
 	/**
+	 * Filters a collection of users by the given email
+	 *
+	 * @param filteredUser the collection of users to be filtered
+	 * @param email the email to filter by
+	 *
+	 * @return the filtered collection of users
+	 */
+	public Collection<User> filterUserByEmail(final Collection<User> filteredUser, final String email) {
+		return filteredUser.stream().filter(x -> x.getEmail().toLowerCase().contains(email))
+				.collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	/**
 	 * Filters a collection of users by the given user-role
 	 *
 	 * @param filteredUser the collection of users to be filtered

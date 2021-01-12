@@ -15,7 +15,8 @@ import java.util.Collection;
 public class SearchUserBean implements Serializable {
     private Collection<User> results;
 
-    private String search = null;
+    private String filterUsername = null;
+    private String filterEmail = null;
     private String filterRole = null;
 
     public Collection<User> getResults() {
@@ -30,15 +31,27 @@ public class SearchUserBean implements Serializable {
         this.results = userService.getAllUsersForAuthority();
     }
 
-    public String getSearch() {
-        return search;
+    public String getFilterUsername() {
+        return filterUsername;
     }
 
-    public void setSearch(final String search) {
-        this.search = search == null ? null : search.trim().toLowerCase();
+    public void setFilterUsername(final String filterUsername) {
+        this.filterUsername = filterUsername == null ? null : filterUsername.trim().toLowerCase();
 
-        if(this.search == ""){
-            this.search = null;
+        if(this.filterUsername == ""){
+            this.filterUsername = null;
+        }
+    }
+
+    public String getFilterEmail() {
+        return filterEmail;
+    }
+
+    public void setFilterEmail(final String filterEmail) {
+        this.filterEmail = filterEmail == null ? null : filterEmail.trim().toLowerCase();
+
+        if(this.filterEmail == ""){
+            this.filterEmail = null;
         }
     }
 
@@ -57,8 +70,12 @@ public class SearchUserBean implements Serializable {
     public void doFilter(){
         Collection<User> results = this.results = userService.getAllUsersForAuthority();
 
-        if(search != null){
-            results = userService.filterUserByUsername(results, search);
+        if(filterUsername != null){
+            results = userService.filterUserByUsername(results, filterUsername);
+        }
+
+        if(filterEmail != null){
+            results = userService.filterUserByEmail(results, filterEmail);
         }
 
         if(filterRole != null){
@@ -69,7 +86,8 @@ public class SearchUserBean implements Serializable {
     }
 
     public void doResetFilter(){
-        this.search = null;
+        this.filterUsername = null;
+        this.filterEmail = null;
         this.filterRole = null;
 
         this.init();

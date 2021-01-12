@@ -12,14 +12,17 @@
                 <p:tab title="Search">
                     <h:panelGrid columns="2" style="margin-bottom: 10px">
                         <p:outputLabel for="@next" value="Search username:" />
-                        <p:inputText value="#{searchUserBean.search}" />
+                        <p:inputText value="#{searchUserBean.filterUsername}" />
+
+                        <p:outputLabel for="@next" value="Search email:" />
+                        <p:inputText value="#{searchUserBean.filterEmail}" />
 
                         <p:outputLabel for="@next" value="Role:" />
                         <p:selectOneMenu value="#{searchUserBean.filterRole}">
                             <f:selectItem itemLabel="Any" itemValue="" />
                             <f:selectItem itemLabel="Customer" itemValue="CUSTOMER" />
-                            <f:selectItem itemLabel="Librarian" itemValue="LIBRARIAN" noSelectionOption="true" />
-                            <f:selectItem itemLabel="Admin" itemValue="ADMIN" />
+                            <f:selectItem itemLabel="Librarian" itemValue="LIBRARIAN" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                            <f:selectItem itemLabel="Admin" itemValue="ADMIN" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
                         </p:selectOneMenu>
                     </h:panelGrid>
                     <p:commandButton
