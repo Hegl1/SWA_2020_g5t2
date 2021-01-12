@@ -7,10 +7,8 @@
                 xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name="content">
-        <p:messages for="asMessage" closable="false" showDetail="true" />
-        <p:growl for="asGrowl" closable="true" showDetail="true" showSummary="true" redisplay="true">
-            <p:autoUpdate />
-        </p:growl>
+        <h2>List media</h2>
+
         <h:form id="filter" style="margin-bottom: 15px">
             <p:accordionPanel activeIndex="-2">
                 <p:tab title="Search &amp; filter">
@@ -57,11 +55,5 @@
         <h:panelGroup id="mediaListWrapper" layout="block">
             <lib:MediaList mediaList="#{searchMediaBean.results}" context="list" id="mediaList"></lib:MediaList>
         </h:panelGroup>
-
-        <p:messages for="asMessage" />
-        <p:growl for="asGrowl" closable="true" showDetail="true" showSummary="true" redisplay="true">
-            <p:autoUpdate />
-        </p:growl>
-
     </ui:define>
 </ui:composition>

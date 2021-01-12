@@ -7,6 +7,8 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
+        <h2>Settings</h2>
+
     	<h:form id="userDataForm"> 
             <p:dataTable id="userTable" var="user" value="#{sessionInfoBean.currentUser}"> 
                 <p:column headerText="Benutzername">
