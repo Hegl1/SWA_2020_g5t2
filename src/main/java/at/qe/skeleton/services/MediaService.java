@@ -1,7 +1,10 @@
 package at.qe.skeleton.services;
 
 import at.qe.skeleton.model.*;
+import at.qe.skeleton.repositories.BookmarkRepository;
 import at.qe.skeleton.repositories.MediaRepository;
+import at.qe.skeleton.ui.controllers.FMSpamController;
+import at.qe.skeleton.ui.controllers.ReservedController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +14,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -22,6 +26,27 @@ public class MediaService {
 
 	@Autowired
 	MediaRepository mediaRepository;
+
+	@Autowired
+	BorrowService borrowService;
+
+	@Autowired
+	BookmarkService bookmarkService;
+
+	@Autowired
+	MailService mailservice;
+
+	@Autowired
+	BookmarkRepository bookmarkRepository;
+
+	@Autowired
+	UndoRedoService undoRedoService;
+
+	@Autowired
+	ReservedController reservedController;
+
+	@Autowired
+	FMSpamController fms;
 
 	/**
 	 * Return collection of Media of desired type.
@@ -141,15 +166,95 @@ public class MediaService {
 		return this.mediaRepository.getAllLanguages();
 	}
 
+//	/**
+//	 * Delete Media from repository
+//	 */
+//	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+//	public void deleteMedia(final Media media) {
+//		this.mediaRepository.delete(media);
+//		FacesContext context = FacesContext.getCurrentInstance();
+//		context.addMessage("asGrowl",
+//				new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted - in Service", ""));
+//	}
+
 	/**
 	 * Delete Media from repository
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void deleteMedia(final Media media) {
-		this.mediaRepository.delete(media);
-		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage("asGrowl",
-				new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted - in Service", ""));
+
+		UndoRedoService.ActionItem deleteAction = undoRedoService.createAction(media,
+				UndoRedoService.ActionType.DELETE_MEDIA);
+
+
+
+
+		{
+			System.out.println("\nnobody is borrowing it");
+
+			// Step 2: Get a list of users that bookmarked this media eventually
+			Collection<Bookmark> a2 = bookmarkService.getBookmarkByMedia(media);
+			List<User> a2_s = new ArrayList<User>();
+			for (Bookmark b : a2) {
+				if (b.getMedia().getMediaID() == media.getMediaID()) {
+					a2_s.add(b.getUser());
+				}
+			}
+
+			// Step 3: If the media is not borrowed and only bookmarked: Delete the media
+			// and bookmark entries and notify users
+			if (a2_s.size() > 0) {
+
+				System.out.println("\nThis media is still bookmarked by some people: ");
+				for (User u : a2_s) {
+					bookmarkService.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(u, media));
+				}
+				for (User u : a2_s) {
+					System.out.println("  by: " + u.getUsername());
+//					context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN,
+//							"This media is still bookmarked by: " + u.getUsername(), ""));
+					fms.warn("This media is still bookmarked by: " + u.getUsername());
+					mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
+							"The following Media is not available anymore: Title: " + media.getTitle() + ", Type: "
+									+ media.getMediaType() + ", Language: " + media.getLanguage() + ", Publishing Year: "
+									+ media.getPublishingYear());
+				}
+				// last but not least: remove reservations
+				if(reservedController.getReservationCountForMedia(media) > 0);
+				for (User u : a2_s) {
+					if(reservedController.isReservedForSpecialUser(media, u)){
+						reservedController.doRemoveReservationForSpecificUser(media, u);
+					}
+				}
+
+				undoRedoService.addAction(deleteAction);
+				deleteMedia(media);
+//				this.media = null;
+
+				System.out.println("\nMedia was deleted finally.");
+				fms.info("Please reload the page.");
+//				context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Please reload the page.", ""));
+
+			} else {
+				System.out.println("\nnobody is bookmarking it");
+
+				// Step 4: Delete the media only if it has not been borrowed by somebody
+				undoRedoService.addAction(deleteAction);
+				deleteMedia(media);
+//				this.media = null;
+				fms.info("Please reload the page.");
+//				context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Please reload the page.", ""));
+			}
+		}
+
+
+
+
+
+//		this.mediaRepository.delete(media);
+//		FacesContext context = FacesContext.getCurrentInstance();
+//		context.addMessage("asGrowl",
+//				new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted - in Service", ""));
 	}
 
 }
