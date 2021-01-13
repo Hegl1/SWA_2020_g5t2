@@ -57,10 +57,8 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	 * @param publishingYear publishing year of the media
 	 * @param language       2 digit language code
 	 * @param totalAvail     number of totally available copies
-	 * @param mediaType      type of the media, see {link MediaType}
 	 */
-	public Media(final String title, final int publishingYear, final String language, final int totalAvail,
-			final MediaType mediaType) {
+	public Media(final String title, final int publishingYear, final String language, final int totalAvail) {
 
 		this.title = title;
 		this.publishingYear = publishingYear;

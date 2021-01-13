@@ -53,31 +53,28 @@ public class CreateMediaBean implements Serializable {
 	public void doCreateAudioBook() {
 
 		Media media = this.mediaService.createAudioBook(title, publishingDate, language, totalAvail,
-				MediaType.AUDIOBOOK, speaker, length, author, ISBN);
+				 speaker, length, author, ISBN);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
 	public void doCreateBook() {
 
-		Media media = this.mediaService.createBook(title, publishingDate, language, totalAvail, MediaType.BOOK, author,
-				ISBN);
+		Media media = this.mediaService.createBook(title, publishingDate, language, totalAvail, author, ISBN);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
 	public void doCreateMagazine() {
 
-		Media media = this.mediaService.createMagazine(title, publishingDate, language, totalAvail, MediaType.MAGAZINE,
-				series);
+		Media media = this.mediaService.createMagazine(title, publishingDate, language, totalAvail, series);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
 	public void doCreateVideo() {
 
-		Media media = this.mediaService.createVideo(title, publishingDate, language, totalAvail, MediaType.VIDEO,
-				length);
+		Media media = this.mediaService.createVideo(title, publishingDate, language, totalAvail, length);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}

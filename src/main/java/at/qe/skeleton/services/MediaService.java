@@ -42,6 +42,10 @@ public class MediaService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media saveMedia(final Media media) {
+
+		if (media.getTotalAvail() < media.getCurBorrowed()){
+			//TODO: throw Exception
+		}
 		return this.mediaRepository.save(media);
 	}
 
@@ -50,39 +54,34 @@ public class MediaService {
 	 */
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public Media createAudioBook(final String title, final int publishingDate, final String language,
-			final int totalAvail, final MediaType mediaType, final String speaker, final int length,
-			final String author, final String ISBN) {
+	public Media createAudioBook(final String title, final int publishingDate, final String language, final int totalAvail, final String speaker, final int length, final String author, final String ISBN) {
 
-		Media newAudioBook = new AudioBook(title, publishingDate, language, totalAvail, mediaType, speaker, length,
+		Media newAudioBook = new AudioBook(title, publishingDate, language, totalAvail, speaker, length,
 				author, ISBN);
 		this.saveMedia(newAudioBook);
 		return newAudioBook;
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public Media createBook(final String title, final int publishingDate, final String language, final int totalAvail,
-			final MediaType mediaType, final String author, final String ISBN) {
+	public Media createBook(final String title, final int publishingDate, final String language, final int totalAvail, final String author, final String ISBN) {
 
-		Media newBook = new Book(title, publishingDate, language, totalAvail, mediaType, author, ISBN);
+		Media newBook = new Book(title, publishingDate, language, totalAvail, author, ISBN);
 		this.saveMedia(newBook);
 		return newBook;
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public Media createMagazine(final String title, final int publishingDate, final String language,
-			final int totalAvail, final MediaType mediaType, final String series) {
+	public Media createMagazine(final String title, final int publishingDate, final String language, final int totalAvail, final String series) {
 
-		Media newMagazine = new Magazine(title, publishingDate, language, totalAvail, mediaType, series);
+		Media newMagazine = new Magazine(title, publishingDate, language, totalAvail, series);
 		this.saveMedia(newMagazine);
 		return newMagazine;
 	}
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public Media createVideo(final String title, final int publishingDate, final String language, final int totalAvail,
-			final MediaType mediaType, final int length) {
+	public Media createVideo(final String title, final int publishingDate, final String language, final int totalAvail, final int length) {
 
-		Media newVideo = new Video(title, publishingDate, language, totalAvail, mediaType, length);
+		Media newVideo = new Video(title, publishingDate, language, totalAvail, length);
 		this.saveMedia(newVideo);
 		return newVideo;
 	}
