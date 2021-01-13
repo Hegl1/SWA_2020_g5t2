@@ -23,7 +23,7 @@ public class Bookmark implements Serializable, Persistable<Long> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name = "bookmark_sequence", initialValue = 10)
+	@SequenceGenerator(name = "bookmark_sequence", initialValue = 11)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bookmark_sequence")
 	private Long bookmarkID;
 
