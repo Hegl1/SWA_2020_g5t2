@@ -29,10 +29,11 @@
                                         rendered="#{sessionInfoBean.hasRole('CUSTOMER')}"/>
 
                             <p:submenu label="Admin" icon="fa fa-fw fa-star"
-                                       class="#{['/admin/users.xhtml', '/admin/media.xhtml'].contains(view.viewId) ? 'current' : ''}"
+                                       class="#{['/admin/users.xhtml', '/admin/media.xhtml', '/admin/borrowTimes.xhtml'].contains(view.viewId) ? 'current' : ''}"
                                        rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}">
-                                <p:menuitem value="Manage User" icon="fa fa-fw fa-user-plus" url="/admin/users.xhtml" rendered="#{sessionInfoBean.hasRole('ADMIN') or sessionInfoBean.hasRole('LIBRARIAN')}"/>
+                                <p:menuitem value="Manage User" icon="fa fa-fw fa-user-plus" url="/admin/users.xhtml"/>
                                 <p:menuitem value="Manage media" icon="fa fa-fw fa-list" url="/admin/media.xhtml"/>
+                                <p:menuitem value="Manage borrow times" icon="fa fa-fw fa-clock-o" url="/admin/borrowTimes.xhtml" rendered="#{sessionInfoBean.hasRole('ADMIN')}" />
                             </p:submenu>
                             <p:submenu label="User" icon="fa fa-fw fa-user" class="#{view.viewId eq '/secured/user_settings.xhtml' ? 'current' : ''}">
                                 <p:menuitem value="Settings" icon="fa fa-fw fa-cog" url="/secured/user_settings.xhtml"/>
