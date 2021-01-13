@@ -263,7 +263,7 @@ public class UndoRedoService {
 		if (!type.equals(ActionType.EDIT_MEDIA_BORROW_TIME)) {
 			logger.error("Action could not be saved for MediaBorrowTimes: wrong action type in wrong method.");
 		}
-		return new BorrowTimeAction(borrowTimes);
+		return new BorrowTimeAction(borrowTimes, type);
 	}
 
 	/**
@@ -522,23 +522,28 @@ public class UndoRedoService {
 
 		protected Collection<MediaBorrowTime> borrowTimes;
 
-		protected BorrowTimeAction(final Collection<MediaBorrowTime> borrowTimes) {
+		protected BorrowTimeAction(final Collection<MediaBorrowTime> borrowTimes, final ActionType type) {
+			this.type = type;
 			this.borrowTimes = borrowTimes;
 		}
 
 		@Override
 		void performUndoAction() {
-			Collection<MediaBorrowTime> tempBorrowTimes = mediaBorrowTimeRepository.findAll();
-			for (MediaBorrowTime current : borrowTimes) {
-				mediaBorrowTimeRepository.save(current);
+			if (type.equals(ActionType.EDIT_MEDIA_BORROW_TIME)) {
+				Collection<MediaBorrowTime> tempBorrowTimes = mediaBorrowTimeRepository.findAll();
+				for (MediaBorrowTime current : borrowTimes) {
+					mediaBorrowTimeRepository.save(current);
+				}
+				borrowTimes = tempBorrowTimes;
 			}
-			borrowTimes = tempBorrowTimes;
 		}
 
 		@Override
 		void performRedoAction() {
 			for (MediaBorrowTime current : borrowTimes) {
-				mediaBorrowTimeRepository.save(current);
+				if (type.equals(ActionType.EDIT_MEDIA_BORROW_TIME)) {
+					mediaBorrowTimeRepository.save(current);
+				}
 			}
 		}
 
