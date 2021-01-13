@@ -106,7 +106,6 @@ public class UserService {
 	 * @return the updated user
 	 */
 	// TODO: Move PasswordEncoder
-	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public User saveUser(final User user) {
 		if (user.isNew()) {
 			user.setCreateDate(new Date());
