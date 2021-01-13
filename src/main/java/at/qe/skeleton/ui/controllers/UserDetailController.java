@@ -32,6 +32,9 @@ public class UserDetailController implements Serializable {
 	@Autowired
 	private UndoRedoService undoRedoService;
 
+	@Autowired
+	FMSpamController fms;
+
 	/**
 	 * Attribute to cache the currently displayed user
 	 */
@@ -82,6 +85,8 @@ public class UserDetailController implements Serializable {
 			// TODO: Exception-Handling
 		}
 		this.doReloadUser();
+		fms.info("A new user with the username: "+ username +" was created!");
+		fms.info("Please reload the page.");
 	}
 
 	/**
@@ -98,9 +103,7 @@ public class UserDetailController implements Serializable {
 		this.undoRedoService.addAction(undoRedoService.createAction(userService.loadUser(this.user.getUsername()), user,
 				UndoRedoService.ActionType.EDIT_USER));
 		this.user = this.userService.saveUser(this.user);
-
-		FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_INFO, "Changes saved!", "");
-		FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
+		fms.info("Changes saved");
 	}
 
 	/**
@@ -111,17 +114,18 @@ public class UserDetailController implements Serializable {
 			this.userService.deleteUser(this.user);
 			this.undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.DELETE_USER));
 
-			FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_WARN, "User was deleted!", "");
-			FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
 		} catch (UserService.UnauthorizedActionException unauthorizedActionException) {
 			System.out.println(unauthorizedActionException.getMessage());
 			// TODO: Exception-Handling
 		}
 		this.user = null;
+		fms.info("The user was deleted and all his bookmarks and reserved media has been deleted");
+		fms.info("Please reload the page.");
 	}
 
 	public void changeUserRoles() {
 		userService.changeUserRoles(user, newRolesString);
+		fms.info("Role edit done successfully.");
 	}
 
 }

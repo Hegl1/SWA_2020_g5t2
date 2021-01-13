@@ -22,7 +22,7 @@ public class FMSpamController implements Serializable {
      */
     public void info(String text) {
         FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "hi  " + text, ""));
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, text, ""));
     }
 
     /**
@@ -32,7 +32,27 @@ public class FMSpamController implements Serializable {
      */
     public void warn(String text) {
         FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN, "nice to  " + text, ""));
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN, text, ""));
+    }
+
+    /**
+     * send with severity "fatal (red)"
+     *
+     * @Param text the message
+     */
+    public void fatal(String text) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_FATAL, text, ""));
+    }
+
+    /**
+     * send with severity "fatal (red)"
+     *
+     * @Param text the message
+     */
+    public void error(String text) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_ERROR, text, ""));
     }
 
 }

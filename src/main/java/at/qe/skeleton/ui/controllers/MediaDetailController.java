@@ -42,15 +42,24 @@ public class MediaDetailController implements Serializable {
 	@Autowired
 	BorrowService borrowService;
 
-
-
 	@Autowired
 	UndoRedoService undoRedoService;
+
+	@Autowired
+	BookmarkService bookmarkService;
+
+	@Autowired
+	MailService mailservice;
+
+	@Autowired
+	BookmarkRepository bookmarkRepository;
+
+	@Autowired
+	ReservedController reservedController;
 
 
 	@Autowired
 	FMSpamController fms;
-
 
 
 	/**
@@ -122,74 +131,42 @@ public class MediaDetailController implements Serializable {
 				.addAction(undoRedoService.createAction(beforeEditMedia, media, UndoRedoService.ActionType.EDIT_MEDIA));
 	}
 
-	/**
-	 * Action to delete the currently displayed media.
-	 */
-	public void doDeleteMedia() {
-		this.mediaService.deleteMedia(media);
-		this.media = null;
-		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage("asGrowl",
-				new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted - in Controller", ""));
-	}
-
-
 
 	/**
-	 * Intermediate function to close the loading window while safe deleting
+	 * Action to safely delete the currently displayed media.
 	 */
-	public void orderASafeDelete(final Media media) {
+	public void doDeleteMedia(final Media media) {
 
 		UndoRedoService.ActionItem deleteAction = undoRedoService.createAction(media,
 				UndoRedoService.ActionType.DELETE_MEDIA);
 
 		// Step 1: Check if the media is still borrowed
-		FacesContext context = FacesContext.getCurrentInstance();
 		Collection<Borrowed> a1 = borrowService.getAllBorrowsByMedia(media);
 		if (a1.size() > 0) {
 			System.out.println("\nThis media is still borrowed by x " + a1.size() + " people.");
 			for (Borrowed a : a1) {
 				System.out.println("  by: " + a.getUser());
-				context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN,
-						"This media is still borrowed by : " + a.getUser().getUsername() + " and cannot be deleted.",
-						""));
+				fms.warn("This media is still borrowed by : " + a.getUser().getUsername() + " and cannot be deleted");
 			}
 		} else {
 
-			fms.info("me too");
-			fms.warn("sweet you");
-			// a loading message is shown, as the deleting and mail sending process can take
-			// up to 20 seconds
-			mediaService.deleteMedia(media);
-
+			doSafeDeleteMedia(media);
 		}
-
-
-		PrimeFaces.current().executeScript("PF('dataChangeDlg').hide()");
+		// optionally close the occuring loading message as the deleting and mail sending process can take a while
+		// PrimeFaces.current().executeScript("PF('dataChangeDlg').hide()");
 	}
 
 	/**
 	 * Safe delete - check if borrowings and bookmarks exist to a given media if
 	 * borrowings exist: do not delete if bookmarks exist: delete them and notify
 	 * with growl Messages and send email
-	 *//*
+	 * */
+
 	public void doSafeDeleteMedia(final Media media) {
 
 		UndoRedoService.ActionItem deleteAction = undoRedoService.createAction(media,
 				UndoRedoService.ActionType.DELETE_MEDIA);
 
-		// Step 1: Check if the media is still borrowed
-	*//*	FacesContext context = FacesContext.getCurrentInstance();
-		Collection<Borrowed> a1 = borrowService.getAllBorrowsByMedia(media);
-		if (a1.size() > 0) {
-			System.out.println("\nThis media is still borrowed by x " + a1.size() + " people.");
-			for (Borrowed a : a1) {
-				System.out.println("  by: " + a.getUser());
-				context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN,
-						"This media is still borrowed by : " + a.getUser().getUsername() + " and cannot be deleted.",
-						""));
-			}
-		} else *//*
 			{
 			System.out.println("\nnobody is borrowing it");
 
@@ -206,15 +183,13 @@ public class MediaDetailController implements Serializable {
 			// and bookmark entries and notify users
 			if (a2_s.size() > 0) {
 
-				System.out.println("\nThis media is still bookmarked by some people: ");
+				System.out.println("\nThis media was bookmarked by some people: ");
 				for (User u : a2_s) {
 					bookmarkService.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(u, media));
 				}
 				for (User u : a2_s) {
 					System.out.println("  by: " + u.getUsername());
-//					context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN,
-//							"This media is still bookmarked by: " + u.getUsername(), ""));
-					fms.warn("This media is still bookmarked by: " + u.getUsername());
+					fms.warn("This media was bookmarked by: " + u.getUsername());
 					mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
 							"The following Media is not available anymore: Title: " + media.getTitle() + ", Type: "
 									+ media.getMediaType() + ", Language: " + media.getLanguage() + ", Publishing Year: "
@@ -234,7 +209,6 @@ public class MediaDetailController implements Serializable {
 
 				System.out.println("\nMedia was deleted finally.");
 				fms.info("Please reload the page.");
-//				context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Please reload the page.", ""));
 
 			} else {
 				System.out.println("\nnobody is bookmarking it");
@@ -244,10 +218,9 @@ public class MediaDetailController implements Serializable {
 				this.mediaService.deleteMedia(media);
 				this.media = null;
 				fms.info("Please reload the page.");
-//				context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Please reload the page.", ""));
-			}*/
-//		}
-//	}
+			}
+		}
+	}
 
 	/**
 	 * Converts a length in seconds to a nicely readable string in the format:

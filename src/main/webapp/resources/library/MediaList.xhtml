@@ -78,7 +78,7 @@
                 <p:column headerText="Return for user" style="width: 7rem; text-align: center" rendered="#{cc.attrs.context == 'adminUserBorrowings'}">
                     <p:commandButton icon="fa fa-fw fa-times" action="#{userBorrowedListController.doUnBorrowForUser(row)}" title="Return media" update="@form" />
                 </p:column>
-                <p:column style="width: 6rem; text-align: center"
+                <p:column headerText="Edit/Delete" style="width: 6rem; text-align: center"
                           rendered="#{cc.attrs.context == 'mediaAdmin'}">
                     <p:commandButton update="@form:mediaEditDialog"
                                      oncomplete="PF('mediaEditDialog').show()" icon="fa fa-fw fa-edit"
@@ -87,19 +87,14 @@
                                                      target="#{mediaDetailController.media}" />
                     </p:commandButton>
                     <p:commandButton update="@form"
-                                     action="#{mediaDetailController.doDeleteMedia}"
-                                     icon="fa fa-fw fa-trash" title="Delete">
+                                     action="#{mediaDetailController.doDeleteMedia(media)}"
+                                     icon="fa fa-fw fa-eraser" title="Delete">
                         <f:setPropertyActionListener value="#{media}"
                                                      target="#{mediaDetailController.media}" />
                         <p:confirm header="Delete media"
                                    message="Do you want to delete the media?" icon="ui-icon-alert" />
                     </p:commandButton>
-                    <p:commandButton id="mDelBut" onclick="PF('dataChangeDlg').show()" action="#{mediaDetailController.orderASafeDelete(media)}" icon="fa fa-fw fa-eraser" title="Delete safely" >
-                        <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
 
-                        <p:confirm header="Delete media"
-                                   message="Do you want to delete the media?" icon="ui-icon-alert" />
-                    </p:commandButton>
                 </p:column>
 
                 <p:column

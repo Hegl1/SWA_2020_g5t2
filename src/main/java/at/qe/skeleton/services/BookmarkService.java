@@ -2,10 +2,7 @@ package at.qe.skeleton.services;
 
 import java.util.Collection;
 import java.util.List;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-
+import at.qe.skeleton.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -24,10 +21,14 @@ import at.qe.skeleton.repositories.BookmarkRepository;
 public class BookmarkService {
 
 	@Autowired
-	private BookmarkRepository bookmarkRepository;
+	BookmarkRepository bookmarkRepository;
 
 	@Autowired
-	private UserService userService;
+	UserService userService;
+
+	@Autowired
+	UserRepository userRepository;
+
 
 	/**
 	 * Returns a collection of all the bookmarks.
@@ -122,8 +123,6 @@ public class BookmarkService {
 		}
 
 		bookmarkRepository.delete(bookmark);
-		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_FATAL, "Bookmark was removed.", ""));
 	}
 
 	/**
@@ -139,13 +138,8 @@ public class BookmarkService {
 			mark.setMedia(media);
 			mark.setUser(myUser);
 			bookmarkRepository.save(mark);
-			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Bookmark was added.", ""));
-		} else {
-			FacesContext context = FacesContext.getCurrentInstance();
-			FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_WARN, "Bookmark was already made!", "");
-			FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
 		}
+
 	}
 
 	/**
