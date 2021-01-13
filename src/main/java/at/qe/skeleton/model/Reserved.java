@@ -26,7 +26,7 @@ public class Reserved implements Serializable, Persistable<Long> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name = "borrow_sequence", initialValue = 10)
+	@SequenceGenerator(name = "borrow_sequence", initialValue = 11)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "borrow_sequence")
 	private Long reservedID;
 

@@ -32,7 +32,7 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name = "media_sequence", initialValue = 10)
+	@SequenceGenerator(name = "media_sequence", initialValue = 21)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "media_sequence")
 	private Long mediaID;
 	private String title;
