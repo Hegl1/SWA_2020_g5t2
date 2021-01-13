@@ -34,18 +34,18 @@ import java.util.stream.Collectors;
 public class UserService {
 
 	@Autowired
-	UserRepository userRepository;
+	private UserRepository userRepository;
 
 	@Autowired
-	private BorrowedRepository borrowedRepository2;
+	private BorrowedRepository borrowedRepository;
 
 	@Autowired
-	private BookmarkRepository bookmarkRepository2;
+	private BookmarkRepository bookmarkRepository;
 
 	/**
 	 * Returns a collection of all users.
 	 *
-	 * @return
+	 * @return the collection of all users
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Collection<User> getAllUsers() {
@@ -79,11 +79,22 @@ public class UserService {
 		return this.userRepository.findFirstByUsername(username);
 	}
 
+	/**
+	 * Loads a user identified by its full name
+	 *
+	 * @param fullName the full name of a user to search for
+	 * @return the user found by its full name
+	 */
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public List<User> loadUserByName(final String fullName) {
 		return userRepository.findByWholeNameConcat(fullName);
 	}
 
+	/**
+	 * Loads the currently authenticated user
+	 *
+	 * @return the the currently authenticated user
+	 */
 	public User loadCurrentUser() {
 		return loadUser(getAuthenticatedUser().getUsername());
 	}
@@ -97,10 +108,7 @@ public class UserService {
 	public List<User> loadCustomers() { return this.userRepository.findByRole(UserRole.CUSTOMER); }
 
 	/**
-	 * Saves the user. This method will also set {@link User#createDate} for new
-	 * entities or {@link User#updateDate} for updated entities. The user requesting
-	 * this operation will also be stored as {@link User#createDate} or
-	 * {@link User#updateUser} respectively.
+	 * Saves the user in the user repository.
 	 *
 	 * @param user the user to save
 	 * @return the updated user
@@ -132,7 +140,7 @@ public class UserService {
 	 *
 	 * @param user     The user whose roles should be changed
 	 * @param newRoles Set of new roles
-	 * @return if the change was succesful.
+	 * @return if the change was successful.
 	 */
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public boolean changeUserRoles(final User user, final Set<UserRole> newRoles) {
@@ -144,6 +152,13 @@ public class UserService {
 		return true;
 	}
 
+	/**
+	 * Changes the set of roles a user possesses.
+	 *
+	 * @param user     The user whose roles should be changed
+	 * @param newRolesString List of new roles
+	 * @return if the change was successful.
+	 */
 	public boolean changeUserRoles(final User user, final List<String> newRolesString) {
 		Set<UserRole> newRolesSet = new HashSet<>();
 
@@ -152,9 +167,7 @@ public class UserService {
 				case "librarian": 	newRolesSet.add(UserRole.LIBRARIAN); break;
 				case "admin": 		newRolesSet.add(UserRole.ADMIN); break;
 				case "customer": 	newRolesSet.add(UserRole.CUSTOMER); break;
-				default:
-					System.err.println("[Warning] UserService - changeUserRoles: Role \"" + selected + "\" not supported yet!");
-					return false;
+				default: return false;
 			}
 		}
 		user.setRoles(newRolesSet);
@@ -163,7 +176,17 @@ public class UserService {
 	}
 
 	/**
-	 * Creates a user.
+	 * Creates a new user and saves it in the user repository.
+	 *
+	 * @param username 	the username for the new user
+	 * @param password 	the password for the new user
+	 * @param firstName the first name of the new user
+	 * @param lastName 	the last name of the new user
+	 * @param enabled 	the status of the new user (enabled or disabled)
+	 * @param roles 	the role for the new user
+	 * @param email 	the email of the new user
+	 *
+	 * @return the newly created user
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public User createUser(final String username, final String password, final String firstName, final String lastName,
@@ -192,7 +215,7 @@ public class UserService {
 	}
 
 	/**
-	 * Deletes the user.
+	 * Deletes the user from the user repository.
 	 *
 	 * @param user the user to delete
 	 */
@@ -204,26 +227,26 @@ public class UserService {
 		FacesContext context = FacesContext.getCurrentInstance();
 		if (this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN)
 				&& user.getRoles().contains(UserRole.ADMIN)) {
-			context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Librarians may not delete Administrators!",  "") );
+			context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Librarians may not delete Librarians or Administrators!",  "") );
 			throw new UnauthorizedActionException("Librarians may not delete Administrators!");
 
 		} else if (this.getAuthenticatedUser().getId().equals(user.getId())) {
-			context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Users may not delete themself!",  "") );
-			throw new UnauthorizedActionException("Users may not delete themself!");
+			context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Users may not delete themselves!",  "") );
+			throw new UnauthorizedActionException("Users may not delete themselves!");
 
 		} else {
 			// Check for borrowed articles
-			List<Borrowed> still_borrowed = borrowedRepository2.findByUser(user);
+			List<Borrowed> still_borrowed = borrowedRepository.findByUser(user);
 
 			if (still_borrowed.size() != 0) {
 				context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Can't delete user - some media is still borrowed",  "") );
 				throw new UnauthorizedActionException("User cannot be deleted: There is a Media that the user has not returned yet!");
 			} else {
 				// delete Bookmarks
-				List<Bookmark> still_bookmarked = bookmarkRepository2.findByUsername(user.getUsername());
+				List<Bookmark> still_bookmarked = bookmarkRepository.findByUsername(user.getUsername());
 				for (Bookmark sbm : still_bookmarked){
 					context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Deleted the user's bookmark No.: " + sbm.getBookmarkID(),  "") );
-					bookmarkRepository2.delete(sbm);
+					bookmarkRepository.delete(sbm);
 				}
 				//mailService.send "your account was deleted"
 				this.userRepository.delete(user);
@@ -233,6 +256,11 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * Returns the currently authenticated user
+	 *
+	 * @return the currently authenticated user
+	 */
 	public User getAuthenticatedUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		return this.userRepository.findFirstByUsername(auth.getName());
