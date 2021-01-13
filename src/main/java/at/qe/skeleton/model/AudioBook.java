@@ -19,10 +19,10 @@ public class AudioBook extends Media {
 	private String author;
 	private String ISBN;
 
-	public AudioBook(final String title, final int publishingYear, final String language, final int totalAvail,
-			final MediaType mediaType, final String speaker, final int length, final String author, final String ISBN) {
+	public AudioBook(final String title, final int publishingYear, final String language, final int totalAvail, final String speaker, final int length, final String author, final String ISBN) {
 
-		super(title, publishingYear, language, totalAvail, mediaType);
+		super(title, publishingYear, language, totalAvail);
+		this.setMediaType(MediaType.AUDIOBOOK);
 		this.speaker = speaker;
 		this.length = length;
 		this.author = author;

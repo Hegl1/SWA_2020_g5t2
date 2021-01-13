@@ -23,15 +23,15 @@ import java.util.Collection;
 public class MediaServiceTest {
 
     @Autowired
-    MediaService mediaService;
+    private MediaService mediaService;
 
     @Test
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testCreateAudioBook() {
 
-        this.mediaService.createAudioBook("Some French AudioBook", 2021, "FR", 12, MediaType.AUDIOBOOK, "Frank Elstner", 42069, "Thomas Gottschalk", "1234-asdf");
-        Media loadedNewAudioBook = this.mediaService.loadMedia(10L);
+        this.mediaService.createAudioBook("Some French AudioBook", 2021, "FR", 12, "Frank Elstner", 42069, "Thomas Gottschalk", "1234-asdf");
+        Media loadedNewAudioBook = this.mediaService.loadMedia(21L);
 
         Assertions.assertNotNull(loadedNewAudioBook);
         Assertions.assertEquals( "Some French AudioBook", loadedNewAudioBook.getTitle(), "--wrong title--");
@@ -50,8 +50,8 @@ public class MediaServiceTest {
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testCreateBook() {
 
-        this.mediaService.createBook("Some Greek Book", 2020, "GR", 11, MediaType.BOOK, "Thomas Brezina", "5678-jkloe");
-        Media loadedNewBook = this.mediaService.loadMedia(10L);
+        this.mediaService.createBook("Some Greek Book", 2020, "GR", 11, "Thomas Brezina", "5678-jkloe");
+        Media loadedNewBook = this.mediaService.loadMedia(21L);
 
         Assertions.assertNotNull(loadedNewBook, "--media is null--");
         Assertions.assertEquals( "Some Greek Book", loadedNewBook.getTitle(), "--wrong title--");
@@ -68,8 +68,8 @@ public class MediaServiceTest {
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testCreateMagazine() {
 
-        this.mediaService.createMagazine("Some Spanish Magazine", 2019, "ES", 10, MediaType.MAGAZINE, "Test Series");
-        Media loadedNewMagazine = this.mediaService.loadMedia(10L);
+        this.mediaService.createMagazine("Some Spanish Magazine", 2019, "ES", 10, "Test Series");
+        Media loadedNewMagazine = this.mediaService.loadMedia(21L);
 
         Assertions.assertNotNull(loadedNewMagazine, "--media is null--");
         Assertions.assertEquals( "Some Spanish Magazine", loadedNewMagazine.getTitle(), "--wrong title--");
@@ -85,8 +85,8 @@ public class MediaServiceTest {
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testCreateVideo() {
 
-        this.mediaService.createVideo("Some Portuguese Video", 2018, "PT", 9, MediaType.VIDEO, 42068);
-        Media loadedNewVideo = this.mediaService.loadMedia(10L);
+        this.mediaService.createVideo("Some Portuguese Video", 2018, "PT", 9, 42068);
+        Media loadedNewVideo = this.mediaService.loadMedia(21L);
 
         Assertions.assertNotNull(loadedNewVideo, "--media is null--");
         Assertions.assertEquals( "Some Portuguese Video", loadedNewVideo.getTitle(), "--wrong title--");
@@ -100,15 +100,17 @@ public class MediaServiceTest {
     @Test
     public void testGetAllMedia() {
         Collection<Media> allMedia = this.mediaService.getAllMedia();
-        Assertions.assertEquals(4, allMedia.size());
+        Assertions.assertEquals(20, allMedia.size());
     }
 
     @Test
     @DirtiesContext
     public void testGetAllLanguages() {
-        Assertions.assertEquals(2, this.mediaService.getAllLanguages().size());
+        Assertions.assertEquals(4, this.mediaService.getAllLanguages().size());
         Assertions.assertTrue(this.mediaService.getAllLanguages().contains("EN"));
         Assertions.assertTrue(this.mediaService.getAllLanguages().contains("DE"));
+        Assertions.assertTrue(this.mediaService.getAllLanguages().contains("IT"));
+        Assertions.assertTrue(this.mediaService.getAllLanguages().contains("FR"));
     }
 
     @Test

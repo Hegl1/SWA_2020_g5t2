@@ -27,7 +27,7 @@ import at.qe.skeleton.services.UserService.UnauthorizedActionException;
  * {@link at.qe.skeleton.services.UndoRedoService.ActionType} The abstract class
  * for an action is {@link at.qe.skeleton.services.UndoRedoService.ActionItem}.
  * These classes will be instantiated with the provided methods. Note that it is
- * necessarry to add all actions that should be 'undoable' with the method
+ * necessary to add all actions that should be 'undoable' with the method
  * {@link UndoRedoService#addAction(ActionItem)}. Redoable actions are managed
  * automatically.
  * 
@@ -97,7 +97,7 @@ public class UndoRedoService {
 	}
 
 	/**
-	 * Method that undos the last saved action.
+	 * Method that undoes the last saved action.
 	 */
 	public void undoLastAction() {
 		ActionItem action = unDoQueue.pop();
@@ -111,7 +111,7 @@ public class UndoRedoService {
 	}
 
 	/**
-	 * Method that redos the last action.
+	 * Method that redoes the last action.
 	 */
 	public void redoLastAction() {
 		ActionItem action = reDoQueue.pop();
@@ -179,7 +179,7 @@ public class UndoRedoService {
 	 *             and
 	 *             {@link at.qe.skeleton.services.UndoRedoService.ActionType#DELETE_USER}
 	 *             are possible values for this method.
-	 * @return the constructed ActionItem or null if the wrong actiontype is used.
+	 * @return the constructed ActionItem or null if the wrong action type is used.
 	 */
 	public ActionItem createAction(final User user, final ActionType type) {
 		if (type.equals(ActionType.EDIT_MEDIA)) {
@@ -196,13 +196,13 @@ public class UndoRedoService {
 	 * DELETE_USER actions, instead use
 	 * {@link UndoRedoService#createAction(User, ActionType)}
 	 * 
-	 * @param beforeEditUser the user before edeting has been performed
-	 * @param afterEditUser  the user after edeting has been performed
+	 * @param beforeEditUser the user before editing has been performed
+	 * @param afterEditUser  the user after editing has been performed
 	 * @param type           the type that is performed in the action. Note that
 	 *                       only
 	 *                       {@link at.qe.skeleton.services.UndoRedoService.ActionType#EDIT_USER},
 	 *                       is possible for this method.
-	 * @return the constructed ActionItem or null if the wrong actiontype is used.
+	 * @return the constructed ActionItem or null if the wrong action type is used.
 	 */
 	public ActionItem createAction(final User beforeEditUser, final User afterEditUser, final ActionType type) {
 		if (!type.equals(ActionType.EDIT_USER)) {
@@ -226,7 +226,7 @@ public class UndoRedoService {
 	 *              and
 	 *              {@link at.qe.skeleton.services.UndoRedoService.ActionType#DELETE_MEDIA}
 	 *              are possible values for this method.
-	 * @return the constructed ActionItem or null if the wrong actiontype is used.
+	 * @return the constructed ActionItem or null if the wrong action type is used.
 	 */
 	public ActionItem createAction(final Media media, final ActionType type) {
 		if (type.equals(ActionType.EDIT_MEDIA)) {
@@ -242,13 +242,13 @@ public class UndoRedoService {
 	 * DELETE_MEDIA actions, instead use
 	 * {@link UndoRedoService#createAction(Media, ActionType)}
 	 * 
-	 * @param beforeEditMedia the media before edeting has been performed
-	 * @param afterEditMedia  the media after edeting has been performed
+	 * @param beforeEditMedia the media before editing has been performed
+	 * @param afterEditMedia  the media after editing has been performed
 	 * @param type            the type that is performed in the action. Note that
 	 *                        only
 	 *                        {@link at.qe.skeleton.services.UndoRedoService.ActionType#EDIT_MEDIA},
 	 *                        is possible for this method.
-	 * @return the constructed ActionItem or null if the wrong actiontype is used.
+	 * @return the constructed ActionItem or null if the wrong action type is used.
 	 */
 	public ActionItem createAction(final Media beforeEditMedia, final Media afterEditMedia, final ActionType type) {
 		if (!type.equals(ActionType.EDIT_MEDIA)) {
@@ -268,7 +268,7 @@ public class UndoRedoService {
 
 	/**
 	 * Abstract class that represents an Action. Contains abstract methods for
-	 * undoing and redoing the sabed action.
+	 * undoing and redoing the saved action.
 	 *
 	 */
 	public abstract class ActionItem {
@@ -279,12 +279,12 @@ public class UndoRedoService {
 		protected ActionType type;
 
 		/**
-		 * method that undos the recent action.
+		 * method that undoes the recent action.
 		 */
 		abstract void performUndoAction();
 
 		/**
-		 * method that redos the recent action.
+		 * method that redoes the recent action.
 		 */
 		abstract void performRedoAction();
 	}
@@ -406,7 +406,7 @@ public class UndoRedoService {
 				try {
 					userService.deleteUser(beforeEditUser);
 				} catch (UnauthorizedActionException e) {
-					logger.error("Errror while undoing user actionm unauthrized deletion of user");
+					logger.error("Error while undoing user action unauthorized deletion of user");
 				}
 			} else if (type.equals(ActionType.DELETE_USER)) {
 				userService.saveUser(beforeEditUser);
@@ -426,7 +426,7 @@ public class UndoRedoService {
 				try {
 					userService.deleteUser(beforeEditUser);
 				} catch (UnauthorizedActionException e) {
-					logger.error("Errror while undoing user actionm unauthrized deletion of user");
+					logger.error("Error while undoing user action unauthorized deletion of user");
 				}
 			} else if (type.equals(ActionType.EDIT_USER)) {
 				userService.saveUser(afterEditUser);
@@ -550,7 +550,7 @@ public class UndoRedoService {
 	}
 
 	/**
-	 * Enum that represents the supportet actions to undo/redo.
+	 * Enum that represents the supported actions to undo/redo.
 	 */
 	public enum ActionType {
 		UNBORROW, BORROW, SAVE_USER, DELETE_USER, EDIT_USER, SAVE_MEDIA, DELETE_MEDIA, EDIT_MEDIA, SAVE_BOOKMARK,
