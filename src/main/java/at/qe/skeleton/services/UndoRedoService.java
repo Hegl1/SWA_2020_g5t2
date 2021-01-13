@@ -13,9 +13,11 @@ import org.springframework.stereotype.Component;
 import at.qe.skeleton.model.Bookmark;
 import at.qe.skeleton.model.Borrowed;
 import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.MediaBorrowTime;
 import at.qe.skeleton.model.Reserved;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
 import at.qe.skeleton.services.UserService.UnauthorizedActionException;
 
 /**
@@ -61,6 +63,9 @@ public class UndoRedoService {
 
 	@Autowired
 	private BookmarkService bookmarkService;
+
+	@Autowired
+	private MediaBorrowTimeRepository mediaBorrowTimeRepository;
 
 	private Logger logger = LoggerFactory.getLogger(UndoRedoService.class);
 
@@ -254,6 +259,13 @@ public class UndoRedoService {
 		return new MediaAction(beforeEditMedia, afterEditMedia, type);
 	}
 
+	public ActionItem createAction(final Collection<MediaBorrowTime> borrowTimes, final ActionType type) {
+		if (!type.equals(ActionType.EDIT_MEDIA_BORROW_TIME)) {
+			logger.error("Action could not be saved for MediaBorrowTimes: wrong action type in wrong method.");
+		}
+		return new BorrowTimeAction(borrowTimes, type);
+	}
+
 	/**
 	 * Abstract class that represents an Action. Contains abstract methods for
 	 * undoing and redoing the sabed action.
@@ -327,7 +339,6 @@ public class UndoRedoService {
 	 * Class that represents a bookmarking action.
 	 */
 	private class BookmarkAction extends ActionItem {
-		// TODO implement action in controller
 		/**
 		 * Bookmark that is used for undoing/redoing
 		 */
@@ -431,7 +442,6 @@ public class UndoRedoService {
 	 * Class that represents a media action.
 	 */
 	private class MediaAction extends ActionItem {
-		// TODO implement action in controller
 		/**
 		 * User that is used for un/redoing every action.
 		 */
@@ -508,12 +518,43 @@ public class UndoRedoService {
 
 	}
 
+	private class BorrowTimeAction extends ActionItem {
+
+		protected Collection<MediaBorrowTime> borrowTimes;
+
+		protected BorrowTimeAction(final Collection<MediaBorrowTime> borrowTimes, final ActionType type) {
+			this.type = type;
+			this.borrowTimes = borrowTimes;
+		}
+
+		@Override
+		void performUndoAction() {
+			if (type.equals(ActionType.EDIT_MEDIA_BORROW_TIME)) {
+				Collection<MediaBorrowTime> tempBorrowTimes = mediaBorrowTimeRepository.findAll();
+				for (MediaBorrowTime current : borrowTimes) {
+					mediaBorrowTimeRepository.save(current);
+				}
+				borrowTimes = tempBorrowTimes;
+			}
+		}
+
+		@Override
+		void performRedoAction() {
+			for (MediaBorrowTime current : borrowTimes) {
+				if (type.equals(ActionType.EDIT_MEDIA_BORROW_TIME)) {
+					mediaBorrowTimeRepository.save(current);
+				}
+			}
+		}
+
+	}
+
 	/**
 	 * Enum that represents the supportet actions to undo/redo.
 	 */
 	public enum ActionType {
 		UNBORROW, BORROW, SAVE_USER, DELETE_USER, EDIT_USER, SAVE_MEDIA, DELETE_MEDIA, EDIT_MEDIA, SAVE_BOOKMARK,
-		DELETE_BOOKMARK
+		DELETE_BOOKMARK, EDIT_MEDIA_BORROW_TIME
 	}
 
 }
