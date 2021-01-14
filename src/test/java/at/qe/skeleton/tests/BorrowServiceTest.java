@@ -8,6 +8,7 @@ import at.qe.skeleton.repositories.*;
 import at.qe.skeleton.services.BorrowService;
 import at.qe.skeleton.services.MailService;
 import at.qe.skeleton.services.UserService;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -19,6 +20,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Collection;
+import java.util.function.BooleanSupplier;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 
@@ -108,9 +110,11 @@ public class BorrowServiceTest {
         Media testMedia1 = this.mediaRepository.findFirstByMediaID(3L);
         Media testMedia2 = this.mediaRepository.findFirstByMediaID(2L);
 
-        Assertions.assertTrue(this.borrowService.unBorrowMedia(testUser, testMedia1));
-        Assertions.assertFalse(this.borrowService.unBorrowMedia(testUser, testMedia2));
+        this.borrowService.unBorrowMedia(testUser, testMedia1);
+        this.borrowService.unBorrowMedia(testUser, testMedia2);
 
+        Assertions.assertNull(this.borrowedRepository.findFirstByMedia(testMedia1));
+        Assertions.assertNull(this.borrowedRepository.findFirstByMedia(testMedia2));
     }
 
     @Test(expected = org.springframework.security.access.AccessDeniedException.class)
@@ -121,7 +125,7 @@ public class BorrowServiceTest {
         User testUser = this.userRepository.findFirstByUsername("csauer");
         Media testMedia = this.mediaRepository.findFirstByMediaID(3L);
 
-        Assertions.assertFalse(this.borrowService.unBorrowMedia(testUser, testMedia));
+        this.borrowService.unBorrowMedia(testUser, testMedia);
     }
 
     @Test
@@ -284,6 +288,7 @@ public class BorrowServiceTest {
         Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
         this.borrowService.removeReservationForAuthenticatedUser(testMedia);
         Assertions.assertFalse(this.borrowService.isReservedForAuthenticatedUser(testMedia));
+        this.borrowService.reserveMediaForAuthenticatedUser(testMedia);
     }
 
     @Test

@@ -103,7 +103,7 @@ public class BorrowService implements CommandLineRunner {
 	 * @param borrowed the Borrowed object that should be removed from the database.
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public boolean unBorrowMedia(final Borrowed borrowed) {
+	public void unBorrowMedia(final Borrowed borrowed) {
 		if (borrowed != null) {
 			borrowedRepository.delete(borrowed);
 			borrowed.getMedia().setCurBorrowed(borrowed.getMedia().getCurBorrowed() - 1);
@@ -113,10 +113,7 @@ public class BorrowService implements CommandLineRunner {
 			for (Reserved current : reservations) {
 				unreserveMedia(current);
 			}
-
-			return true;
-		}
-		return false;
+		};
 	}
 
 	/**
@@ -126,8 +123,8 @@ public class BorrowService implements CommandLineRunner {
 	 * @param mediaToUnBorrow media that should be unborrowed.
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public boolean unBorrowMedia(final User borrower, final Media mediaToUnBorrow) {
-		return unBorrowMedia(borrowedRepository.findFirstByUserAndMedia(borrower, mediaToUnBorrow));
+	public void unBorrowMedia(final User borrower, final Media mediaToUnBorrow) {
+		unBorrowMedia(borrowedRepository.findFirstByUserAndMedia(borrower, mediaToUnBorrow));
 	}
 
 	/**
@@ -136,9 +133,9 @@ public class BorrowService implements CommandLineRunner {
 	 * 
 	 * @param mediaToUnBorrow the media which should be unborrowed.
 	 */
-	public boolean unBorrowMediaForAuthenticatedUser(final Media mediaToUnBorrow) {
+	public void unBorrowMediaForAuthenticatedUser(final Media mediaToUnBorrow) {
 		User user = userService.loadCurrentUser();
-		return unBorrowMedia(user, mediaToUnBorrow);
+		unBorrowMedia(user, mediaToUnBorrow);
 	}
 
 	/**
