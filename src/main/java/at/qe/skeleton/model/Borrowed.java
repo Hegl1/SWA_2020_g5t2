@@ -48,7 +48,7 @@ public class Borrowed implements Serializable, Persistable<Long> {
 	}
 
 	/**
-	 * Construcotr that sets all the fields.
+	 * Constructor that sets all the fields.
 	 * 
 	 * @param user  the user to borrow a media.
 	 * @param media the media to be borrowed.

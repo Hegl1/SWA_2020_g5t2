@@ -32,7 +32,7 @@ public class UserServiceTest {
 	@Test
 	@WithMockUser(username = "admin", authorities = { "ADMIN" })
 	public void testInitData() {
-		Assertions.assertTrue(userService.getAllUsers().size() >= 3, "Insufficient amoutn of users initialized");
+		Assertions.assertTrue(userService.getAllUsers().size() >= 3, "Insufficient amount of users initialized");
 		for (User current : userService.getAllUsers()) {
 			if (current.getUsername().equals("amuss")) {
 				Assertions.assertTrue(current.getRoles().contains(UserRole.ADMIN),
@@ -63,7 +63,7 @@ public class UserServiceTest {
 		Assertions.assertEquals(loadedNewUser.getLastName(), "Mustermann", "Last name was not persisted correctly");
 		Assertions.assertEquals(loadedNewUser.getEmail(), "tester@email.com");
 		Assertions.assertTrue(loadedNewUser.getRoles().contains(UserRole.ADMIN),
-				"Userrole was not correctly persisted");
+				"User role was not correctly persisted");
 	}
 
 	@Test
@@ -97,15 +97,15 @@ public class UserServiceTest {
 		List<String> roleList = new ArrayList<String>();
 		roleList.add("LIBRARIAN");
 		Assertions.assertFalse(userService.changeUserRoles(testUser, roleList),
-				"Changing roles should not work without authorizatoin");
+				"Changing roles should not work without authorization");
 	}
 
 	@Test
 	@WithMockUser(username = "admin", authorities = { "ADMIN" })
 	public void testAuthorizedLoadUser() {
 		User testUser = userService.loadUser("csauer");
-		Assertions.assertEquals("Clemens", testUser.getFirstName(), "Retrival of first name didnt work");
-		Assertions.assertEquals("Sauerwein", testUser.getLastName(), "Retrival of last name didnt work");
+		Assertions.assertEquals("Clemens", testUser.getFirstName(), "Retrieval of first name did not work");
+		Assertions.assertEquals("Sauerwein", testUser.getLastName(), "Retrieval of last name did not work");
 		Assertions.assertEquals("c.sauerwein@swa.at", testUser.getEmail());
 		Assertions.assertTrue(testUser.getRoles().contains(UserRole.CUSTOMER));
 	}
@@ -131,7 +131,7 @@ public class UserServiceTest {
 	}
 
 	@Test(expected = org.springframework.security.access.AccessDeniedException.class)
-	@WithMockUser(username = "admin", authorities = { "CUSTOMER" })
+	@WithMockUser(username = "customer", authorities = { "CUSTOMER" })
 	public void testUnauthorizedLoadUsers() {
 		Assertions.assertNull(userService.getAllUsers());
 	}
