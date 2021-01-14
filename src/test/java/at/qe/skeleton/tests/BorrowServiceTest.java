@@ -2,6 +2,7 @@ package at.qe.skeleton.tests;
 
 import at.qe.skeleton.model.Borrowed;
 import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.Reserved;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.*;
 import at.qe.skeleton.services.BorrowService;
@@ -170,23 +171,20 @@ public class BorrowServiceTest {
     }
 
     @Test
-    @DirtiesContext
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testGetAllBorrowsByUser() {
-
-        User testUser = this.userRepository.findFirstByUsername("csauer");
+        User testUser = this.userRepository.findFirstByUsername("lkalt");
         Collection<Borrowed> testCollection = this.borrowService.getAllBorrowsByUser(testUser);
         Assertions.assertEquals(4, testCollection.size());
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 3));
         Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 5));
         Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 6));
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 10));
+        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 7));
+        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 8));
     }
 
     @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testGetAllBorrowsByUsername() {
-
         Collection<Borrowed> testCollection = this.borrowService.getAllBorrowsByUsername("csauer");
         Assertions.assertEquals(4, testCollection.size());
         Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 3));
@@ -198,7 +196,6 @@ public class BorrowServiceTest {
     @Test
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testGetAllBorrowsByAuthenticatedUser() {
-
         User testUser = this.userService.getAuthenticatedUser();
         Collection<Borrowed> testCollection = this.borrowService.getAllBorrowsByUser(testUser);
         Assertions.assertEquals(4, testCollection.size());
@@ -209,143 +206,168 @@ public class BorrowServiceTest {
     }
 
     @Test
+    @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllBorrowsByMedia() {
-        Collection<Borrowed> testCollectionOfBorrowed = this.borrowService.getAllBorrows();
-        Assertions.assertEquals(10, testCollectionOfBorrowed.size());
+        Media testMedia = this.mediaRepository.findFirstByMediaID(5L);
+        Collection<Borrowed> testCollectionOfBorrowed = this.borrowService.getAllBorrowsByMedia(testMedia);
+        Assertions.assertEquals(3, testCollectionOfBorrowed.size());
 
+        Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(borrowed -> borrowed.getUser().getId().equals("csauer")));
+        Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(borrowed -> borrowed.getUser().getId().equals("lkalt")));
+        Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(borrowed -> borrowed.getUser().getId().equals("mfeld")));
     }
 
-    @Test
+    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
+    @DirtiesContext
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedGetAllBorrowsByMedia() {
-
+        Media testMedia = this.mediaRepository.findFirstByMediaID(5L);
+        Collection<Borrowed> testCollectionOfBorrowed = this.borrowService.getAllBorrowsByMedia(testMedia);
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedLoadBorrowed() {
-
+        User testUser = this.userRepository.findFirstByUsername("csauer");
+        Media testMedia = this.mediaRepository.findFirstByMediaID(3L);
+        Borrowed testBorrowed = this.borrowService.loadBorrowed(testUser, testMedia);
+        Assertions.assertEquals(1L, (long) testBorrowed.getBorrowID());
     }
 
-    @Test
+    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedLoadBorrowed() {
-
+        User testUser = this.userRepository.findFirstByUsername("csauer");
+        Media testMedia = this.mediaRepository.findFirstByMediaID(3L);
+        Borrowed testBorrowed = this.borrowService.loadBorrowed(testUser, testMedia);
     }
 
     @Test
-    @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
+    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testLoadBorrowedForAuthenticatedUser() {
-
+        Media testMedia = this.mediaRepository.findFirstByMediaID(3L);
+        Borrowed testBorrowed = this.borrowService.loadBorrowedForAuthenticatedUser(testMedia);
+        Assertions.assertEquals("Playboy", testBorrowed.getMedia().getTitle());
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedReserveMedia() {
+        User testUser = this.userRepository.findFirstByUsername("csauer");
+        Media testMedia = this.mediaRepository.findFirstByMediaID(20L);
+        this.borrowService.reserveMedia(testUser, testMedia);
 
+        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByUser(testUser);
+        Assertions.assertTrue(testCollectionOfReserved.stream().anyMatch(reserved -> reserved.getMedia().getMediaID() == 20));
     }
 
-    @Test
+    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedReserveMedia() {
-
+        User testUser = this.userRepository.findFirstByUsername("csauer");
+        Media testMedia = this.mediaRepository.findFirstByMediaID(20L);
+        this.borrowService.reserveMedia(testUser, testMedia);
     }
 
     @Test
-    @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
-    public void testReserveMedia() {
-
-    }
-
-    @Test
-    @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
+    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testReserveMediaForAuthenticatedUser() {
-
+        Media testMedia = this.mediaRepository.findFirstByMediaID(19L);
+        this.borrowService.reserveMediaForAuthenticatedUser(testMedia);
+        Assertions.assertTrue(this.borrowService.isReservedForAuthenticatedUser(testMedia));
     }
 
     @Test
-    @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
+    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testRemoveReservationForAuthenticatedUser() {
-
+        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
+        this.borrowService.removeReservationForAuthenticatedUser(testMedia);
+        Assertions.assertFalse(this.borrowService.isReservedForAuthenticatedUser(testMedia));
     }
 
     @Test
-    @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
+    @WithMockUser(username = "lkalt", authorities = { "CUSTOMER" })
     public void testIsReservedForAuthenticatedUser() {
-
-    }
-
-    @Test
-    @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
-    public void testUnReserveMedia() {
-
+        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
+        Assertions.assertTrue(this.borrowService.isReservedForAuthenticatedUser(testMedia));
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllReserved() {
-
+        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReserved();
+        Assertions.assertEquals(testCollectionOfReserved.size(), 4);
+        Assertions.assertTrue(testCollectionOfReserved.stream().anyMatch(reserved -> reserved.getMedia().getMediaID() == 6));
     }
 
-    @Test
+    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedGetAllReserved() {
-
+        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReserved();
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllReservedByUser() {
-
+        User testUser = this.userRepository.findFirstByUsername("lkalt");
+        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByUser(testUser);
+        Assertions.assertEquals(testCollectionOfReserved.size(), 1);
+        Assertions.assertTrue(testCollectionOfReserved.stream().allMatch(reserved -> reserved.getMedia().getMediaID() == 6));
     }
 
-    @Test
+    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedGetAllReservedByUser() {
-
+        User testUser = this.userRepository.findFirstByUsername("lkalt");
+        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByUser(testUser);
     }
 
     @Test
-    @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
+    @WithMockUser(username = "mfeld", authorities = { "CUSTOMER" })
     public void testGetAllReservedByAuthenticatedUser() {
-
+        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByAuthenticatedUser();
+        Assertions.assertEquals(testCollectionOfReserved.size(), 1);
+        Assertions.assertTrue(testCollectionOfReserved.stream().allMatch(reserved -> reserved.getMedia().getMediaID() == 6));
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllReservedByMedia() {
-
+        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
+        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByMedia(testMedia);
+        Assertions.assertEquals(testCollectionOfReserved.size(), 4);
+        Assertions.assertTrue(testCollectionOfReserved.stream().allMatch(reserved -> reserved.getMedia().getMediaID() == 6));
     }
 
-    @Test
+    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedGetAllReservedByMedia() {
-
+        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
+        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByMedia(testMedia);
     }
 
     @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testGetReservationCountForMedia() {
-
+        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
+        Assertions.assertEquals(4, this.borrowService.getReservationCountForMedia(testMedia));
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedLoadReserved() {
-
+        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
+        User testUser = this.userRepository.findFirstByUsername("lkalt");
+        Assertions.assertEquals(3, this.borrowService.loadReserved(testUser, testMedia).getReservedID());
     }
 
-    @Test
+    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedLoadReserved() {
-
-    }
-
-    @Test
-    @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
-    public void testCheckBorrowTimeout() {
-
+        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
+        User testUser = this.userRepository.findFirstByUsername("lkalt");
+       this.borrowService.loadReserved(testUser, testMedia);
     }
 
 }
