@@ -31,7 +31,7 @@ public class MediaServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    public void testCreateAudioBook() {
+    public void testCreateAudioBook() throws MediaService.TotalAvailabilitySetTooLowException {
 
         this.mediaService.createAudioBook("Some French AudioBook", 2021, "FR", 12, MediaType.AUDIOBOOK, "Frank Elstner", 42069, "Thomas Gottschalk", "1234-asdf");
         Media loadedNewAudioBook = this.mediaService.loadMedia(10L);
@@ -51,7 +51,7 @@ public class MediaServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    public void testCreateBook() {
+    public void testCreateBook() throws MediaService.TotalAvailabilitySetTooLowException {
 
         this.mediaService.createBook("Some Greek Book", 2020, "GR", 11, MediaType.BOOK, "Thomas Brezina", "5678-jkloe");
         Media loadedNewBook = this.mediaService.loadMedia(10L);
@@ -69,7 +69,7 @@ public class MediaServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    public void testCreateMagazine() {
+    public void testCreateMagazine() throws MediaService.TotalAvailabilitySetTooLowException {
 
         this.mediaService.createMagazine("Some Spanish Magazine", 2019, "ES", 10, MediaType.MAGAZINE, "Test Series");
         Media loadedNewMagazine = this.mediaService.loadMedia(10L);
@@ -86,7 +86,7 @@ public class MediaServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    public void testCreateVideo() {
+    public void testCreateVideo() throws MediaService.TotalAvailabilitySetTooLowException {
 
         this.mediaService.createVideo("Some Portuguese Video", 2018, "PT", 9, MediaType.VIDEO, 42068);
         Media loadedNewVideo = this.mediaService.loadMedia(10L);

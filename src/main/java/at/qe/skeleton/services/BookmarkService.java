@@ -91,6 +91,12 @@ public class BookmarkService {
 		}
 	}
 
+	/**
+	 * Display if a bookmark is currently borrowed
+	 *
+	 * @param bookmark of the wanted bookmark
+	 * @return 0 (available) or 1 (not available)
+	 */
 	public String getIfCurrentBorrowed(final Bookmark bookmark) {
 
 		switch (bookmark.getMedia().getCurBorrowed()) {
@@ -104,7 +110,12 @@ public class BookmarkService {
 			return "availability status not defined";
 		}
 	}
-
+	/**
+	 * Check if the current user has bookmarked a media
+	 *
+	 * @param media
+	 * @return true if it is bookmarked
+	 */
 	public boolean isBookmarkedForAuthenticatedUser(final Media media) {
 		User myUser = userService.loadCurrentUser();
 		Bookmark b_check = bookmarkRepository.findFirstByUserAndMedia(myUser, media);
@@ -173,21 +184,44 @@ public class BookmarkService {
 		return bookmarkRepository.findFirstByUserAndMedia(myUser, media);
 	}
 
+	/**
+	 * Returns the bookmarks that fit to a given media
+	 *
+	 * @param media the media to search for
+	 * @return a list of bookmarks of that media
+	 */
 	public List<Bookmark> getBookmarkByMedia(final Media media) {
 		return bookmarkRepository.findByMedia(media);
 	}
 
+	/**
+	 * add a bookmark to the repository
+	 *
+	 * @param bookmark
+	 */
 	public void addBookmark(final Bookmark bookmark) {
 		bookmarkRepository.save(bookmark);
 	}
 
+	/**
+	 * add a bookmark for a specified user to the repository
+	 *
+	 * @param user
+	 * @param media
+	 */
 	public void addBookmark(final User user, final Media media) {
 		Bookmark bookmark = new Bookmark();
 		bookmark.setMedia(media);
 		bookmark.setUser(user);
 		bookmarkRepository.save(bookmark);
 	}
-
+	/**
+	 * return a bookmark that fits to a specific user and media
+	 *
+	 * @param user
+	 * @param media
+	 * @return bookmark
+	 */
 	public Bookmark getBookmarkByUserAndMedia(final User user, final Media media) {
 		return this.bookmarkRepository.findFirstByUserAndMedia(user, media);
 	}

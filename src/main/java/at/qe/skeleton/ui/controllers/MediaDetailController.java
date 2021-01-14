@@ -126,10 +126,22 @@ public class MediaDetailController implements Serializable {
 	 */
 	public void doSaveMedia() {
 		Media beforeEditMedia = mediaService.loadMedia(media.getId());
-		this.media = this.mediaService.saveMedia(this.media);
-		undoRedoService
-				.addAction(undoRedoService.createAction(beforeEditMedia, media, UndoRedoService.ActionType.EDIT_MEDIA));
+		try {
+			this.media = this.mediaService.saveMedia(this.media);
+			undoRedoService.addAction(undoRedoService.createAction(beforeEditMedia, media, UndoRedoService.ActionType.EDIT_MEDIA));
+		} catch (MediaService.TotalAvailabilitySetTooLowException e) {
+			System.out.println(e.getMessage());
+			fms.warn("It is not possible to set less available items than there are borrowed at the moment!");
+		}
 	}
+
+
+
+
+
+
+
+
 
 
 	/**
@@ -143,9 +155,9 @@ public class MediaDetailController implements Serializable {
 		// Step 1: Check if the media is still borrowed
 		Collection<Borrowed> a1 = borrowService.getAllBorrowsByMedia(media);
 		if (a1.size() > 0) {
-			System.out.println("\nThis media is still borrowed by x " + a1.size() + " people.");
+
 			for (Borrowed a : a1) {
-				System.out.println("  by: " + a.getUser());
+
 				fms.warn("This media is still borrowed by : " + a.getUser().getUsername() + " and cannot be deleted");
 			}
 		} else {
@@ -168,7 +180,7 @@ public class MediaDetailController implements Serializable {
 				UndoRedoService.ActionType.DELETE_MEDIA);
 
 			{
-			System.out.println("\nnobody is borrowing it");
+
 
 			// Step 2: Get a list of users that bookmarked this media eventually
 			Collection<Bookmark> a2 = bookmarkService.getBookmarkByMedia(media);
@@ -183,13 +195,14 @@ public class MediaDetailController implements Serializable {
 			// and bookmark entries and notify users
 			if (a2_s.size() > 0) {
 
-				System.out.println("\nThis media was bookmarked by some people: ");
+
 				for (User u : a2_s) {
 					bookmarkService.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(u, media));
 				}
 				for (User u : a2_s) {
-					System.out.println("  by: " + u.getUsername());
-					fms.warn("This media was bookmarked by: " + u.getUsername());
+
+
+					fms.info("Media was deleted.");
 					mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
 							"The following Media is not available anymore: Title: " + media.getTitle() + ", Type: "
 									+ media.getMediaType() + ", Language: " + media.getLanguage() + ", Publishing Year: "
@@ -207,11 +220,11 @@ public class MediaDetailController implements Serializable {
 				this.mediaService.deleteMedia(media);
 				this.media = null;
 
-				System.out.println("\nMedia was deleted finally.");
+				fms.info("Media was deleted.");
 				fms.info("Please reload the page.");
 
 			} else {
-				System.out.println("\nnobody is bookmarking it");
+
 
 				// Step 4: Delete the media only if it has not been borrowed by somebody
 				undoRedoService.addAction(deleteAction);

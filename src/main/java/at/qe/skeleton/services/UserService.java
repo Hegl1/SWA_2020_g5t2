@@ -7,6 +7,7 @@ import at.qe.skeleton.repositories.ReservedRepository;
 import at.qe.skeleton.repositories.UserRepository;
 
 
+import at.qe.skeleton.ui.controllers.FMSpamController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,11 +42,8 @@ public class UserService {
 	@Autowired
 	private BookmarkRepository bookmarkRepository2;
 
-
-
 	@Autowired
 	private ReservedRepository reservedRepository;
-
 
 	@Autowired
 	MailService mailService;
@@ -89,11 +87,22 @@ public class UserService {
 		return this.userRepository.findFirstByUsername(username);
 	}
 
+	/**
+	 * Loads a list of user that have the same name
+	 *
+	 * @param fullName
+	 * @return users with that name
+	 */
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public List<User> loadUserByName(final String fullName) {
 		return userRepository.findByWholeNameConcat(fullName);
 	}
 
+	/**
+	 * Loads the current logged in user
+	 *
+	 * @return user
+	 */
 	public User loadCurrentUser() {
 		return loadUser(getAuthenticatedUser().getUsername());
 	}
@@ -138,11 +147,11 @@ public class UserService {
 	}
 
 	/**
-	 * Changes the set of roles a user possesses.
+	 * Changes the set of roles a user possesses
 	 *
 	 * @param user     The user whose roles should be changed
 	 * @param newRoles Set of new roles
-	 * @return if the change was succesful.
+	 * @return true if the change was successful
 	 */
 	@PreAuthorize("hasAuthority('ADMIN')")
 	public boolean changeUserRoles(final User user, final Set<UserRole> newRoles) {
@@ -154,6 +163,13 @@ public class UserService {
 		return true;
 	}
 
+	/**
+	 * Changes the set of roles a user possesses
+	 *
+	 * @param user     The user whose roles should be changed
+	 * @param newRolesString a List of UserRoles
+	 * @return if the change was successful
+	 */
 	public boolean changeUserRoles(final User user, final List<String> newRolesString) {
 		Set<UserRole> newRolesSet = new HashSet<>();
 
@@ -223,7 +239,9 @@ public class UserService {
 			List<Borrowed> still_borrowed = borrowedRepository2.findByUser(user);
 
 			if (still_borrowed.size() != 0) {
+
 				throw new UnauthorizedActionException("User cannot be deleted: There is a Media that the user has not returned yet!");
+
 			} else {
 				// delete Bookmarks
 				List<Bookmark> still_bookmarked = bookmarkRepository2.findByUsername(user.getUsername());
@@ -235,9 +253,9 @@ public class UserService {
 				res = reservedRepository.findByUser(user);
 				if(res.size() > 0){
 					for (Reserved r : res) {
-						if (r.getUser() == user){
+
 							reservedRepository.delete(r);
-						}
+
 					}
 				}
 				mailService.sendMail(user.getEmail(), "Your account has been removed", "Hello, your account was deleted by administrative personnel.");
@@ -248,6 +266,11 @@ public class UserService {
 		}
 	}
 
+	/**
+	 * Get the currently logged in user
+	 *
+	 * @return user
+	 */
 	public User getAuthenticatedUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		return this.userRepository.findFirstByUsername(auth.getName());

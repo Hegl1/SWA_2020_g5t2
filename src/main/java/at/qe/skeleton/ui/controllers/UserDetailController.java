@@ -1,11 +1,15 @@
 package at.qe.skeleton.ui.controllers;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import at.qe.skeleton.model.Borrowed;
+import at.qe.skeleton.model.Reserved;
+import at.qe.skeleton.services.BorrowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -34,6 +38,11 @@ public class UserDetailController implements Serializable {
 
 	@Autowired
 	FMSpamController fms;
+
+	@Autowired
+	BorrowService borrowService;
+
+
 
 	/**
 	 * Attribute to cache the currently displayed user
@@ -110,17 +119,24 @@ public class UserDetailController implements Serializable {
 	 * Action to delete the currently displayed user.
 	 */
 	public void doDeleteUser() {
-		try {
-			this.userService.deleteUser(this.user);
-			this.undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.DELETE_USER));
 
-		} catch (UserService.UnauthorizedActionException unauthorizedActionException) {
-			System.out.println(unauthorizedActionException.getMessage());
-			// TODO: Exception-Handling
+		Collection<Borrowed> d1 = borrowService.getAllBorrowsByUser(this.user);
+		if (d1.size() > 0) {
+				fms.warn("This user has still borrowed: " + d1.size() + " article(s) and cannot be deleted yet.");
+		} else {
+				try {
+					this.userService.deleteUser(this.user);
+					this.undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.DELETE_USER));
+
+				} catch (UserService.UnauthorizedActionException unauthorizedActionException) {
+					System.out.println(unauthorizedActionException.getMessage());
+
+				}
+				this.user = null;
+				fms.info("The user was deleted and all his bookmarks and reserved media has been deleted");
+				fms.info("Please reload the page.");
 		}
-		this.user = null;
-		fms.info("The user was deleted and all his bookmarks and reserved media has been deleted");
-		fms.info("Please reload the page.");
+
 	}
 
 	public void changeUserRoles() {

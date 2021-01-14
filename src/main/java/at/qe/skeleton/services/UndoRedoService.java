@@ -94,7 +94,7 @@ public class UndoRedoService {
 	/**
 	 * Method that undos the last saved action.
 	 */
-	public void undoLastAction() {
+	public void undoLastAction() throws MediaService.TotalAvailabilitySetTooLowException {
 		ActionItem action = unDoQueue.pop();
 		if (action != null) {
 			action.performUndoAction();
@@ -108,7 +108,7 @@ public class UndoRedoService {
 	/**
 	 * Method that redos the last action.
 	 */
-	public void redoLastAction() {
+	public void redoLastAction() throws MediaService.TotalAvailabilitySetTooLowException {
 		ActionItem action = reDoQueue.pop();
 		if (action != null) {
 			action.performRedoAction();
@@ -269,12 +269,12 @@ public class UndoRedoService {
 		/**
 		 * method that undos the recent action.
 		 */
-		abstract void performUndoAction();
+		abstract void performUndoAction() throws MediaService.TotalAvailabilitySetTooLowException;
 
 		/**
 		 * method that redos the recent action.
 		 */
-		abstract void performRedoAction();
+		abstract void performRedoAction() throws MediaService.TotalAvailabilitySetTooLowException;
 	}
 
 	/**
@@ -461,7 +461,7 @@ public class UndoRedoService {
 		}
 
 		@Override
-		void performUndoAction() {
+		void performUndoAction() throws MediaService.TotalAvailabilitySetTooLowException {
 			if (type.equals(ActionType.SAVE_MEDIA)) {
 				saveMetaInfo();
 				mediaService.deleteMedia(beforeEditMedia);
@@ -477,7 +477,7 @@ public class UndoRedoService {
 		}
 
 		@Override
-		void performRedoAction() {
+		void performRedoAction() throws MediaService.TotalAvailabilitySetTooLowException {
 			if (type.equals(ActionType.SAVE_MEDIA)) {
 				restoreMetaInfo();
 				beforeEditMedia = mediaService.saveMedia(beforeEditMedia);

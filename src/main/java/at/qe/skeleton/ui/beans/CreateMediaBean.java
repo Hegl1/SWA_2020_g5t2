@@ -50,7 +50,7 @@ public class CreateMediaBean implements Serializable {
 	 * Create different Medias.
 	 */
 
-	public void doCreateAudioBook() {
+	public void doCreateAudioBook() throws MediaService.TotalAvailabilitySetTooLowException {
 
 		Media media = this.mediaService.createAudioBook(title, publishingDate, language, totalAvail,
 				MediaType.AUDIOBOOK, speaker, length, author, ISBN);
@@ -58,7 +58,7 @@ public class CreateMediaBean implements Serializable {
 		// this.doReloadMedia();
 	}
 
-	public void doCreateBook() {
+	public void doCreateBook() throws MediaService.TotalAvailabilitySetTooLowException {
 
 		Media media = this.mediaService.createBook(title, publishingDate, language, totalAvail, MediaType.BOOK, author,
 				ISBN);
@@ -66,7 +66,7 @@ public class CreateMediaBean implements Serializable {
 		// this.doReloadMedia();
 	}
 
-	public void doCreateMagazine() {
+	public void doCreateMagazine() throws MediaService.TotalAvailabilitySetTooLowException {
 
 		Media media = this.mediaService.createMagazine(title, publishingDate, language, totalAvail, MediaType.MAGAZINE,
 				series);
@@ -74,7 +74,7 @@ public class CreateMediaBean implements Serializable {
 		// this.doReloadMedia();
 	}
 
-	public void doCreateVideo() {
+	public void doCreateVideo() throws MediaService.TotalAvailabilitySetTooLowException {
 
 		Media media = this.mediaService.createVideo(title, publishingDate, language, totalAvail, MediaType.VIDEO,
 				length);
@@ -82,7 +82,7 @@ public class CreateMediaBean implements Serializable {
 		// this.doReloadMedia();
 	}
 
-	public void doCreateMedia() {
+	public void doCreateMedia() throws MediaService.TotalAvailabilitySetTooLowException {
 		switch (mediaType) {
 		case "VIDEO":
 			doCreateVideo();

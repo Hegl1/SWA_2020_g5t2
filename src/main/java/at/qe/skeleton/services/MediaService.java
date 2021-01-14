@@ -39,9 +39,22 @@ public class MediaService {
 	/**
 	 * Save Media in repository
 	 */
-	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public Media saveMedia(final Media media) {
-		return this.mediaRepository.save(media);
+	public Media saveMedia(final Media media) throws TotalAvailabilitySetTooLowException {
+
+		if (media.getTotalAvail() < media.getCurBorrowed()) {
+			throw new TotalAvailabilitySetTooLowException("You cannot set less available items than are currently borrowed by persons");
+		} else{
+			return this.mediaRepository.save(media);
+		}
+
+	}
+
+	public static class TotalAvailabilitySetTooLowException extends Exception {
+		private static final long serialVersionUID = 1L;
+
+		public TotalAvailabilitySetTooLowException(final String message) {
+			super(message);
+		}
 	}
 
 	/**
@@ -51,7 +64,7 @@ public class MediaService {
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media createAudioBook(final String title, final int publishingDate, final String language,
 			final int totalAvail, final MediaType mediaType, final String speaker, final int length,
-			final String author, final String ISBN) {
+			final String author, final String ISBN) throws TotalAvailabilitySetTooLowException {
 
 		Media newAudioBook = new AudioBook(title, publishingDate, language, totalAvail, mediaType, speaker, length,
 				author, ISBN);
@@ -61,7 +74,7 @@ public class MediaService {
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media createBook(final String title, final int publishingDate, final String language, final int totalAvail,
-			final MediaType mediaType, final String author, final String ISBN) {
+			final MediaType mediaType, final String author, final String ISBN) throws TotalAvailabilitySetTooLowException {
 
 		Media newBook = new Book(title, publishingDate, language, totalAvail, mediaType, author, ISBN);
 		this.saveMedia(newBook);
@@ -70,7 +83,7 @@ public class MediaService {
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media createMagazine(final String title, final int publishingDate, final String language,
-			final int totalAvail, final MediaType mediaType, final String series) {
+			final int totalAvail, final MediaType mediaType, final String series) throws TotalAvailabilitySetTooLowException {
 
 		Media newMagazine = new Magazine(title, publishingDate, language, totalAvail, mediaType, series);
 		this.saveMedia(newMagazine);
@@ -79,7 +92,7 @@ public class MediaService {
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media createVideo(final String title, final int publishingDate, final String language, final int totalAvail,
-			final MediaType mediaType, final int length) {
+			final MediaType mediaType, final int length) throws TotalAvailabilitySetTooLowException {
 
 		Media newVideo = new Video(title, publishingDate, language, totalAvail, mediaType, length);
 		this.saveMedia(newVideo);
