@@ -118,10 +118,10 @@ public class MediaServiceTest {
     public void testDeleteMedia() {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
-        Media toDeleteMedia = this.mediaService.loadMedia(4L);
-        Assertions.assertNotNull(toDeleteMedia);
+
+        Media toDeleteMedia = this.mediaService.loadMedia(18L);
         this.mediaService.deleteMedia(toDeleteMedia);
-        Media notExistingMedia = this.mediaService.loadMedia(4L);
+        Media notExistingMedia = this.mediaService.loadMedia(18L);
         Assertions.assertNull(notExistingMedia);
     }
 }

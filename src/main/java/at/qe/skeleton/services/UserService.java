@@ -228,7 +228,7 @@ public class UserService {
 		if (this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN)
 				&& user.getRoles().contains(UserRole.ADMIN)) {
 			context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Librarians may not delete Librarians or Administrators!",  "") );
-			throw new UnauthorizedActionException("Librarians may not delete Administrators!");
+			throw new UnauthorizedActionException("Librarians may not delete Librarians or Administrators!");
 
 		} else if (this.getAuthenticatedUser().getId().equals(user.getId())) {
 			context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Users may not delete themselves!",  "") );

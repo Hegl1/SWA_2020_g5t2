@@ -8,19 +8,18 @@ import at.qe.skeleton.repositories.*;
 import at.qe.skeleton.services.BorrowService;
 import at.qe.skeleton.services.MailService;
 import at.qe.skeleton.services.UserService;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Collection;
-import java.util.function.BooleanSupplier;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 
@@ -69,7 +68,7 @@ public class BorrowServiceTest {
                 borrowed -> borrowed.getMedia().getMediaID() == 2));
     }
 
-    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
+    @Test
     @DirtiesContext
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedBorrowMedia() {
@@ -80,7 +79,7 @@ public class BorrowServiceTest {
         Assertions.assertFalse(this.borrowService.getAllBorrowsByUser(testUser).stream().anyMatch(
                 borrowed -> borrowed.getMedia().getMediaID() == 2));
 
-        this.borrowService.borrowMedia(testUser, testMedia);
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.borrowMedia(testUser, testMedia), "AccessDeniedException was not thrown");
     }
 
     @Test
@@ -115,9 +114,11 @@ public class BorrowServiceTest {
 
         Assertions.assertNull(this.borrowedRepository.findFirstByMedia(testMedia1));
         Assertions.assertNull(this.borrowedRepository.findFirstByMedia(testMedia2));
+
+        // TODO: provoke call for unreserveMedia()
     }
 
-    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
+    @Test
     @DirtiesContext
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedUnBorrowMedia() {
@@ -125,10 +126,11 @@ public class BorrowServiceTest {
         User testUser = this.userRepository.findFirstByUsername("csauer");
         Media testMedia = this.mediaRepository.findFirstByMediaID(3L);
 
-        this.borrowService.unBorrowMedia(testUser, testMedia);
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.unBorrowMedia(testUser, testMedia), "AccessDeniedException was not thrown");
     }
 
     @Test
+    @DirtiesContext
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testUnBorrowMediaForAuthenticatedUser() {
 
@@ -141,7 +143,6 @@ public class BorrowServiceTest {
     }
 
     @Test
-    @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllBorrows() {
 
@@ -168,22 +169,22 @@ public class BorrowServiceTest {
                         borrowed.getMedia().getCurBorrowed() == 1));
     }
 
-    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
+    @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedGetAllBorrows() {
-        Collection<Borrowed> testCollectionOfBorrowed = this.borrowService.getAllBorrows();
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.getAllBorrows(), "AccessDeniedException was not thrown");
     }
 
     @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testGetAllBorrowsByUser() {
-        User testUser = this.userRepository.findFirstByUsername("lkalt");
+        User testUser = this.userRepository.findFirstByUsername("csauer");
         Collection<Borrowed> testCollection = this.borrowService.getAllBorrowsByUser(testUser);
         Assertions.assertEquals(4, testCollection.size());
+        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 3));
         Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 5));
         Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 6));
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 7));
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 8));
+        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 10));
     }
 
     @Test
@@ -210,7 +211,6 @@ public class BorrowServiceTest {
     }
 
     @Test
-    @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllBorrowsByMedia() {
         Media testMedia = this.mediaRepository.findFirstByMediaID(5L);
@@ -222,12 +222,11 @@ public class BorrowServiceTest {
         Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(borrowed -> borrowed.getUser().getId().equals("mfeld")));
     }
 
-    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
-    @DirtiesContext
+    @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedGetAllBorrowsByMedia() {
         Media testMedia = this.mediaRepository.findFirstByMediaID(5L);
-        Collection<Borrowed> testCollectionOfBorrowed = this.borrowService.getAllBorrowsByMedia(testMedia);
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.getAllBorrowsByMedia(testMedia), "AccessDeniedException was not thrown");
     }
 
     @Test
@@ -239,12 +238,12 @@ public class BorrowServiceTest {
         Assertions.assertEquals(1L, (long) testBorrowed.getBorrowID());
     }
 
-    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
+    @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedLoadBorrowed() {
         User testUser = this.userRepository.findFirstByUsername("csauer");
         Media testMedia = this.mediaRepository.findFirstByMediaID(3L);
-        Borrowed testBorrowed = this.borrowService.loadBorrowed(testUser, testMedia);
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.loadBorrowed(testUser, testMedia), "AccessDeniedException was not thrown");
     }
 
     @Test
@@ -256,6 +255,7 @@ public class BorrowServiceTest {
     }
 
     @Test
+    @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedReserveMedia() {
         User testUser = this.userRepository.findFirstByUsername("csauer");
@@ -266,15 +266,17 @@ public class BorrowServiceTest {
         Assertions.assertTrue(testCollectionOfReserved.stream().anyMatch(reserved -> reserved.getMedia().getMediaID() == 20));
     }
 
-    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
+    @Test
+    @DirtiesContext
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedReserveMedia() {
         User testUser = this.userRepository.findFirstByUsername("csauer");
         Media testMedia = this.mediaRepository.findFirstByMediaID(20L);
-        this.borrowService.reserveMedia(testUser, testMedia);
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.reserveMedia(testUser, testMedia), "AccessDeniedException was not thrown");
     }
 
     @Test
+    @DirtiesContext
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testReserveMediaForAuthenticatedUser() {
         Media testMedia = this.mediaRepository.findFirstByMediaID(19L);
@@ -283,16 +285,16 @@ public class BorrowServiceTest {
     }
 
     @Test
+    @DirtiesContext
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testRemoveReservationForAuthenticatedUser() {
         Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
         this.borrowService.removeReservationForAuthenticatedUser(testMedia);
         Assertions.assertFalse(this.borrowService.isReservedForAuthenticatedUser(testMedia));
-        this.borrowService.reserveMediaForAuthenticatedUser(testMedia);
     }
 
     @Test
-    @WithMockUser(username = "lkalt", authorities = { "CUSTOMER" })
+    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testIsReservedForAuthenticatedUser() {
         Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
         Assertions.assertTrue(this.borrowService.isReservedForAuthenticatedUser(testMedia));
@@ -302,34 +304,34 @@ public class BorrowServiceTest {
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllReserved() {
         Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReserved();
-        Assertions.assertEquals(testCollectionOfReserved.size(), 4);
+        Assertions.assertEquals(testCollectionOfReserved.size(), 3);
         Assertions.assertTrue(testCollectionOfReserved.stream().anyMatch(reserved -> reserved.getMedia().getMediaID() == 6));
     }
 
-    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
+    @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedGetAllReserved() {
-        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReserved();
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.getAllReserved(), "AccessDeniedException was not thrown");
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllReservedByUser() {
-        User testUser = this.userRepository.findFirstByUsername("lkalt");
+        User testUser = this.userRepository.findFirstByUsername("csauer");
         Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByUser(testUser);
         Assertions.assertEquals(testCollectionOfReserved.size(), 1);
         Assertions.assertTrue(testCollectionOfReserved.stream().allMatch(reserved -> reserved.getMedia().getMediaID() == 6));
     }
 
-    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
+    @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedGetAllReservedByUser() {
-        User testUser = this.userRepository.findFirstByUsername("lkalt");
-        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByUser(testUser);
+        User testUser = this.userRepository.findFirstByUsername("csauer");
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.getAllReservedByUser(testUser), "AccessDeniedException was not thrown");
     }
 
     @Test
-    @WithMockUser(username = "mfeld", authorities = { "CUSTOMER" })
+    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testGetAllReservedByAuthenticatedUser() {
         Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByAuthenticatedUser();
         Assertions.assertEquals(testCollectionOfReserved.size(), 1);
@@ -341,38 +343,44 @@ public class BorrowServiceTest {
     public void testAuthorizedGetAllReservedByMedia() {
         Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
         Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByMedia(testMedia);
-        Assertions.assertEquals(testCollectionOfReserved.size(), 4);
+        Assertions.assertEquals(testCollectionOfReserved.size(), 3);
         Assertions.assertTrue(testCollectionOfReserved.stream().allMatch(reserved -> reserved.getMedia().getMediaID() == 6));
     }
 
-    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
+    @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedGetAllReservedByMedia() {
         Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
-        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByMedia(testMedia);
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.getAllReservedByMedia(testMedia), "AccessDeniedException was not thrown");
     }
 
     @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testGetReservationCountForMedia() {
         Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
-        Assertions.assertEquals(4, this.borrowService.getReservationCountForMedia(testMedia));
+        Assertions.assertEquals(3, this.borrowService.getReservationCountForMedia(testMedia));
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedLoadReserved() {
         Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
-        User testUser = this.userRepository.findFirstByUsername("lkalt");
-        Assertions.assertEquals(3, this.borrowService.loadReserved(testUser, testMedia).getReservedID());
+        User testUser = this.userRepository.findFirstByUsername("csauer");
+        Assertions.assertEquals(4, this.borrowService.loadReserved(testUser, testMedia).getReservedID());
     }
 
-    @Test(expected = org.springframework.security.access.AccessDeniedException.class)
+    @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedLoadReserved() {
         Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
-        User testUser = this.userRepository.findFirstByUsername("lkalt");
-       this.borrowService.loadReserved(testUser, testMedia);
+        User testUser = this.userRepository.findFirstByUsername("csauer");
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.loadReserved(testUser, testMedia), "AccessDeniedException was not thrown");
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    public void testCheckBorrowTimeout() {
+        this.borrowService.checkBorrowTimeout();
     }
 
 }
