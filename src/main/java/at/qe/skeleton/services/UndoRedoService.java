@@ -79,6 +79,7 @@ public class UndoRedoService {
 
 	/**
 	 * Method that adds an action to the undoing queue.
+	 * The redo-queue will be emptied.
 	 * 
 	 * @param action the action that should be prepared for undoing.
 	 */
@@ -87,12 +88,16 @@ public class UndoRedoService {
 		if (unDoQueue.size() >= MAX_SAVED_STATES) {
 			unDoQueue.removeLast();
 		}
+
+		reDoQueue.clear();
 	}
 
 	/**
 	 * Method that undoes the last saved action.
+	 *
+	 * @return the undid action-type
 	 */
-	public void undoLastAction() {
+	public ActionType undoLastAction() {
 		ActionItem action = unDoQueue.pop();
 		if (action != null) {
 			action.performUndoAction();
@@ -100,17 +105,27 @@ public class UndoRedoService {
 			if (reDoQueue.size() >= MAX_SAVED_STATES) {
 				reDoQueue.removeLast();
 			}
+
+			return action.type;
 		}
+
+		return null;
 	}
 
 	/**
 	 * Method that redoes the last action.
+	 *
+	 * @return the redid action-type
 	 */
-	public void redoLastAction() {
+	public ActionType redoLastAction() {
 		ActionItem action = reDoQueue.pop();
 		if (action != null) {
 			action.performRedoAction();
+
+			return action.type;
 		}
+
+		return null;
 	}
 
 	/**

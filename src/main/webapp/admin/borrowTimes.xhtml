@@ -11,7 +11,7 @@
             <p:dataTable
                     id="borrowTimesTable" var="borrowTime" value="#{borrowTimesController.mediaBorrowTimes}">
                 <f:facet name="header">
-                    <p:commandButton update="@form" action="#{borrowTimesController.save}" icon="fa fa-fw fa-check" value="Save changes"></p:commandButton>
+                    <p:commandButton update="@all" action="#{borrowTimesController.save}" icon="fa fa-fw fa-check" value="Save changes"></p:commandButton>
                 </f:facet>
                 <p:column headerText="Media type">
                     <h:outputText value="#{borrowTimesController.getMediaTypeHuman(borrowTime.mediaType)}"/>
