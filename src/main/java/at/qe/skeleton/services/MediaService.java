@@ -146,7 +146,7 @@ public class MediaService {
 	 * @return collection of filtered media
 	 */
 	public Collection<Media> filterMediaByTitle(final Collection<Media> filteredMedia, final String title) {
-		return filteredMedia.stream().filter(x -> x.getTitle().toLowerCase().contains(title))
+		return filteredMedia.stream().filter(x -> x.getTitle().toLowerCase().contains(title.toLowerCase()))
 				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
@@ -159,9 +159,7 @@ public class MediaService {
 	 */
     public Collection<Media> filterMediaByAvailability(Collection<Media> filteredMedia, boolean isAvailable) {
         return filteredMedia.stream().filter(x ->
-                isAvailable ?
-                        x.getAvailable() :
-                        !x.getAvailable()).collect(Collectors.toCollection(ArrayList::new));
+				isAvailable == x.getAvailable()).collect(Collectors.toCollection(ArrayList::new));
     }
 
 	/**
@@ -186,46 +184,6 @@ public class MediaService {
 	public Collection<Media> filterMediaByType(final Collection<Media> filteredMedia, final MediaType mediaType) {
 		return filteredMedia.stream().filter(x -> x.getMediaType().equals(mediaType))
 				.collect(Collectors.toCollection(ArrayList::new));
-	}
-
-	/**
-	 * Filters all media by title
-	 *
-	 * @param title the title the collection is filtered by
-	 * @return filtered collection of media
-	 */
-	public Collection<Media> filterMediaByTitle(final String title) {
-		return filterMediaByTitle(this.getAllMedia(), title);
-	}
-
-	/**
-	 * Filters all media by availability
-	 *
-	 * @param isAvailable
-	 * @return filtered collection of media
-	 */
-	public Collection<Media> filterMediaByAvailability(final boolean isAvailable) {
-		return filterMediaByAvailability(this.getAllMedia(), isAvailable);
-	}
-
-	/**
-	 * Filters all media by language
-	 *
-	 * @param language the language the collection is filtered by
-	 * @return filtered collection of media
-	 */
-	public Collection<Media> filterMediaByLanguage(final String language) {
-		return filterMediaByLanguage(this.getAllMedia(), language);
-	}
-
-	/**
-	 * Filters all media by media type
-	 *
-	 * @param mediaType the media type the collection is filtered by
-	 * @return filtered collection of media
-	 */
-	public Collection<Media> filterMediaByType(final MediaType mediaType) {
-		return filterMediaByType(this.getAllMedia(), mediaType);
 	}
 
 	/**
