@@ -1,24 +1,17 @@
 package at.qe.skeleton.services;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Deque;
-
+import at.qe.skeleton.model.*;
+import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
+import at.qe.skeleton.services.UserService.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.Bookmark;
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaBorrowTime;
-import at.qe.skeleton.model.Reserved;
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
-import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
-import at.qe.skeleton.services.UserService.UnauthorizedActionException;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Deque;
 
 /**
  * Class that provides a Service to undo and redo certain actions. As the class
@@ -289,6 +282,8 @@ public class UndoRedoService {
 		abstract void performRedoAction();
 	}
 
+	// TODO: fix authorization errors for customers in undo/redo
+
 	/**
 	 * Class that represents a borrowing action.
 	 */
@@ -307,13 +302,21 @@ public class UndoRedoService {
 		@Override
 		protected void performUndoAction() {
 			if (type.equals(ActionType.BORROW)) {
+				recacheMediaForBorrowed();
+
 				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
 					borrowService.unBorrowMedia(borrowed);
 				} else {
 					borrowService.unBorrowMediaForAuthenticatedUser(borrowed.getMedia());
 				}
 			} else if (type.equals(ActionType.UNBORROW)) {
-				borrowService.borrowMedia(borrowed.getUser(), borrowed.getMedia());
+				recacheMediaForBorrowed();
+
+				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
+					borrowService.borrowMedia(borrowed.getUser(), borrowed.getMedia());
+				} else {
+					borrowService.borrowMediaForAuthenticatedUser(borrowed.getMedia());
+				}
 			} else {
 				logger.error("Error while undoing borrow action, wrong action type");
 			}
@@ -322,8 +325,16 @@ public class UndoRedoService {
 		@Override
 		protected void performRedoAction() {
 			if (type.equals(ActionType.BORROW)) {
-				borrowService.borrowMedia(borrowed.getUser(), borrowed.getMedia());
+				recacheMediaForBorrowed();
+
+				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
+					borrowService.borrowMedia(borrowed.getUser(), borrowed.getMedia());
+				} else {
+					borrowService.borrowMediaForAuthenticatedUser(borrowed.getMedia());
+				}
 			} else if (type.equals(ActionType.UNBORROW)) {
+				recacheMediaForBorrowed();
+
 				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
 					borrowService.unBorrowMedia(borrowed);
 				} else {
@@ -332,6 +343,10 @@ public class UndoRedoService {
 			} else {
 				logger.error("Error while redoing borrow action, wrong action type");
 			}
+		}
+
+		private void recacheMediaForBorrowed(){
+			this.borrowed.setMedia(mediaService.loadMedia(this.borrowed.getMedia().getMediaID()));
 		}
 	}
 
@@ -443,12 +458,12 @@ public class UndoRedoService {
 	 */
 	private class MediaAction extends ActionItem {
 		/**
-		 * User that is used for un/redoing every action.
+		 * Media that is used for un/redoing every action.
 		 */
 		protected Media beforeEditMedia;
 
 		/**
-		 * User that is only used for edit actions.
+		 * Media that is only used for edit actions.
 		 */
 		protected Media afterEditMedia;
 
