@@ -148,6 +148,7 @@ public class MediaServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testFilterMediaByTitle2() {
+        // TODO: FIX THIS TEST
         Collection<Media> filteredMedia = this.mediaService.filterMediaByTitle("Pride and Prejudice");
         Assertions.assertEquals(3, filteredMedia.size());
     }
