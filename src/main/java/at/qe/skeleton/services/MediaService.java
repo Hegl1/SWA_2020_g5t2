@@ -157,7 +157,7 @@ public class MediaService {
 	 * @param isAvailable
 	 * @return collection of filtered media
 	 */
-    public Collection<Media> filterMediaByAvailability(Collection<Media> filteredMedia, boolean isAvailable) {
+    public Collection<Media> filterMediaByAvailability(final Collection<Media> filteredMedia, final boolean isAvailable) {
         return filteredMedia.stream().filter(x ->
                 isAvailable ?
                         x.getAvailable() :
