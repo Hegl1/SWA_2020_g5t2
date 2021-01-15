@@ -32,7 +32,7 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name = "media_sequence", initialValue = 10)
+	@SequenceGenerator(name = "media_sequence", initialValue = 21)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "media_sequence")
 	private Long mediaID;
 	private String title;
@@ -57,10 +57,8 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	 * @param publishingYear publishing year of the media
 	 * @param language       2 digit language code
 	 * @param totalAvail     number of totally available copies
-	 * @param mediaType      type of the media, see {link MediaType}
 	 */
-	public Media(final String title, final int publishingYear, final String language, final int totalAvail,
-			final MediaType mediaType) {
+	public Media(final String title, final int publishingYear, final String language, final int totalAvail) {
 
 		this.title = title;
 		this.publishingYear = publishingYear;

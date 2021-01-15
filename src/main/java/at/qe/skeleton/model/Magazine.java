@@ -17,9 +17,10 @@ public class Magazine extends Media {
 	private String series;
 
 	public Magazine(final String title, final int publishingYear, final String language, final int totalAvail,
-			final MediaType mediaType, final String series) {
+					final String series) {
 
-		super(title, publishingYear, language, totalAvail, mediaType);
+		super(title, publishingYear, language, totalAvail);
+		this.setMediaType(MediaType.MAGAZINE);
 		this.series = series;
 	}
 

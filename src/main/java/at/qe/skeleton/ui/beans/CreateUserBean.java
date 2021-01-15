@@ -74,11 +74,7 @@ public class CreateUserBean implements Serializable {
 			case "customer":
 				userRole.add(UserRole.CUSTOMER);
 				break;
-			default:
-				System.err.println(
-						"[Warning] CreateUserBean - setUserRoles: Role \"" + selected + "\" not supported yet!"); // TODO:
-																													// add
-																													// logger
+			default: return;
 			}
 		}
 

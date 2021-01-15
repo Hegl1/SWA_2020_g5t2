@@ -16,7 +16,7 @@
 
 						<!-- Buttons for create media -->
 						<f:facet name="header">
-							<p:commandButton update=":createMedia:mediaCreateMediaDialog"
+							<p:commandButton update="@all"
 								oncomplete="PF('mediaCreateMediaDialog').show()"
 								icon="fa fa-fw fa-plus" title="Create book" value="Create book">
 								<f:setPropertyActionListener value="BOOK"
@@ -24,7 +24,7 @@
 							</p:commandButton>
 						</f:facet>
 						<f:facet name="header">
-							<p:commandButton update=":createMedia:mediaCreateMediaDialog"
+							<p:commandButton update="@all"
 								oncomplete="PF('mediaCreateMediaDialog').show()"
 								icon="fa fa-fw fa-plus" title="Create Audiobook"
 								value="Create Audiobook">
@@ -33,7 +33,7 @@
 							</p:commandButton>
 						</f:facet>
 						<f:facet name="header">
-							<p:commandButton update=":createMedia:mediaCreateMediaDialog"
+							<p:commandButton update="@all"
 								oncomplete="PF('mediaCreateMediaDialog').show()"
 								icon="fa fa-fw fa-plus" title="Create Magazine"
 								value="Create Magazine">
@@ -42,7 +42,7 @@
 							</p:commandButton>
 						</f:facet>
 						<f:facet name="header">
-							<p:commandButton update=":createMedia:mediaCreateMediaDialog"
+							<p:commandButton update="@all"
 								oncomplete="PF('mediaCreateMediaDialog').show()"
 								icon="fa fa-fw fa-plus" title="Create Video" value="Create Video">
 								<f:setPropertyActionListener value="VIDEO"
@@ -109,7 +109,7 @@
 						<p:commandButton value="Save"
 							action="#{createMediaBean.doCreateMedia()}"
 							oncomplete="PF('mediaCreateMediaDialog').hide()"
-							update=":mediaListWrapper">
+							update="@all">
 						</p:commandButton>
 						<p:commandButton value="Cancel"
 							onclick="PF('mediaCreateMediaDialog').hide()" />

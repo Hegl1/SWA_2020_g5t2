@@ -32,7 +32,6 @@ public class BookmarkController implements Serializable {
 			action = UndoRedoService.ActionType.DELETE_BOOKMARK;
 		}
 
-		undoRedoService.addAction(undoRedoService.createAction(target, action));
 	}
 
 	public boolean isBookmarkedForAuthenticatedUser(final Media media) {

@@ -42,12 +42,12 @@
                             icon="fa fa-fw fa-search"
                             value="Search"
                             action="#{searchMediaBean.doFilter}"
-                            update=":mediaListWrapper" />
+                            update="@all" />
                     <p:commandButton
                             icon="fa fa-fw fa-times"
                             value="Clear search"
                             action="#{searchMediaBean.doResetFilter}"
-                            update=":mediaListWrapper @form" />
+                            update="@all" />
                 </p:tab>
             </p:accordionPanel>
         </h:form>

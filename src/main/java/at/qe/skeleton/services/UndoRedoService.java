@@ -1,22 +1,17 @@
 package at.qe.skeleton.services;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Deque;
-
+import at.qe.skeleton.model.*;
+import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
+import at.qe.skeleton.services.UserService.UnauthorizedActionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.Bookmark;
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.Reserved;
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
-import at.qe.skeleton.services.UserService.UnauthorizedActionException;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Deque;
 
 /**
  * Class that provides a Service to undo and redo certain actions. As the class
@@ -25,7 +20,7 @@ import at.qe.skeleton.services.UserService.UnauthorizedActionException;
  * {@link at.qe.skeleton.services.UndoRedoService.ActionType} The abstract class
  * for an action is {@link at.qe.skeleton.services.UndoRedoService.ActionItem}.
  * These classes will be instantiated with the provided methods. Note that it is
- * necessarry to add all actions that should be 'undoable' with the method
+ * necessary to add all actions that should be 'undoable' with the method
  * {@link UndoRedoService#addAction(ActionItem)}. Redoable actions are managed
  * automatically.
  * 
@@ -62,6 +57,9 @@ public class UndoRedoService {
 	@Autowired
 	private BookmarkService bookmarkService;
 
+	@Autowired
+	private MediaBorrowTimeRepository mediaBorrowTimeRepository;
+
 	private Logger logger = LoggerFactory.getLogger(UndoRedoService.class);
 
 	/**
@@ -81,6 +79,7 @@ public class UndoRedoService {
 
 	/**
 	 * Method that adds an action to the undoing queue.
+	 * The redo-queue will be emptied.
 	 * 
 	 * @param action the action that should be prepared for undoing.
 	 */
@@ -89,12 +88,16 @@ public class UndoRedoService {
 		if (unDoQueue.size() >= MAX_SAVED_STATES) {
 			unDoQueue.removeLast();
 		}
+
+		reDoQueue.clear();
 	}
 
 	/**
-	 * Method that undos the last saved action.
+	 * Method that undoes the last saved action.
+	 *
+	 * @return the undid action-type
 	 */
-	public void undoLastAction() {
+	public ActionType undoLastAction() {
 		ActionItem action = unDoQueue.pop();
 		if (action != null) {
 			action.performUndoAction();
@@ -102,17 +105,27 @@ public class UndoRedoService {
 			if (reDoQueue.size() >= MAX_SAVED_STATES) {
 				reDoQueue.removeLast();
 			}
+
+			return action.type;
 		}
+
+		return null;
 	}
 
 	/**
-	 * Method that redos the last action.
+	 * Method that redoes the last action.
+	 *
+	 * @return the redid action-type
 	 */
-	public void redoLastAction() {
+	public ActionType redoLastAction() {
 		ActionItem action = reDoQueue.pop();
 		if (action != null) {
 			action.performRedoAction();
+
+			return action.type;
 		}
+
+		return null;
 	}
 
 	/**
@@ -174,7 +187,7 @@ public class UndoRedoService {
 	 *             and
 	 *             {@link at.qe.skeleton.services.UndoRedoService.ActionType#DELETE_USER}
 	 *             are possible values for this method.
-	 * @return the constructed ActionItem or null if the wrong actiontype is used.
+	 * @return the constructed ActionItem or null if the wrong action type is used.
 	 */
 	public ActionItem createAction(final User user, final ActionType type) {
 		if (type.equals(ActionType.EDIT_MEDIA)) {
@@ -191,13 +204,13 @@ public class UndoRedoService {
 	 * DELETE_USER actions, instead use
 	 * {@link UndoRedoService#createAction(User, ActionType)}
 	 * 
-	 * @param beforeEditUser the user before edeting has been performed
-	 * @param afterEditUser  the user after edeting has been performed
+	 * @param beforeEditUser the user before editing has been performed
+	 * @param afterEditUser  the user after editing has been performed
 	 * @param type           the type that is performed in the action. Note that
 	 *                       only
 	 *                       {@link at.qe.skeleton.services.UndoRedoService.ActionType#EDIT_USER},
 	 *                       is possible for this method.
-	 * @return the constructed ActionItem or null if the wrong actiontype is used.
+	 * @return the constructed ActionItem or null if the wrong action type is used.
 	 */
 	public ActionItem createAction(final User beforeEditUser, final User afterEditUser, final ActionType type) {
 		if (!type.equals(ActionType.EDIT_USER)) {
@@ -221,7 +234,7 @@ public class UndoRedoService {
 	 *              and
 	 *              {@link at.qe.skeleton.services.UndoRedoService.ActionType#DELETE_MEDIA}
 	 *              are possible values for this method.
-	 * @return the constructed ActionItem or null if the wrong actiontype is used.
+	 * @return the constructed ActionItem or null if the wrong action type is used.
 	 */
 	public ActionItem createAction(final Media media, final ActionType type) {
 		if (type.equals(ActionType.EDIT_MEDIA)) {
@@ -237,13 +250,13 @@ public class UndoRedoService {
 	 * DELETE_MEDIA actions, instead use
 	 * {@link UndoRedoService#createAction(Media, ActionType)}
 	 * 
-	 * @param beforeEditMedia the media before edeting has been performed
-	 * @param afterEditMedia  the media after edeting has been performed
+	 * @param beforeEditMedia the media before editing has been performed
+	 * @param afterEditMedia  the media after editing has been performed
 	 * @param type            the type that is performed in the action. Note that
 	 *                        only
 	 *                        {@link at.qe.skeleton.services.UndoRedoService.ActionType#EDIT_MEDIA},
 	 *                        is possible for this method.
-	 * @return the constructed ActionItem or null if the wrong actiontype is used.
+	 * @return the constructed ActionItem or null if the wrong action type is used.
 	 */
 	public ActionItem createAction(final Media beforeEditMedia, final Media afterEditMedia, final ActionType type) {
 		if (!type.equals(ActionType.EDIT_MEDIA)) {
@@ -254,9 +267,16 @@ public class UndoRedoService {
 		return new MediaAction(beforeEditMedia, afterEditMedia, type);
 	}
 
+	public ActionItem createAction(final Collection<MediaBorrowTime> borrowTimes, final ActionType type) {
+		if (!type.equals(ActionType.EDIT_MEDIA_BORROW_TIME)) {
+			logger.error("Action could not be saved for MediaBorrowTimes: wrong action type in wrong method.");
+		}
+		return new BorrowTimeAction(borrowTimes, type);
+	}
+
 	/**
 	 * Abstract class that represents an Action. Contains abstract methods for
-	 * undoing and redoing the sabed action.
+	 * undoing and redoing the saved action.
 	 *
 	 */
 	public abstract class ActionItem {
@@ -267,15 +287,17 @@ public class UndoRedoService {
 		protected ActionType type;
 
 		/**
-		 * method that undos the recent action.
+		 * method that undoes the recent action.
 		 */
 		abstract void performUndoAction();
 
 		/**
-		 * method that redos the recent action.
+		 * method that redoes the recent action.
 		 */
 		abstract void performRedoAction();
 	}
+
+	// TODO: fix authorization errors for customers in undo/redo
 
 	/**
 	 * Class that represents a borrowing action.
@@ -295,13 +317,21 @@ public class UndoRedoService {
 		@Override
 		protected void performUndoAction() {
 			if (type.equals(ActionType.BORROW)) {
+				recacheMediaForBorrowed();
+
 				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
 					borrowService.unBorrowMedia(borrowed);
 				} else {
 					borrowService.unBorrowMediaForAuthenticatedUser(borrowed.getMedia());
 				}
 			} else if (type.equals(ActionType.UNBORROW)) {
-				borrowService.borrowMedia(borrowed.getUser(), borrowed.getMedia());
+				recacheMediaForBorrowed();
+
+				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
+					borrowService.borrowMedia(borrowed.getUser(), borrowed.getMedia());
+				} else {
+					borrowService.borrowMediaForAuthenticatedUser(borrowed.getMedia());
+				}
 			} else {
 				logger.error("Error while undoing borrow action, wrong action type");
 			}
@@ -310,8 +340,16 @@ public class UndoRedoService {
 		@Override
 		protected void performRedoAction() {
 			if (type.equals(ActionType.BORROW)) {
-				borrowService.borrowMedia(borrowed.getUser(), borrowed.getMedia());
+				recacheMediaForBorrowed();
+
+				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
+					borrowService.borrowMedia(borrowed.getUser(), borrowed.getMedia());
+				} else {
+					borrowService.borrowMediaForAuthenticatedUser(borrowed.getMedia());
+				}
 			} else if (type.equals(ActionType.UNBORROW)) {
+				recacheMediaForBorrowed();
+
 				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
 					borrowService.unBorrowMedia(borrowed);
 				} else {
@@ -321,13 +359,16 @@ public class UndoRedoService {
 				logger.error("Error while redoing borrow action, wrong action type");
 			}
 		}
+
+		private void recacheMediaForBorrowed(){
+			this.borrowed.setMedia(mediaService.loadMedia(this.borrowed.getMedia().getMediaID()));
+		}
 	}
 
 	/**
 	 * Class that represents a bookmarking action.
 	 */
 	private class BookmarkAction extends ActionItem {
-		// TODO implement action in controller
 		/**
 		 * Bookmark that is used for undoing/redoing
 		 */
@@ -395,7 +436,7 @@ public class UndoRedoService {
 				try {
 					userService.deleteUser(beforeEditUser);
 				} catch (UnauthorizedActionException e) {
-					logger.error("Errror while undoing user actionm unauthrized deletion of user");
+					logger.error("Error while undoing user action unauthorized deletion of user");
 				}
 			} else if (type.equals(ActionType.DELETE_USER)) {
 				userService.saveUser(beforeEditUser);
@@ -415,7 +456,7 @@ public class UndoRedoService {
 				try {
 					userService.deleteUser(beforeEditUser);
 				} catch (UnauthorizedActionException e) {
-					logger.error("Errror while undoing user actionm unauthrized deletion of user");
+					logger.error("Error while undoing user action unauthorized deletion of user");
 				}
 			} else if (type.equals(ActionType.EDIT_USER)) {
 				userService.saveUser(afterEditUser);
@@ -431,14 +472,13 @@ public class UndoRedoService {
 	 * Class that represents a media action.
 	 */
 	private class MediaAction extends ActionItem {
-		// TODO implement action in controller
 		/**
-		 * User that is used for un/redoing every action.
+		 * Media that is used for un/redoing every action.
 		 */
 		protected Media beforeEditMedia;
 
 		/**
-		 * User that is only used for edit actions.
+		 * Media that is only used for edit actions.
 		 */
 		protected Media afterEditMedia;
 
@@ -508,12 +548,43 @@ public class UndoRedoService {
 
 	}
 
+	private class BorrowTimeAction extends ActionItem {
+
+		protected Collection<MediaBorrowTime> borrowTimes;
+
+		protected BorrowTimeAction(final Collection<MediaBorrowTime> borrowTimes, final ActionType type) {
+			this.type = type;
+			this.borrowTimes = borrowTimes;
+		}
+
+		@Override
+		void performUndoAction() {
+			if (type.equals(ActionType.EDIT_MEDIA_BORROW_TIME)) {
+				Collection<MediaBorrowTime> tempBorrowTimes = mediaBorrowTimeRepository.findAll();
+				for (MediaBorrowTime current : borrowTimes) {
+					mediaBorrowTimeRepository.save(current);
+				}
+				borrowTimes = tempBorrowTimes;
+			}
+		}
+
+		@Override
+		void performRedoAction() {
+			for (MediaBorrowTime current : borrowTimes) {
+				if (type.equals(ActionType.EDIT_MEDIA_BORROW_TIME)) {
+					mediaBorrowTimeRepository.save(current);
+				}
+			}
+		}
+
+	}
+
 	/**
-	 * Enum that represents the supportet actions to undo/redo.
+	 * Enum that represents the supported actions to undo/redo.
 	 */
 	public enum ActionType {
 		UNBORROW, BORROW, SAVE_USER, DELETE_USER, EDIT_USER, SAVE_MEDIA, DELETE_MEDIA, EDIT_MEDIA, SAVE_BOOKMARK,
-		DELETE_BOOKMARK
+		DELETE_BOOKMARK, EDIT_MEDIA_BORROW_TIME
 	}
 
 }

@@ -27,12 +27,12 @@
             
 			<p:dataTable id="userTables" var="user" value="#{sessionInfoBean.currentUser}">
 			<p:column style="width:100px;text-align: center">
-                    <p:commandButton update=":userDataForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="ui-icon-pencil" title="Edit core data" value="Edit personal data">
+                    <p:commandButton update="@all" oncomplete="PF('userEditDialog').show()" icon="ui-icon-pencil" title="Edit core data" value="Edit personal data">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                     </p:commandButton>
             </p:column>
             <p:column style="width:100px;text-align: center">
-                    <p:commandButton update=":userDataForm:passwordEditDialog" oncomplete="PF('passwordEditDialog').show()" icon="ui-icon-key" title="Change password" value="Change password">
+                    <p:commandButton update="@all" oncomplete="PF('passwordEditDialog').show()" icon="ui-icon-key" title="Change password" value="Change password">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                     </p:commandButton>
             </p:column>
@@ -52,7 +52,7 @@
                     </h:panelGrid>
                     <p:separator />
                     <h:panelGrid columns="2">
-                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update=":userDataForm:userTable"/>
+                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update="@all"/>
                         <p:commandButton value="Cancel" onclick="PF('userEditDialog').hide()"/>
                     </h:panelGrid>
                 </p:outputPanel>
@@ -68,7 +68,7 @@
                     </h:panelGrid>
 					<p:separator />
                     <h:panelGrid columns="2">
-                    	<p:commandButton value="Save new password" action="#{userDetailController.doSaveUser()}" oncomplete="PF('passwordEditDialog').hide()" update=":userDataForm:userTable"/>
+                    	<p:commandButton value="Save new password" action="#{userDetailController.doSaveUser()}" oncomplete="PF('passwordEditDialog').hide()" update="@all"/>
                         <p:commandButton value="Cancel" onclick="PF('passwordEditDialog').hide()"/>
                     </h:panelGrid>
                 </p:outputPanel>
