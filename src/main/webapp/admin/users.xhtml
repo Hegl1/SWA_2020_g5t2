@@ -29,12 +29,12 @@
                             icon="fa fa-fw fa-search"
                             value="Search"
                             action="#{searchUserBean.doFilter}"
-                            update=":userForm" />
+                            update="@all" />
                     <p:commandButton
                             icon="fa fa-fw fa-times"
                             value="Clear search"
                             action="#{searchUserBean.doResetFilter}"
-                            update=":userForm @form" />
+                            update="@all" />
                 </p:tab>
             </p:accordionPanel>
         </h:form>
@@ -42,7 +42,7 @@
         <h:form id="userForm">
             <p:dataTable id="usersTable" var="user" value="#{searchUserBean.results}">
                 <f:facet name="header">
-                    <p:commandButton update=":userForm:userAddDialog" oncomplete="PF('userAddDialog').show()" icon="ui-icon-plus" title="Neuen Benutzer erstellen" value="Neuen Benutzer erstellen"></p:commandButton>
+                    <p:commandButton update="@all" oncomplete="PF('userAddDialog').show()" icon="ui-icon-plus" title="Neuen Benutzer erstellen" value="Neuen Benutzer erstellen"></p:commandButton>
                 </f:facet>
                 <p:column headerText="Benutzername">
                     <h:outputText value="#{user.username}"/>
@@ -60,10 +60,10 @@
                     <h:selectBooleanCheckbox value="#{user.enabled}" disabled="true"/>
                 </p:column>
                 <p:column style="width:100px;text-align: center">
-                    <p:commandButton update=":userForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="fa fa-fw fa-edit" title="Bearbeiten">
+                    <p:commandButton update="@all" oncomplete="PF('userEditDialog').show()" icon="fa fa-fw fa-edit" title="Bearbeiten">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                     </p:commandButton>
-                    <p:commandButton action="#{userDetailController.doDeleteUser}" icon="fa fa-fw fa-trash" title="Löschen" update=":userForm:usersTable">
+                    <p:commandButton action="#{userDetailController.doDeleteUser}" icon="fa fa-fw fa-trash" title="Löschen" update="@all">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                         <p:confirm header="Nutzer entfernen" message="Soll dieser Benutzer wirklich unwiderruflich gelöscht werden?" icon="ui-icon-alert" />
                     </p:commandButton>
@@ -110,10 +110,10 @@
                     </h:panelGrid>
                     <p:separator />
                     <h:panelGrid columns="3">
-                        <p:commandButton value="Speichern" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update=":userForm:usersTable">
+                        <p:commandButton value="Speichern" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update="@all">
                             <f:actionListener binding="#{userDetailController.changeUserRoles()}" />
                         </p:commandButton>
-                        <p:commandButton value="Neu Laden" action="#{userDetailController.doReloadUser()}" update=":userForm:userData"/>
+                        <p:commandButton value="Neu Laden" action="#{userDetailController.doReloadUser()}" update="@all"/>
                         <p:commandButton value="Abbrechen" onclick="PF('userEditDialog').hide()"/>
                     </h:panelGrid>
                 </p:outputPanel>
@@ -146,7 +146,7 @@
                     </h:panelGrid>
                 </p:outputPanel>
                 <h:panelGrid columns="2">
-                    <p:commandButton value="Erstellen" action="#{createUserBean.saveUser()}" oncomplete="PF('userAddDialog').hide()" update=":userForm:usersTable"/>
+                    <p:commandButton value="Erstellen" action="#{createUserBean.saveUser()}" oncomplete="PF('userAddDialog').hide()" update="@all"/>
                     <p:commandButton value="Verwerfen" onclick="PF('userAddDialog').hide()"/>
                 </h:panelGrid>
             </p:dialog>

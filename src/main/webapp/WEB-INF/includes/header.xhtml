@@ -4,6 +4,7 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:c="http://java.sun.com/jstl/core"
+      xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <body>
         <ui:composition>
@@ -39,6 +40,23 @@
                                 <p:menuitem value="Settings" icon="fa fa-fw fa-cog" url="/secured/user_settings.xhtml"/>
                                 <p:menuitem value="Logout" icon="fa fa-fw fa-sign-out" url="/logout"/>
                             </p:submenu>
+
+                            <f:facet name="options">
+                                <h:panelGroup layout="block" id="undoRedoGroup">
+                                    <p:commandButton
+                                            icon="fa fa-fw fa-undo" title="Undo"
+                                            disabled="#{!undoRedoController.undoActionAvailable}"
+                                            action="#{undoRedoController.undoLastAction}"
+                                            update="@all"
+                                    />
+                                    <p:commandButton
+                                            icon="fa fa-fw fa-repeat" title="Redo"
+                                            disabled="#{!undoRedoController.redoActionAvailable}"
+                                            action="#{undoRedoController.redoLastAction}"
+                                            update="@all"
+                                    />
+                                </h:panelGroup>
+                            </f:facet>
                         </c:when>
 
                         <c:otherwise>
