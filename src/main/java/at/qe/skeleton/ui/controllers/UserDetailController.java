@@ -124,4 +124,11 @@ public class UserDetailController implements Serializable {
 		userService.changeUserRoles(user, newRolesString);
 	}
 
+	public UserService getUserService() {
+		return userService;
+	}
+
+	public void setUserService(UserService userService) {
+		this.userService = userService;
+	}
 }

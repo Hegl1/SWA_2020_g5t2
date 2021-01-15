@@ -44,12 +44,12 @@ public class CreateUserBean implements Serializable {
 		this.user = new User();
 	}
 
-	@PreAuthorize("hasAuthority('ADMIN')")
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void saveUser() {
 		RandomString passwordGen = new RandomString(8);
 
 		String password = passwordGen.nextString();
-		user.setPassword(password);
+		user.setPassword("passwd");
 		user.setEnabled(true);
 
 		setUserRoles();
