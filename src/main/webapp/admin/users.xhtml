@@ -92,8 +92,8 @@
                         <p:inputText id="email" value="#{userDetailController.user.email}"/>
 
                         <p:selectManyButton value="#{userDetailController.newRolesString}">
-                            <f:selectItem itemLabel="Librarian" itemValue="librarian" />
-                            <f:selectItem itemLabel="Admin" itemValue="admin" />
+                            <f:selectItem itemLabel="Librarian" itemValue="librarian" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                            <f:selectItem itemLabel="Admin" itemValue="admin" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
                             <f:selectItem itemLabel="Customer" itemValue="customer" />
                         </p:selectManyButton>
 
@@ -137,8 +137,8 @@
                         <p:inputText id="regEmail" value="#{createUserBean.user.email}"/>
                         <h:outputText value="User permissions:" />
                         <p:selectManyButton value="#{createUserBean.selectedUserRoles}">
-                            <f:selectItem itemLabel="Librarian" itemValue="librarian" />
-                            <f:selectItem itemLabel="Admin" itemValue="admin" />
+                            <f:selectItem itemLabel="Librarian" itemValue="librarian" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                            <f:selectItem itemLabel="Admin" itemValue="admin" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
                             <f:selectItem itemLabel="Customer" itemValue="customer" />
                         </p:selectManyButton>
                     </h:panelGrid>

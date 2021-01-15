@@ -49,7 +49,7 @@ public class CreateUserBean implements Serializable {
 		RandomString passwordGen = new RandomString(8);
 
 		String password = passwordGen.nextString();
-		user.setPassword(password);
+		user.setPassword("passwd");
 		user.setEnabled(true);
 
 		setUserRoles();
