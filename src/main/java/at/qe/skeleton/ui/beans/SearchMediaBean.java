@@ -38,9 +38,9 @@ public class SearchMediaBean implements Serializable {
     }
 
     public void setSearch(final String search) {
-        this.search = search == null ? null : search.trim().toLowerCase();
+        this.search = search == null ? null : search.trim();
 
-        if(this.search == ""){
+        if(search != null && this.search.isEmpty()){
             this.search = null;
         }
     }
@@ -52,7 +52,7 @@ public class SearchMediaBean implements Serializable {
     public void setFilterType(final String filterType) {
         this.filterType = filterType == null ? null : filterType.trim().toUpperCase();
 
-        if(this.filterType == ""){
+        if(filterType != null && this.filterType.isEmpty()){
             this.filterType = null;
         }
     }
@@ -64,7 +64,7 @@ public class SearchMediaBean implements Serializable {
     public void setFilterLanguage(final String filterLanguage) {
         this.filterLanguage = filterLanguage == null ? null : filterLanguage.trim();
 
-        if(this.filterLanguage == ""){
+        if(filterLanguage != null && this.filterLanguage.isEmpty()){
             this.filterLanguage = null;
         }
     }
@@ -76,7 +76,7 @@ public class SearchMediaBean implements Serializable {
     public void setFilterAvailable(final String filterAvailable) {
         this.filterAvailable = filterAvailable == null ? null : filterAvailable.trim();
 
-        if(this.filterAvailable == ""){
+        if(filterAvailable != null && this.filterAvailable.isEmpty()){
             this.filterAvailable = null;
         }
     }
