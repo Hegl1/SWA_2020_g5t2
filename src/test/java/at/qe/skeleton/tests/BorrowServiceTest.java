@@ -56,15 +56,18 @@ public class BorrowServiceTest {
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedBorrowMedia() {
 
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Media testMedia = this.mediaRepository.findFirstByMediaID(2L);
+        User user = this.userRepository.findFirstByUsername("csauer");
+        Media media = this.mediaRepository.findFirstByMediaID(2L);
+        Media unavailableMedia = this.mediaRepository.findFirstByMediaID(6L);
 
-        Assertions.assertFalse(this.borrowService.getAllBorrowsByUser(testUser).stream().anyMatch(
+        Assertions.assertFalse(this.borrowService.borrowMedia(user, unavailableMedia));
+
+        Assertions.assertFalse(this.borrowService.getAllBorrowsByUser(user).stream().anyMatch(
                 borrowed -> borrowed.getMedia().getMediaID() == 2));
 
-        this.borrowService.borrowMedia(testUser, testMedia);
+        this.borrowService.borrowMedia(user, media);
 
-        Assertions.assertTrue(this.borrowService.getAllBorrowsByUser(testUser).stream().anyMatch(
+        Assertions.assertTrue(this.borrowService.getAllBorrowsByUser(user).stream().anyMatch(
                 borrowed -> borrowed.getMedia().getMediaID() == 2));
     }
 
@@ -73,13 +76,13 @@ public class BorrowServiceTest {
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedBorrowMedia() {
 
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Media testMedia = this.mediaRepository.findFirstByMediaID(2L);
+        User user = this.userRepository.findFirstByUsername("csauer");
+        Media media = this.mediaRepository.findFirstByMediaID(2L);
 
-        Assertions.assertFalse(this.borrowService.getAllBorrowsByUser(testUser).stream().anyMatch(
+        Assertions.assertFalse(this.borrowService.getAllBorrowsByUser(user).stream().anyMatch(
                 borrowed -> borrowed.getMedia().getMediaID() == 2));
 
-        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.borrowMedia(testUser, testMedia), "AccessDeniedException was not thrown");
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.borrowMedia(user, media), "AccessDeniedException was not thrown");
     }
 
     @Test
@@ -87,13 +90,13 @@ public class BorrowServiceTest {
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testBorrowMediaForAuthenticatedUser() {
 
-        Media testMedia = this.mediaRepository.findFirstByMediaID(2L);
+        Media media = this.mediaRepository.findFirstByMediaID(2L);
 
         Assertions.assertFalse(this.borrowService.getAllBorrowsByUser(
                 this.userService.getAuthenticatedUser()).stream().anyMatch(
                 borrowed -> borrowed.getMedia().getMediaID() == 2));
 
-        Assertions.assertTrue(this.borrowService.borrowMediaForAuthenticatedUser(testMedia));
+        Assertions.assertTrue(this.borrowService.borrowMediaForAuthenticatedUser(media));
 
         Assertions.assertTrue(this.borrowService.getAllBorrowsByUser(
                 this.userService.getAuthenticatedUser()).stream().anyMatch(
@@ -105,17 +108,15 @@ public class BorrowServiceTest {
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedUnBorrowMedia() {
 
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Media testMedia1 = this.mediaRepository.findFirstByMediaID(3L);
-        Media testMedia2 = this.mediaRepository.findFirstByMediaID(2L);
+        User user = this.userRepository.findFirstByUsername("csauer");
+        Media notReservedMedia = this.mediaRepository.findFirstByMediaID(3L);
+        Media reservedMedia = this.mediaRepository.findFirstByMediaID(6L);
 
-        this.borrowService.unBorrowMedia(testUser, testMedia1);
-        this.borrowService.unBorrowMedia(testUser, testMedia2);
+        this.borrowService.unBorrowMedia(user, notReservedMedia);
+        this.borrowService.unBorrowMedia(user, reservedMedia);
 
-        Assertions.assertNull(this.borrowedRepository.findFirstByMedia(testMedia1));
-        Assertions.assertNull(this.borrowedRepository.findFirstByMedia(testMedia2));
-
-        // TODO: provoke call for unreserveMedia()
+        Assertions.assertNull(this.borrowedRepository.findFirstByUserAndMedia(user, notReservedMedia));
+        Assertions.assertNull(this.borrowedRepository.findFirstByUserAndMedia(user, reservedMedia));
     }
 
     @Test
@@ -123,48 +124,46 @@ public class BorrowServiceTest {
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedUnBorrowMedia() {
 
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Media testMedia = this.mediaRepository.findFirstByMediaID(3L);
+        User user = this.userRepository.findFirstByUsername("csauer");
+        Media media = this.mediaRepository.findFirstByMediaID(3L);
 
-        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.unBorrowMedia(testUser, testMedia), "AccessDeniedException was not thrown");
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.unBorrowMedia(user, media), "AccessDeniedException was not thrown");
     }
 
     @Test
     @DirtiesContext
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testUnBorrowMediaForAuthenticatedUser() {
+        Media media = this.mediaRepository.findFirstByMediaID(3L);
+        this.borrowService.unBorrowMediaForAuthenticatedUser(media);
 
-        Media testMedia = this.mediaRepository.findFirstByMediaID(3L);
-
-        Assertions.assertTrue(this.borrowService.borrowMediaForAuthenticatedUser(testMedia));
-        Assertions.assertFalse(this.borrowService.getAllBorrowsByUser(
-                this.userService.getAuthenticatedUser()).stream().noneMatch(
-                        borrowed -> borrowed.getMedia().getMediaID() == 3));
+        Assertions.assertTrue(this.borrowService.getAllBorrowsByAuthenticatedUser().stream().noneMatch(
+                borrowed -> borrowed.getMedia().getMediaID() == 3));
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllBorrows() {
 
-        Collection<Borrowed> testCollectionOfBorrowed = this.borrowService.getAllBorrows();
-        Assertions.assertEquals(10, testCollectionOfBorrowed.size());
+        Collection<Borrowed> borrows = this.borrowService.getAllBorrows();
+        Assertions.assertEquals(10, borrows.size());
 
-        Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(
+        Assertions.assertTrue(borrows.stream().anyMatch(
                 borrowed -> borrowed.getMedia().getMediaID() == 3 &&
                         borrowed.getMedia().getCurBorrowed() == 1));
-        Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(
+        Assertions.assertTrue(borrows.stream().anyMatch(
                 borrowed -> borrowed.getMedia().getMediaID() == 5 &&
                         borrowed.getMedia().getCurBorrowed() == 3));
-        Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(
+        Assertions.assertTrue(borrows.stream().anyMatch(
                 borrowed -> borrowed.getMedia().getMediaID() == 6 &&
                         borrowed.getMedia().getCurBorrowed() == 2));
-        Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(
+        Assertions.assertTrue(borrows.stream().anyMatch(
                 borrowed -> borrowed.getMedia().getMediaID() == 7 &&
                         borrowed.getMedia().getCurBorrowed() == 2));
-        Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(
+        Assertions.assertTrue(borrows.stream().anyMatch(
                 borrowed -> borrowed.getMedia().getMediaID() == 8 &&
                         borrowed.getMedia().getCurBorrowed() == 1));
-        Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(
+        Assertions.assertTrue(borrows.stream().anyMatch(
                 borrowed -> borrowed.getMedia().getMediaID() == 10 &&
                         borrowed.getMedia().getCurBorrowed() == 1));
     }
@@ -178,91 +177,97 @@ public class BorrowServiceTest {
     @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testGetAllBorrowsByUser() {
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Collection<Borrowed> testCollection = this.borrowService.getAllBorrowsByUser(testUser);
-        Assertions.assertEquals(4, testCollection.size());
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 3));
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 5));
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 6));
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 10));
+        User user = this.userRepository.findFirstByUsername("csauer");
+        Collection<Borrowed> borrows = this.borrowService.getAllBorrowsByUser(user);
+
+        Assertions.assertEquals(4, borrows.size());
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 3));
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 5));
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 6));
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 10));
     }
 
     @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testGetAllBorrowsByUsername() {
-        Collection<Borrowed> testCollection = this.borrowService.getAllBorrowsByUsername("csauer");
-        Assertions.assertEquals(4, testCollection.size());
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 3));
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 5));
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 6));
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 10));
+        Collection<Borrowed> borrows = this.borrowService.getAllBorrowsByUsername("csauer");
+
+        Assertions.assertEquals(4, borrows.size());
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 3));
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 5));
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 6));
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 10));
     }
 
     @Test
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testGetAllBorrowsByAuthenticatedUser() {
-        User testUser = this.userService.getAuthenticatedUser();
-        Collection<Borrowed> testCollection = this.borrowService.getAllBorrowsByUser(testUser);
-        Assertions.assertEquals(4, testCollection.size());
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 3));
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 5));
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 6));
-        Assertions.assertTrue(testCollection.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 10));
+        Collection<Borrowed> borrows = this.borrowService.getAllBorrowsByAuthenticatedUser();
+
+        Assertions.assertEquals(4, borrows.size());
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 3));
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 5));
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 6));
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getMedia().getMediaID() == 10));
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllBorrowsByMedia() {
-        Media testMedia = this.mediaRepository.findFirstByMediaID(5L);
-        Collection<Borrowed> testCollectionOfBorrowed = this.borrowService.getAllBorrowsByMedia(testMedia);
-        Assertions.assertEquals(3, testCollectionOfBorrowed.size());
+        Media media = this.mediaRepository.findFirstByMediaID(5L);
+        Collection<Borrowed> borrows = this.borrowService.getAllBorrowsByMedia(media);
 
-        Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(borrowed -> borrowed.getUser().getId().equals("csauer")));
-        Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(borrowed -> borrowed.getUser().getId().equals("lkalt")));
-        Assertions.assertTrue(testCollectionOfBorrowed.stream().anyMatch(borrowed -> borrowed.getUser().getId().equals("mfeld")));
+        Assertions.assertEquals(3, borrows.size());
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getUser().getId().equals("csauer")));
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getUser().getId().equals("lkalt")));
+        Assertions.assertTrue(borrows.stream().anyMatch(borrowed -> borrowed.getUser().getId().equals("mfeld")));
     }
 
     @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedGetAllBorrowsByMedia() {
-        Media testMedia = this.mediaRepository.findFirstByMediaID(5L);
-        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.getAllBorrowsByMedia(testMedia), "AccessDeniedException was not thrown");
+        Media media = this.mediaRepository.findFirstByMediaID(5L);
+
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.getAllBorrowsByMedia(media), "AccessDeniedException was not thrown");
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedLoadBorrowed() {
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Media testMedia = this.mediaRepository.findFirstByMediaID(3L);
-        Borrowed testBorrowed = this.borrowService.loadBorrowed(testUser, testMedia);
-        Assertions.assertEquals(1L, (long) testBorrowed.getBorrowID());
+        User user = this.userRepository.findFirstByUsername("csauer");
+        Media media = this.mediaRepository.findFirstByMediaID(3L);
+        Borrowed borrowed = this.borrowService.loadBorrowed(user, media);
+
+        Assertions.assertEquals(1L, (long) borrowed.getBorrowID());
     }
 
     @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedLoadBorrowed() {
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Media testMedia = this.mediaRepository.findFirstByMediaID(3L);
-        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.loadBorrowed(testUser, testMedia), "AccessDeniedException was not thrown");
+        User user = this.userRepository.findFirstByUsername("csauer");
+        Media media = this.mediaRepository.findFirstByMediaID(3L);
+
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.loadBorrowed(user, media), "AccessDeniedException was not thrown");
     }
 
     @Test
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testLoadBorrowedForAuthenticatedUser() {
-        Media testMedia = this.mediaRepository.findFirstByMediaID(3L);
-        Borrowed testBorrowed = this.borrowService.loadBorrowedForAuthenticatedUser(testMedia);
-        Assertions.assertEquals("Playboy", testBorrowed.getMedia().getTitle());
+        Media media = this.mediaRepository.findFirstByMediaID(3L);
+        Borrowed borrowed = this.borrowService.loadBorrowedForAuthenticatedUser(media);
+
+        Assertions.assertEquals("Playboy", borrowed.getMedia().getTitle());
     }
 
     @Test
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedReserveMedia() {
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Media testMedia = this.mediaRepository.findFirstByMediaID(20L);
-        this.borrowService.reserveMedia(testUser, testMedia);
+        User user = this.userRepository.findFirstByUsername("csauer");
+        Media media = this.mediaRepository.findFirstByMediaID(20L);
+        this.borrowService.reserveMedia(user, media);
+        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByUser(user);
 
-        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByUser(testUser);
         Assertions.assertTrue(testCollectionOfReserved.stream().anyMatch(reserved -> reserved.getMedia().getMediaID() == 20));
     }
 
@@ -270,42 +275,47 @@ public class BorrowServiceTest {
     @DirtiesContext
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedReserveMedia() {
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Media testMedia = this.mediaRepository.findFirstByMediaID(20L);
-        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.reserveMedia(testUser, testMedia), "AccessDeniedException was not thrown");
+        User user = this.userRepository.findFirstByUsername("csauer");
+        Media media = this.mediaRepository.findFirstByMediaID(20L);
+
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.reserveMedia(user, media), "AccessDeniedException was not thrown");
     }
 
     @Test
     @DirtiesContext
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testReserveMediaForAuthenticatedUser() {
-        Media testMedia = this.mediaRepository.findFirstByMediaID(19L);
-        this.borrowService.reserveMediaForAuthenticatedUser(testMedia);
-        Assertions.assertTrue(this.borrowService.isReservedForAuthenticatedUser(testMedia));
+        Media media = this.mediaRepository.findFirstByMediaID(19L);
+        this.borrowService.reserveMediaForAuthenticatedUser(media);
+
+        Assertions.assertTrue(this.borrowService.isReservedForAuthenticatedUser(media));
     }
 
     @Test
     @DirtiesContext
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testRemoveReservationForAuthenticatedUser() {
-        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
-        this.borrowService.removeReservationForAuthenticatedUser(testMedia);
-        Assertions.assertFalse(this.borrowService.isReservedForAuthenticatedUser(testMedia));
+        Media media = this.mediaRepository.findFirstByMediaID(6L);
+        this.borrowService.removeReservationForAuthenticatedUser(media);
+
+        Assertions.assertFalse(this.borrowService.isReservedForAuthenticatedUser(media));
     }
 
     @Test
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testIsReservedForAuthenticatedUser() {
-        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
-        Assertions.assertTrue(this.borrowService.isReservedForAuthenticatedUser(testMedia));
+        Media media = this.mediaRepository.findFirstByMediaID(6L);
+
+        Assertions.assertTrue(this.borrowService.isReservedForAuthenticatedUser(media));
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllReserved() {
-        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReserved();
-        Assertions.assertEquals(testCollectionOfReserved.size(), 3);
-        Assertions.assertTrue(testCollectionOfReserved.stream().anyMatch(reserved -> reserved.getMedia().getMediaID() == 6));
+        Collection<Reserved> borrows = this.borrowService.getAllReserved();
+
+        Assertions.assertEquals(borrows.size(), 3);
+        Assertions.assertTrue(borrows.stream().anyMatch(reserved -> reserved.getMedia().getMediaID() == 6));
     }
 
     @Test
@@ -317,64 +327,72 @@ public class BorrowServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllReservedByUser() {
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByUser(testUser);
-        Assertions.assertEquals(testCollectionOfReserved.size(), 1);
-        Assertions.assertTrue(testCollectionOfReserved.stream().allMatch(reserved -> reserved.getMedia().getMediaID() == 6));
+        User user = this.userRepository.findFirstByUsername("csauer");
+        Collection<Reserved> borrows = this.borrowService.getAllReservedByUser(user);
+
+        Assertions.assertEquals(borrows.size(), 1);
+        Assertions.assertTrue(borrows.stream().allMatch(reserved -> reserved.getMedia().getMediaID() == 6));
     }
 
     @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedGetAllReservedByUser() {
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.getAllReservedByUser(testUser), "AccessDeniedException was not thrown");
+        User user = this.userRepository.findFirstByUsername("csauer");
+
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.getAllReservedByUser(user), "AccessDeniedException was not thrown");
     }
 
     @Test
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testGetAllReservedByAuthenticatedUser() {
-        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByAuthenticatedUser();
-        Assertions.assertEquals(testCollectionOfReserved.size(), 1);
-        Assertions.assertTrue(testCollectionOfReserved.stream().allMatch(reserved -> reserved.getMedia().getMediaID() == 6));
+        Collection<Reserved> borrows = this.borrowService.getAllReservedByAuthenticatedUser();
+
+        Assertions.assertEquals(borrows.size(), 1);
+        Assertions.assertTrue(borrows.stream().allMatch(reserved -> reserved.getMedia().getMediaID() == 6));
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedGetAllReservedByMedia() {
-        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
-        Collection<Reserved> testCollectionOfReserved = this.borrowService.getAllReservedByMedia(testMedia);
-        Assertions.assertEquals(testCollectionOfReserved.size(), 3);
-        Assertions.assertTrue(testCollectionOfReserved.stream().allMatch(reserved -> reserved.getMedia().getMediaID() == 6));
+        Media media = this.mediaRepository.findFirstByMediaID(6L);
+        Collection<Reserved> borrows = this.borrowService.getAllReservedByMedia(media);
+
+        Assertions.assertEquals(borrows.size(), 3);
+        Assertions.assertTrue(borrows.stream().allMatch(reserved -> reserved.getMedia().getMediaID() == 6));
     }
 
     @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedGetAllReservedByMedia() {
-        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
-        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.getAllReservedByMedia(testMedia), "AccessDeniedException was not thrown");
+        Media media = this.mediaRepository.findFirstByMediaID(6L);
+
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.getAllReservedByMedia(media), "AccessDeniedException was not thrown");
     }
 
     @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testGetReservationCountForMedia() {
-        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
-        Assertions.assertEquals(3, this.borrowService.getReservationCountForMedia(testMedia));
+        Media media = this.mediaRepository.findFirstByMediaID(6L);
+
+        Assertions.assertEquals(3, this.borrowService.getReservationCountForMedia(media));
     }
 
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testAuthorizedLoadReserved() {
-        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Assertions.assertEquals(4, this.borrowService.loadReserved(testUser, testMedia).getReservedID());
+        Media media = this.mediaRepository.findFirstByMediaID(6L);
+        User user = this.userRepository.findFirstByUsername("csauer");
+
+        Assertions.assertEquals(4, this.borrowService.loadReserved(user, media).getReservedID());
     }
 
     @Test
     @WithMockUser(username = "customer", authorities = { "CUSTOMER" })
     public void testUnauthorizedLoadReserved() {
-        Media testMedia = this.mediaRepository.findFirstByMediaID(6L);
-        User testUser = this.userRepository.findFirstByUsername("csauer");
-        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.loadReserved(testUser, testMedia), "AccessDeniedException was not thrown");
+        Media media = this.mediaRepository.findFirstByMediaID(6L);
+        User user = this.userRepository.findFirstByUsername("csauer");
+
+        Assertions.assertThrows(AccessDeniedException.class, () -> this.borrowService.loadReserved(user, media), "AccessDeniedException was not thrown");
     }
 
     @Test

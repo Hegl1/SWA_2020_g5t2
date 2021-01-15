@@ -3,7 +3,6 @@ package at.qe.skeleton.tests;
 import at.qe.skeleton.model.*;
 import at.qe.skeleton.services.MediaService;
 import at.qe.skeleton.ui.beans.ContextMocker;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -47,8 +46,8 @@ public class MediaServiceTest {
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testSaveMedia() {
-        AudioBook testMedia = new AudioBook("Some French AudioBook", 2021, "FR", 12, "Frank Elstner", 42069, "Thomas Gottschalk", "1234-asdf");
-        this.mediaService.saveMedia(testMedia);
+        AudioBook audioBook = new AudioBook("Some French AudioBook", 2021, "FR", 12, "Frank Elstner", 42069, "Thomas Gottschalk", "1234-asdf");
+        this.mediaService.saveMedia(audioBook);
         Media loadedNewAudioBook = this.mediaService.loadMedia(21L);
 
         Assertions.assertNotNull(loadedNewAudioBook);
@@ -139,32 +138,17 @@ public class MediaServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testFilterMediaByTitle1() {
-        // TODO: FIX THIS TEST
         Collection<Media> allMedia = this.mediaService.getAllMedia();
         Collection<Media> filteredMedia = this.mediaService.filterMediaByTitle(allMedia, "Pride and Prejudice");
         Assertions.assertEquals(3, filteredMedia.size());
     }
 
-    @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
-    public void testFilterMediaByTitle2() {
-        // TODO: FIX THIS TEST
-        Collection<Media> filteredMedia = this.mediaService.filterMediaByTitle("Pride and Prejudice");
-        Assertions.assertEquals(3, filteredMedia.size());
-    }
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testFilterMediaByAvailability1() {
         Collection<Media> allMedia = this.mediaService.getAllMedia();
         Collection<Media> filteredMedia = this.mediaService.filterMediaByAvailability(allMedia, false);
-        Assertions.assertEquals(1, filteredMedia.size());
-    }
-
-    @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
-    public void testFilterMediaByAvailability2() {
-        Collection<Media> filteredMedia = this.mediaService.filterMediaByAvailability(false);
         Assertions.assertEquals(1, filteredMedia.size());
     }
 
@@ -178,13 +162,6 @@ public class MediaServiceTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
-    public void testFilterMediaByLanguage2() {
-        Collection<Media> filteredMedia = this.mediaService.filterMediaByLanguage("DE");
-        Assertions.assertEquals(7, filteredMedia.size());
-    }
-
-    @Test
-    @WithMockUser(username = "admin", authorities = {"ADMIN"})
     public void testFilterMediaByType1() {
         Collection<Media> allMedia = this.mediaService.getAllMedia();
         Collection<Media> filteredMedia = this.mediaService.filterMediaByType(allMedia, MediaType.MAGAZINE);
@@ -193,9 +170,11 @@ public class MediaServiceTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
-    public void testFilterMediaByType2() {
-        Collection<Media> filteredMedia = this.mediaService.filterMediaByType(MediaType.MAGAZINE);
-        Assertions.assertEquals(2, filteredMedia.size());
+    public void testLoadMediaByLanguageTypeYearTitle() {
+        Media media = this.mediaService.loadMedia(3L);
+        Media loadedMedia = this.mediaService.loadMediaByLanguageTypeYearTitle(media);
+
+        // TODO: equals method for Media
     }
 
     @Test
