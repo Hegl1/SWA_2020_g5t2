@@ -24,9 +24,58 @@
             }
         </style>
 
+        <c:set value="#{['list', 'mediaAdmin'].contains(cc.attrs.context)}" var="useFilter" />
+
+        <c:if test="${useFilter}">
+            <c:set value="#{cc.attrs.mediaList}" target="#{searchMediaBean}" property="init" />
+        </c:if>
+
+        <h:form id="filter" style="margin-bottom: 15px" rendered="#{useFilter}">
+            <p:accordionPanel activeIndex="-2">
+                <p:tab title="Search &amp; filter">
+                    <h:panelGrid columns="2" style="margin-bottom: 10px">
+                        <p:outputLabel for="@next" value="Search title:" />
+                        <p:inputText id="title_filter" value="#{searchMediaBean.search}" />
+
+                        <p:outputLabel for="@next" value="Type:" />
+                        <p:selectOneMenu id="type_filter" value="#{searchMediaBean.filterType}">
+                            <f:selectItem itemLabel="Any" itemValue="" />
+                            <f:selectItem itemLabel="Book" itemValue="BOOK" />
+                            <f:selectItem itemLabel="Audiobook" itemValue="AUDIOBOOK" />
+                            <f:selectItem itemLabel="Video" itemValue="VIDEO" />
+                            <f:selectItem itemLabel="Magazine" itemValue="MAGAZINE" />
+                        </p:selectOneMenu>
+
+                        <p:outputLabel for="@next" value="Language:" />
+                        <p:selectOneMenu id="language_filter" value="#{searchMediaBean.filterLanguage}" dynamic="true">
+                            <f:selectItem itemLabel="Any" itemValue="" />
+                            <f:selectItems value="#{mediaListController.allLanguages}" var="lang" itemValue="#{lang}" itemLabel="#{mediaListController.convertLanguageHuman(lang)}" />
+                        </p:selectOneMenu>
+
+                        <p:outputLabel for="@next" value="Availability:" />
+                        <p:selectOneMenu id="available_filter" value="#{searchMediaBean.filterAvailable}">
+                            <f:selectItem itemLabel="Any" itemValue="" />
+                            <f:selectItem itemLabel="Available" itemValue="YES" />
+                            <f:selectItem itemLabel="Not available" itemValue="NO" />
+                        </p:selectOneMenu>
+                    </h:panelGrid>
+                    <p:commandButton
+                            icon="fa fa-fw fa-search"
+                            value="Search"
+                            action="#{searchMediaBean.doFilter}"
+                            update="@all" />
+                    <p:commandButton
+                            icon="fa fa-fw fa-times"
+                            value="Clear search"
+                            action="#{searchMediaBean.doResetFilter}"
+                            update="@all" />
+                </p:tab>
+            </p:accordionPanel>
+        </h:form>
+
         <h:form id="mediaListForm">
             <p:dataTable
-                    id="mediaTable" var="row" value="#{cc.attrs.mediaList}"
+                    id="mediaTable" var="row" value="#{useFilter ? searchMediaBean.results : cc.attrs.mediaList}"
                     paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
                     currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
