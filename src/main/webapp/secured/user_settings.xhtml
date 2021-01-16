@@ -1,5 +1,4 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
@@ -9,7 +8,7 @@
     <ui:define name ="content">
         <h2>Settings</h2>
 
-    	<h:form id="userDataForm"> 
+    	<h:form id="userDataForm">
             <p:dataTable id="userTable" var="user" value="#{sessionInfoBean.currentUser}"> 
                 <p:column headerText="User name">
                     <h:outputText value="#{user.username}"/>
@@ -26,16 +25,16 @@
             </p:dataTable>
             
 			<p:dataTable id="userTables" var="user" value="#{sessionInfoBean.currentUser}">
-			<p:column style="width:100px;text-align: center">
-                    <p:commandButton update="@all" oncomplete="PF('userEditDialog').show()" icon="ui-icon-pencil" title="Edit core data" value="Edit personal data">
-                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
-                    </p:commandButton>
-            </p:column>
-            <p:column style="width:100px;text-align: center">
-                    <p:commandButton update="@all" oncomplete="PF('passwordEditDialog').show()" icon="ui-icon-key" title="Change password" value="Change password">
-                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
-                    </p:commandButton>
-            </p:column>
+                <p:column style="width:100px;text-align: center">
+                        <p:commandButton update=":userDataForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="ui-icon-pencil" title="Edit core data" value="Edit personal data">
+                            <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
+                        </p:commandButton>
+                </p:column>
+                <p:column style="width:100px;text-align: center">
+                        <p:commandButton update=":userDataForm:passwordEditDialog" oncomplete="PF('passwordEditDialog').show()" icon="ui-icon-key" title="Change password" value="Change password">
+                            <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
+                        </p:commandButton>
+                </p:column>
             </p:dataTable> 
             
             <p:dialog header="Edit personal data" id="userEditDialog" widgetVar="userEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
@@ -52,7 +51,7 @@
                     </h:panelGrid>
                     <p:separator />
                     <h:panelGrid columns="2">
-                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update="@all"/>
+                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update=":userDataForm:userTable :headerForm:undoRedoGroup"/>
                         <p:commandButton value="Cancel" onclick="PF('userEditDialog').hide()"/>
                     </h:panelGrid>
                 </p:outputPanel>
@@ -68,7 +67,7 @@
                     </h:panelGrid>
 					<p:separator />
                     <h:panelGrid columns="2">
-                    	<p:commandButton value="Save new password" action="#{userDetailController.doSaveUser()}" oncomplete="PF('passwordEditDialog').hide()" update="@all"/>
+                    	<p:commandButton value="Save new password" action="#{userDetailController.doSaveUser()}" oncomplete="PF('passwordEditDialog').hide()" update=":userDataForm:userTable :headerForm:undoRedoGroup"/>
                         <p:commandButton value="Cancel" onclick="PF('passwordEditDialog').hide()"/>
                     </h:panelGrid>
                 </p:outputPanel>

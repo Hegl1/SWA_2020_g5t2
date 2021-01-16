@@ -29,12 +29,12 @@
                             icon="fa fa-fw fa-search"
                             value="Search"
                             action="#{searchUserBean.doFilter}"
-                            update="@all" />
+                            update=":userForm" />
                     <p:commandButton
                             icon="fa fa-fw fa-times"
                             value="Clear search"
                             action="#{searchUserBean.doResetFilter}"
-                            update="@all" />
+                            update=":userForm" />
                 </p:tab>
             </p:accordionPanel>
         </h:form>
@@ -42,7 +42,7 @@
         <h:form id="userForm">
             <p:dataTable id="usersTable" var="user" value="#{searchUserBean.results}">
                 <f:facet name="header">
-                    <p:commandButton update="@all" oncomplete="PF('userAddDialog').show()" icon="ui-icon-plus" title="Create new user" value="Create new user"></p:commandButton>
+                    <p:commandButton update=":userForm:userAddDialog" oncomplete="PF('userAddDialog').show()" icon="ui-icon-plus" title="Create new user" value="Create new user" />
                 </f:facet>
                 <p:column headerText="User name">
                     <h:outputText value="#{user.username}"/>
@@ -60,10 +60,10 @@
                     <h:selectBooleanCheckbox value="#{user.enabled}" disabled="true"/>
                 </p:column>
                 <p:column style="width:100px;text-align: center">
-                    <p:commandButton update="@all" oncomplete="PF('userEditDialog').show()" icon="fa fa-fw fa-edit" title="Edit">
+                    <p:commandButton update=":userForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="fa fa-fw fa-edit" title="Edit">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                     </p:commandButton>
-                    <p:commandButton action="#{userDetailController.doDeleteUser}" icon="fa fa-fw fa-trash" title="Delete" update="@all">
+                    <p:commandButton action="#{userDetailController.doDeleteUser}" icon="fa fa-fw fa-trash" title="Delete" update=":userForm:usersTable :headerForm:undoRedoGroup">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                         <p:confirm header="Delete user" message="Are you sure? User gets deleted irreversible!" icon="ui-icon-alert" />
                     </p:commandButton>
@@ -108,10 +108,10 @@
                     </h:panelGrid>
                     <p:separator />
                     <h:panelGrid columns="3">
-                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update="@all">
+                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update=":userForm:usersTable :headerForm:undoRedoGroup">
                             <f:actionListener binding="#{userDetailController.changeUserRoles()}" />
                         </p:commandButton>
-                        <p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}" update="@all"/>
+                        <p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}" update=":userForm:userData"/>
                         <p:commandButton value="Cancel" onclick="PF('userEditDialog').hide()"/>
                     </h:panelGrid>
                 </p:outputPanel>
@@ -144,7 +144,7 @@
                     </h:panelGrid>
                 </p:outputPanel>
                 <h:panelGrid columns="2">
-                    <p:commandButton value="Create user" action="#{createUserBean.saveUser()}" oncomplete="PF('userAddDialog').hide()" update="@all"/>
+                    <p:commandButton value="Create user" action="#{createUserBean.saveUser()}" oncomplete="PF('userAddDialog').hide()" update=":userForm:usersTable :headerForm:undoRedoGroup"/>
                     <p:commandButton value="Cancel" onclick="PF('userAddDialog').hide()"/>
                 </h:panelGrid>
             </p:dialog>
