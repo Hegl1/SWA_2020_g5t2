@@ -92,7 +92,7 @@
                 <!-- END -->
 
                 <p:column headerText="" style="width: 2rem; text-align: center">
-                    <p:commandButton update="#{cc.id}:mediaListForm:mediaDetailDialog" oncomplete="PF('mediaDetailDialog').show()" icon="fa fa-fw fa-info-circle" title="Show details">
+                    <p:commandButton update="#{cc.id}:mediaDetailForm:mediaDetailDialog" oncomplete="PF('mediaDetailDialog').show()" icon="fa fa-fw fa-info-circle" title="Show details">
                         <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
                     </p:commandButton>
                 </p:column>
@@ -129,7 +129,7 @@
                 </p:column>
                 <p:column style="width: 6rem; text-align: center"
                           rendered="#{cc.attrs.context == 'mediaAdmin'}">
-                    <p:commandButton update="#{cc.id}:mediaListForm:mediaEditDialog"
+                    <p:commandButton update="#{cc.id}:mediaEditForm:mediaEditDialog"
                                      oncomplete="PF('mediaEditDialog').show()" icon="fa fa-fw fa-edit"
                                      title="Edit">
                         <f:setPropertyActionListener value="#{media}"
@@ -157,7 +157,7 @@
                         headerText="Borrow for user"
                         style="width: 7rem; text-align: center"
                         rendered="#{(cc.attrs.context == 'list' or cc.attrs.context == 'mediaAdmin') and sessionInfoBean.currentUserRoles != 'CUSTOMER'}">
-                    <p:commandButton update="#{cc.id}:mediaListForm:borrowForUserDialog" oncomplete="PF('borrowForUserDialog').show()" icon="fa fa-fw fa-user-plus" title="Borrow for user" disabled="#{!media.available}">
+                    <p:commandButton update="#{cc.id}:mediaBorrowForUserForm:borrowForUserDialog" oncomplete="PF('borrowForUserDialog').show()" icon="fa fa-fw fa-user-plus" title="Borrow for user" disabled="#{!media.available}">
                         <f:setPropertyActionListener value="#{media}" target="#{borrowForUserController.media}" />
                     </p:commandButton>
                 </p:column>
@@ -166,7 +166,9 @@
                     <p:commandButton icon="fa fa-fw fa-times" action="#{reservedController.doRemoveReservationForAuthenticatedUser(media)}" title="Cancel reservation" update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup" />
                 </p:column>
             </p:dataTable>
+        </h:form>
 
+        <h:form id="mediaDetailForm">
             <!-- Detail dialog -->
             <p:dialog header="Detail" id="mediaDetailDialog" widgetVar="mediaDetailDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="mediaData" rendered="#{not empty mediaDetailController.media}">
@@ -245,13 +247,15 @@
                             id="reserveButton"
                             icon="fa fa-fw fa-#{reservedController.isReservedForAuthenticatedUser(mediaDetailController.media) ? 'minus' : 'plus'}-square-o"
                             oncomplete="PF('mediaDetailDialog').hide()"
-                            update="@form :headerForm:undoRedoGroup"
+                            update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup"
                             rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed' and cc.attrs.context != 'reservations'}"
                             disabled="#{mediaDetailController.media.available}"
                     />
                 </p:outputPanel>
             </p:dialog>
+        </h:form>
 
+        <h:form id="mediaEditForm">
             <!-- Edit dialog -->
             <p:dialog header="Edit Media" id="mediaEditDialog"
                       widgetVar="mediaEditDialog" modal="true" showEffect="fade"
@@ -270,7 +274,7 @@
                         <p:inputText id="mediaType" disabled="true"
                                      value="#{mediaDetailController.media.mediaType}" />
                         <p:outputLabel for="@next" value="Language:" />
-                        <p:selectOneMenu value="#{mediaDetailController.media.language}" dynamic="true" filter="true">
+                        <p:selectOneMenu value="#{mediaDetailController.media.language}" filter="true">
                             <f:selectItem itemLabel="-- select language --" itemValue="" />
                             <f:selectItems value="#{mediaDetailController.allLanguages}" var="lang" itemValue="#{lang}" itemLabel="#{mediaListController.convertLanguageHuman(lang)}" />
                         </p:selectOneMenu>
@@ -318,13 +322,15 @@
                         </p:commandButton>
                         <p:commandButton value="Reload"
                                          action="#{mediaDetailController.doReloadMedia()}"
-                                         update="#{cc.id}:mediaListForm:mediaEditDialog" />
+                                         update="#{cc.id}:mediaEditForm:mediaEditDialog" />
                         <p:commandButton value="Cancel"
                                          onclick="PF('mediaEditDialog').hide()" />
                     </h:panelGrid>
                 </p:outputPanel>
             </p:dialog>
+        </h:form>
 
+        <h:form id="mediaConfirmForm">
             <!-- Delete dialog -->
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
                              width="300">
@@ -333,7 +339,9 @@
                 <p:commandButton value="No" type="button"
                                  styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
             </p:confirmDialog>
+        </h:form>
 
+        <h:form id="mediaBorrowForUserForm">
             <!-- Borrow for user dialog -->
             <p:dialog header="Borrow for user" id="borrowForUserDialog" widgetVar="borrowForUserDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel rendered="#{not empty borrowForUserController.media}">
