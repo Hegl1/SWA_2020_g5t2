@@ -67,8 +67,11 @@
 						<p:outputLabel for="@next" value="Published Year: " />
 						<p:inputText
 							value="#{createMediaBean.publishingDate}" />
-						<p:outputLabel for="@next" value="Language:  " />
-						<p:inputText value="#{createMediaBean.language}" />
+						<p:outputLabel for="@next" value="Language:" />
+						<p:selectOneMenu value="#{createMediaBean.language}" dynamic="true" filter="true">
+							<f:selectItem itemLabel="-- select language --" itemValue="" />
+							<f:selectItems value="#{mediaDetailController.allLanguages}" var="lang" itemValue="#{lang}" itemLabel="#{mediaListController.convertLanguageHuman(lang)}" />
+						</p:selectOneMenu>
 						<p:outputLabel for="@next" value="totalAvail: " />
 						<p:inputText
 							value="#{createMediaBean.totalAvail}" />

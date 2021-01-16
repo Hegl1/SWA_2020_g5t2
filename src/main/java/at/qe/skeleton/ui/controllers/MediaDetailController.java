@@ -1,9 +1,8 @@
 package at.qe.skeleton.ui.controllers;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -231,5 +230,22 @@ public class MediaDetailController implements Serializable {
 		int hours = (length / 60) / 60;
 
 		return hours + "h " + minutes + "m " + seconds + "s";
+	}
+
+	/**
+	 * Returns a list of all 2-letter language codes defined in ISO 639
+	 *
+	 * @return the list of 2-letter language codes
+	 */
+	public Collection<String> getAllLanguages() {
+		return Arrays.stream(Locale.getISOLanguages()).map(String::toUpperCase).sorted((l1, l2) -> {
+			Locale l = new Locale(l1);
+			String l1_display = l.getDisplayLanguage();
+
+			l = new Locale(l2);
+			String l2_display = l.getDisplayLanguage();
+
+			return l1_display.compareTo(l2_display);
+		}).collect(Collectors.toList());
 	}
 }
