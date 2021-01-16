@@ -54,7 +54,7 @@ public class UserServiceTest {
 	@Test
 	@DirtiesContext
 	@WithMockUser(username = "admin", authorities = { "ADMIN" })
-	public void testAuthorizedSaveUser() {
+	public void testSaveUser() {
 
 		User newUser = new User("testUser", "passwd", "Max", "Mustermann", true, UserRole.ADMIN, "tester@email.com");
 		userService.saveUser(newUser);
@@ -66,14 +66,6 @@ public class UserServiceTest {
 		Assertions.assertEquals(loadedNewUser.getLastName(), "Mustermann", "Last name was not persisted correctly");
 		Assertions.assertEquals(loadedNewUser.getEmail(), "tester@email.com");
 		Assertions.assertTrue(loadedNewUser.getRoles().contains(UserRole.ADMIN), "User role was not correctly persisted");
-	}
-
-	@Test
-	@WithMockUser(username = "customer", authorities = { "CUSTOMER" })
-	public void testUnauthorizedSaveUser() {
-		User user = new User("testUser", "passwd", "Max", "Mustermann", true, UserRole.ADMIN, "tester@email.com");
-
-		Assertions.assertThrows(AccessDeniedException.class, () -> this.userService.saveUser(user), "AccessDeniedException was not thrown");
 	}
 
 	@Test
