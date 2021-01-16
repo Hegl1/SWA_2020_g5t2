@@ -64,7 +64,6 @@ public class MediaDetailController implements Serializable {
 	 */
 	public void setMedia(final Media media) {
 		this.media = media;
-		this.doReloadMedia();
 	}
 
 	/**
