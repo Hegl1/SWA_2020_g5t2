@@ -228,7 +228,7 @@ public class BorrowService implements CommandLineRunner {
 	 * 
 	 * @param reserved Reserved object to save.
 	 */
-	public void reserveMedia(final Reserved reserved) {
+	public void saveReserved(final Reserved reserved) {
 		reservedRepository.save(reserved);
 	}
 

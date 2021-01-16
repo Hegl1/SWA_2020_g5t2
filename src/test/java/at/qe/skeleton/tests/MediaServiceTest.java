@@ -174,7 +174,7 @@ public class MediaServiceTest {
         Media media = this.mediaService.loadMedia(3L);
         Media loadedMedia = this.mediaService.loadMediaByLanguageTypeYearTitle(media);
 
-        // TODO: equals method for Media
+        Assertions.assertEquals(media, loadedMedia);
     }
 
     @Test

@@ -3,6 +3,7 @@ package at.qe.skeleton.tests;
 import at.qe.skeleton.model.Bookmark;
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.BookmarkService;
 import at.qe.skeleton.services.MediaService;
 import at.qe.skeleton.services.UserService;
@@ -204,6 +205,23 @@ public class BookmarkServiceTest {
         Assertions.assertEquals(2, bookmarks.size());
         Assertions.assertTrue(bookmarks.stream().anyMatch(bookmark -> bookmark.getBookmarkID() == 1));
         Assertions.assertTrue(bookmarks.stream().anyMatch(bookmark -> bookmark.getBookmarkID() == 7));
+    }
+
+    @Test
+    @DirtiesContext
+    @WithMockUser(username = "csauer", authorities = {"Customer"})
+    public void testSaveBookmark () {
+        Media media = this.mediaService.loadMedia(4L);
+
+        Bookmark bookmark = new Bookmark();
+        bookmark.setMedia(media);
+        bookmark.setUser(this.userService.getAuthenticatedUser());
+        this.bookmarkService.saveBookmark(bookmark);
+        Bookmark loadedBookmark = this.bookmarkService.loadBookmark(11L);
+
+        Assertions.assertNotNull(loadedBookmark, "New bookmark could not be loaded");
+        Assertions.assertEquals(4, loadedBookmark.getMedia().getMediaID(), "password was not encrypted");
+        Assertions.assertEquals("csauer", loadedBookmark.getUser().getId(), "First name was not persisted correctly");
     }
 
     @Test

@@ -29,7 +29,7 @@ import javax.faces.context.FacesContext;
 public class UserServiceTest {
 
 	@Autowired
-	UserService userService;
+	private UserService userService;
 
 	@Test
 	@WithMockUser(username = "admin", authorities = { "ADMIN" })

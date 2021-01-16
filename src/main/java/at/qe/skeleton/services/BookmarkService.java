@@ -70,40 +70,6 @@ public class BookmarkService {
 		return bookmark.getMedia().getTitle();
 	}
 
-	public String getMediaInfo(final Bookmark bookmark) {
-
-		switch (bookmark.getMedia().getMediaType().toString()) {
-		case "BOOK":
-			return "Book - author";
-
-		case "AUDIOBOOK":
-			return "Audiobook - author";
-
-		case "MAGAZINE":
-			return "Magazine - series";
-
-		case "VIDEO":
-			return "Video - length";
-
-		default:
-			return "Media type not defined";
-		}
-	}
-
-	public String getIfCurrentBorrowed(final Bookmark bookmark) {
-
-		switch (bookmark.getMedia().getCurBorrowed()) {
-		case 0:
-			return "available";
-
-		case 1:
-			return "not available";
-
-		default:
-			return "availability status not defined";
-		}
-	}
-
 	public boolean isBookmarkedForAuthenticatedUser(final Media media) {
 		User myUser = userService.loadCurrentUser();
 		Bookmark b_check = bookmarkRepository.findFirstByUserAndMedia(myUser, media);
@@ -183,7 +149,7 @@ public class BookmarkService {
 		return bookmarkRepository.findByMedia(media);
 	}
 
-	public void addBookmark(final Bookmark bookmark) {
+	public void saveBookmark(final Bookmark bookmark) {
 		bookmarkRepository.save(bookmark);
 	}
 
