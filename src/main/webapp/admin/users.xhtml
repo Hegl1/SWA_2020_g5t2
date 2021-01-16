@@ -34,7 +34,7 @@
                             icon="fa fa-fw fa-times"
                             value="Clear search"
                             action="#{searchUserBean.doResetFilter}"
-                            update=":userForm" />
+                            update=":userForm @form" />
                 </p:tab>
             </p:accordionPanel>
         </h:form>
@@ -42,7 +42,9 @@
         <h:form id="userForm">
             <p:dataTable id="usersTable" var="user" value="#{searchUserBean.results}">
                 <f:facet name="header">
-                    <p:commandButton update=":userForm:userAddDialog" oncomplete="PF('userAddDialog').show()" icon="ui-icon-plus" title="Create new user" value="Create new user" />
+                    <p:commandButton
+                            update=":userForm:userAddDialog" oncomplete="PF('userAddDialog').show()"
+                            icon="fa fa-fw fa-plus" title="Create new user" value="Create new user" />
                 </f:facet>
                 <p:column headerText="User name">
                     <h:outputText value="#{user.username}"/>
@@ -144,8 +146,12 @@
                     </h:panelGrid>
                 </p:outputPanel>
                 <h:panelGrid columns="2">
-                    <p:commandButton value="Create user" action="#{createUserBean.saveUser()}" oncomplete="PF('userAddDialog').hide()" update=":userForm:usersTable :headerForm:undoRedoGroup"/>
-                    <p:commandButton value="Cancel" onclick="PF('userAddDialog').hide()"/>
+                    <p:commandButton
+                            value="Create user" action="#{createUserBean.saveUser()}" oncomplete="PF('userAddDialog').hide()"
+                            update=":userForm:usersTable :userForm:userAddDialog :headerForm:undoRedoGroup" />
+                    <p:commandButton
+                            value="Cancel" action="#{createUserBean.reset}" oncomplete="PF('userAddDialog').hide()"
+                            update=":userForm:userAddDialog" />
                 </h:panelGrid>
             </p:dialog>
         </h:form>

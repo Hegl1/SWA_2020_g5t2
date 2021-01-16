@@ -109,13 +109,15 @@
 
 					<p:separator />
 					<h:panelGrid columns="3">
-						<p:commandButton value="Save"
-							action="#{createMediaBean.doCreateMedia()}"
-							oncomplete="PF('mediaCreateMediaDialog').hide()"
-							update=":mediaListWrapper :headerForm:undoRedoGroup">
+						<p:commandButton
+								value="Save" action="#{createMediaBean.doCreateMedia()}"
+								oncomplete="PF('mediaCreateMediaDialog').hide()"
+								update=":mediaListWrapper :headerForm:undoRedoGroup :createMedia:mediaCreateMediaDialog">
 						</p:commandButton>
-						<p:commandButton value="Cancel"
-							onclick="PF('mediaCreateMediaDialog').hide()" />
+						<p:commandButton
+								value="Cancel" action="#{createMediaBean.reset}"
+								oncomplete="PF('mediaCreateMediaDialog').hide()"
+								update=":createMedia:mediaCreateMediaDialog" />
 					</h:panelGrid>
 				</p:outputPanel>
 			</p:dialog>
