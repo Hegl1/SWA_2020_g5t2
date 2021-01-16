@@ -267,9 +267,11 @@
                         <p:outputLabel for="mediaType" value="Type: " />
                         <p:inputText id="mediaType" disabled="true"
                                      value="#{mediaDetailController.media.mediaType}" />
-                        <p:outputLabel for="language" value="Language: " />
-                        <p:inputText id="language"
-                                     value="#{mediaDetailController.media.language}" />
+                        <p:outputLabel for="@next" value="Language:" />
+                        <p:selectOneMenu value="#{mediaDetailController.media.language}" dynamic="true" filter="true">
+                            <f:selectItem itemLabel="-- select language --" itemValue="" />
+                            <f:selectItems value="#{mediaDetailController.allLanguages}" var="lang" itemValue="#{lang}" itemLabel="#{mediaListController.convertLanguageHuman(lang)}" />
+                        </p:selectOneMenu>
                         <p:outputLabel for="publishingYear" value="Publishing Year: " />
                         <p:inputText id="publishingYear"
                                      value="#{mediaDetailController.media.publishingYear}" />
