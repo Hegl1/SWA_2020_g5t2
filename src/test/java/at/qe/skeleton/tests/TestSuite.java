@@ -6,9 +6,11 @@ import org.junit.runner.RunWith;
 
 @RunWith(JUnitPlatform.class)
 @SelectClasses({
+        at.qe.skeleton.tests.BookmarkServiceTest.class,
+        at.qe.skeleton.tests.BorrowServiceTest.class,
         at.qe.skeleton.tests.MediaServiceTest.class,
         at.qe.skeleton.tests.UserServiceTest.class,
-        at.qe.skeleton.tests.BorrowServiceTest.class,
+
         at.qe.skeleton.tests.EqualsImplementationTest.class,
         at.qe.skeleton.tests.SessionInfoBeanTest.class,
 })
