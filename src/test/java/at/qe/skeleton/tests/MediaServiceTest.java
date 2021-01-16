@@ -137,7 +137,7 @@ public class MediaServiceTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
-    public void testFilterMediaByTitle1() {
+    public void testFilterMediaByTitle() {
         Collection<Media> allMedia = this.mediaService.getAllMedia();
         Collection<Media> filteredMedia = this.mediaService.filterMediaByTitle(allMedia, "Pride and Prejudice");
         Assertions.assertEquals(3, filteredMedia.size());
@@ -146,7 +146,7 @@ public class MediaServiceTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
-    public void testFilterMediaByAvailability1() {
+    public void testFilterMediaByAvailability() {
         Collection<Media> allMedia = this.mediaService.getAllMedia();
         Collection<Media> filteredMedia = this.mediaService.filterMediaByAvailability(allMedia, false);
         Assertions.assertEquals(1, filteredMedia.size());
@@ -154,7 +154,7 @@ public class MediaServiceTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
-    public void testFilterMediaByLanguage1() {
+    public void testFilterMediaByLanguage() {
         Collection<Media> allMedia = this.mediaService.getAllMedia();
         Collection<Media> filteredMedia = this.mediaService.filterMediaByLanguage(allMedia, "DE");
         Assertions.assertEquals(7, filteredMedia.size());
@@ -162,7 +162,7 @@ public class MediaServiceTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ADMIN"})
-    public void testFilterMediaByType1() {
+    public void testFilterMediaByType() {
         Collection<Media> allMedia = this.mediaService.getAllMedia();
         Collection<Media> filteredMedia = this.mediaService.filterMediaByType(allMedia, MediaType.MAGAZINE);
         Assertions.assertEquals(2, filteredMedia.size());

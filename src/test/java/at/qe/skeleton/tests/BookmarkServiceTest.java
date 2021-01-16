@@ -157,14 +157,6 @@ public class BookmarkServiceTest {
     @DirtiesContext
     @WithMockUser(username = "csauer", authorities = {"Customer"})
     public void testAddBookmark2() {
-
-        // TODO: determine the usefulness of the method to test
-    }
-
-    @Test
-    @DirtiesContext
-    @WithMockUser(username = "csauer", authorities = {"Customer"})
-    public void testAddBookmark3() {
         Media media = this.mediaService.loadMedia(3L);
         User user = this.userService.getAuthenticatedUser();
 
