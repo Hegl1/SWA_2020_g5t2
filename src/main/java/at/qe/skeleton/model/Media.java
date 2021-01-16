@@ -103,6 +103,8 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	 * @return the converted language string
 	 */
 	public String getLanguageHuman() {
+		if(this.language == null) return null;
+
 		Locale l = new Locale(this.language);
 		return l.getDisplayLanguage();
 	}
@@ -130,6 +132,8 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	 * @return the converted media type
 	 */
 	public String getMediaTypeHuman() {
+		if(this.mediaType == null) return null;
+
 		return this.mediaType.toString().substring(0, 1).toUpperCase()
 				+ this.mediaType.toString().substring(1).toLowerCase();
 	}

@@ -34,7 +34,7 @@ import at.qe.skeleton.services.UndoRedoService;
 @Component
 @Scope("view")
 public class MediaDetailController implements Serializable {
-
+	// TODO: set private
 	@Autowired
 	MediaService mediaService;
 

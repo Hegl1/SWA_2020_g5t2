@@ -50,30 +50,26 @@ public class CreateMediaBean implements Serializable {
 	 * Create different Medias.
 	 */
 
-	public void doCreateAudioBook() {
-
+	private void doCreateAudioBook() {
 		Media media = this.mediaService.createAudioBook(title, publishingDate, language, totalAvail,
 				 speaker, length, author, ISBN);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	public void doCreateBook() {
-
+	private void doCreateBook() {
 		Media media = this.mediaService.createBook(title, publishingDate, language, totalAvail, author, ISBN);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	public void doCreateMagazine() {
-
+	private void doCreateMagazine() {
 		Media media = this.mediaService.createMagazine(title, publishingDate, language, totalAvail, series);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	public void doCreateVideo() {
-
+	private void doCreateVideo() {
 		Media media = this.mediaService.createVideo(title, publishingDate, language, totalAvail, length);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
@@ -94,17 +90,8 @@ public class CreateMediaBean implements Serializable {
 			doCreateMagazine();
 			break;
 		}
-	}
 
-	public void setSelectedMediaTypes(final List<String> selectedMediaTypes) {
-	}
-
-	public MediaService getMediaService() {
-		return mediaService;
-	}
-
-	public void setMediaService(final MediaService mediaService) {
-		this.mediaService = mediaService;
+		this.reset();
 	}
 
 	public String getTitle() {
@@ -187,4 +174,16 @@ public class CreateMediaBean implements Serializable {
 		this.length = length;
 	}
 
+	public void reset() {
+		this.title = null;
+		this.publishingDate = 0;
+		this.language = null;
+		this.totalAvail = 0;
+		this.mediaType = null;
+		this.author = null;
+		this.ISBN = null;
+		this.speaker = null;
+		this.series = null;
+		this.length = 0;
+	}
 }

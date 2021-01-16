@@ -39,11 +39,6 @@ public class CreateUserBean implements Serializable {
 
 	private List<String> selectedUserRoles;
 
-	@PostConstruct
-	public void init() {
-		this.user = new User();
-	}
-
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void saveUser() {
 		RandomString passwordGen = new RandomString(8);
@@ -58,6 +53,8 @@ public class CreateUserBean implements Serializable {
 
 		FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_INFO, "Changes saved!", "");
 		FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
+
+		this.user = null;
 	}
 
 	private void setUserRoles() {
@@ -82,7 +79,11 @@ public class CreateUserBean implements Serializable {
 	}
 
 	public User getUser() {
-		return user;
+		if(this.user == null){
+			this.user = new User();
+		}
+
+		return this.user;
 	}
 
 	public void setUser(final User user) {
@@ -97,4 +98,7 @@ public class CreateUserBean implements Serializable {
 		this.selectedUserRoles = selectedUserRoles;
 	}
 
+	public void reset(){
+		this.user = null;
+	}
 }
