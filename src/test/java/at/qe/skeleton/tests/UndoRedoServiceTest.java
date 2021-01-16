@@ -45,72 +45,92 @@ public class UndoRedoServiceTest {
 
     @Test
     @DirtiesContext
-    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
+    @WithMockUser(username = "amuss", authorities = { "ADMIN" })
     public void testSaveBookmarkAction() {
+        // TODO: FIX
+
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
         Media media = this.mediaService.loadMedia(2L);
-        Bookmark bookmark = this.bookmarkService.getBookmarkForAuthenticatedUserByMedia(media);
+        User user = this.userService.loadUser("csauer");
+        Bookmark bookmark = this.bookmarkService.getBookmarkByUserAndMedia(user, media);
 
         UndoRedoService.ActionItem saveBookmarkActionItem = this.undoRedoService.createAction(bookmark, SAVE_BOOKMARK);
         this.undoRedoService.addAction(saveBookmarkActionItem);
+
         Assertions.assertEquals(SAVE_BOOKMARK, this.undoRedoService.undoLastAction());
+        Assertions.assertNull(this.bookmarkService.getBookmarkByUserAndMedia(user, media));
         Assertions.assertEquals(SAVE_BOOKMARK, this.undoRedoService.redoLastAction());
-    }
-
-    @Test
-    @DirtiesContext
-    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
-    public void testDeleteBookmarkAction() {
-        // ignore FacesContext Messages that the mediaservice delete function uses
-        FacesContext context = ContextMocker.mockFacesContext();
-
-        Media media = this.mediaService.loadMedia(2L);
-        Bookmark bookmark = this.bookmarkService.getBookmarkForAuthenticatedUserByMedia(media);
-
-        UndoRedoService.ActionItem deleteBookmarkActionItem = this.undoRedoService.createAction(bookmark, DELETE_BOOKMARK);
-        this.undoRedoService.addAction(deleteBookmarkActionItem);
-        Assertions.assertEquals(DELETE_BOOKMARK, this.undoRedoService.undoLastAction());
-        Assertions.assertEquals(DELETE_BOOKMARK, this.undoRedoService.redoLastAction());
-    }
-
-    @Test
-    @DirtiesContext
-    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
-    public void testBorrowAction() {
-        // ignore FacesContext Messages that the mediaservice delete function uses
-        FacesContext context = ContextMocker.mockFacesContext();
-
-        Media media = this.mediaService.loadMedia(3L);
-        Borrowed borrowed = this.borrowService.loadBorrowedForAuthenticatedUser(media);
-
-        UndoRedoService.ActionItem borrowActionItem = this.undoRedoService.createAction(borrowed, BORROW);
-        this.undoRedoService.addAction(borrowActionItem);
-        Assertions.assertEquals(BORROW, this.undoRedoService.undoLastAction());
-        Assertions.assertEquals(BORROW, this.undoRedoService.redoLastAction());
-    }
-
-    @Test
-    @DirtiesContext
-    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
-    public void testUnBorrowAction() {
-        // ignore FacesContext Messages that the mediaservice delete function uses
-        FacesContext context = ContextMocker.mockFacesContext();
-
-        Media media = this.mediaService.loadMedia(3L);
-        Borrowed borrowed = this.borrowService.loadBorrowedForAuthenticatedUser(media);
-
-        UndoRedoService.ActionItem unBorrowActionItem = this.undoRedoService.createAction(borrowed, UNBORROW);
-        this.undoRedoService.addAction(unBorrowActionItem);
-        Assertions.assertEquals(UNBORROW, this.undoRedoService.undoLastAction());
-        Assertions.assertEquals(UNBORROW, this.undoRedoService.redoLastAction());
+        Assertions.assertEquals(11, this.bookmarkService.getBookmarkByUserAndMedia(user, media).getBookmarkID());
     }
 
     @Test
     @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testAuthorizedSaveUserAction() {
+    public void testDeleteBookmarkAction() {
+        // TODO: FIX
+
+        // ignore FacesContext Messages that the mediaservice delete function uses
+        FacesContext context = ContextMocker.mockFacesContext();
+
+        Media media = this.mediaService.loadMedia(2L);
+        User user = this.userService.loadUser("csauer");
+        Bookmark bookmark = this.bookmarkService.getBookmarkByUserAndMedia(user, media);
+
+        UndoRedoService.ActionItem deleteBookmarkActionItem = this.undoRedoService.createAction(bookmark, DELETE_BOOKMARK);
+        this.undoRedoService.addAction(deleteBookmarkActionItem);
+
+        Assertions.assertEquals(DELETE_BOOKMARK, this.undoRedoService.undoLastAction());
+        Assertions.assertEquals(1, this.bookmarkService.getBookmarkByUserAndMedia(user, media).getId());
+        Assertions.assertEquals(DELETE_BOOKMARK, this.undoRedoService.redoLastAction());
+        Assertions.assertNull(this.bookmarkService.getBookmarkByUserAndMedia(user, media));
+    }
+
+    @Test
+    @DirtiesContext
+    @WithMockUser(username = "amuss", authorities = { "ADMIN" })
+    public void testBorrowAction() {
+        // ignore FacesContext Messages that the mediaservice delete function uses
+        FacesContext context = ContextMocker.mockFacesContext();
+
+        Media media = this.mediaService.loadMedia(3L);
+        User user = this.userService.loadUser("csauer");
+        Borrowed borrowed = this.borrowService.loadBorrowed(user, media);
+
+        UndoRedoService.ActionItem borrowActionItem = this.undoRedoService.createAction(borrowed, BORROW);
+        this.undoRedoService.addAction(borrowActionItem);
+
+        Assertions.assertEquals(BORROW, this.undoRedoService.undoLastAction());
+        Assertions.assertNull(this.borrowService.loadBorrowed(user, media));
+        Assertions.assertEquals(BORROW, this.undoRedoService.redoLastAction());
+        Assertions.assertEquals(11, this.borrowService.loadBorrowed(user, media).getBorrowID());
+    }
+
+    @Test
+    @DirtiesContext
+    @WithMockUser(username = "amuss", authorities = { "ADMIN" })
+    public void testUnBorrowAction() {
+        // ignore FacesContext Messages that the mediaservice delete function uses
+        FacesContext context = ContextMocker.mockFacesContext();
+
+        Media media = this.mediaService.loadMedia(3L);
+        User user = this.userService.loadUser("csauer");
+        Borrowed borrowed = this.borrowService.loadBorrowed(user, media);
+
+        UndoRedoService.ActionItem unBorrowActionItem = this.undoRedoService.createAction(borrowed, UNBORROW);
+        this.undoRedoService.addAction(unBorrowActionItem);
+
+        Assertions.assertEquals(UNBORROW, this.undoRedoService.undoLastAction());
+        Assertions.assertEquals(1, this.borrowService.loadBorrowed(user, media).getId());
+        Assertions.assertEquals(UNBORROW, this.undoRedoService.redoLastAction());
+        Assertions.assertNull(this.borrowService.loadBorrowed(user, media));
+    }
+
+    @Test
+    @DirtiesContext
+    @WithMockUser(username = "amuss", authorities = { "ADMIN" })
+    public void testSaveUserAction() {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -118,29 +138,15 @@ public class UndoRedoServiceTest {
 
         UndoRedoService.ActionItem saveUserActionItem = this.undoRedoService.createAction(user, SAVE_USER);
         this.undoRedoService.addAction(saveUserActionItem);
+
         Assertions.assertEquals(SAVE_USER, this.undoRedoService.undoLastAction());
         Assertions.assertEquals(SAVE_USER, this.undoRedoService.redoLastAction());
     }
 
     @Test
     @DirtiesContext
-    @WithMockUser(username = "lkalt", authorities = { "CUSTOMER" })
-    public void testUnauthorizedSaveUserAction() {
-        // ignore FacesContext Messages that the mediaservice delete function uses
-        FacesContext context = ContextMocker.mockFacesContext();
-
-        User user = this.userService.loadUser("csauer");
-
-        UndoRedoService.ActionItem saveUserActionItem = this.undoRedoService.createAction(user, SAVE_USER);
-        this.undoRedoService.addAction(saveUserActionItem);
-        Assertions.assertThrows(AccessDeniedException.class, () -> this.undoRedoService.undoLastAction());
-        Assertions.assertThrows(NoSuchElementException.class, () -> this.undoRedoService.redoLastAction());
-    }
-
-    @Test
-    @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testAuthorizedDeleteUserAction() {
+    public void testDeleteUserAction() {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -155,31 +161,18 @@ public class UndoRedoServiceTest {
 
     @Test
     @DirtiesContext
-    @WithMockUser(username = "lkalt", authorities = { "CUSTOMER" })
-    public void testUnauthorizedDeleteUserAction() {
+    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
+    public void testEditUserAction() {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
-        User user = this.userService.loadUser("customer2");
-
-        UndoRedoService.ActionItem deleteUserActionItem = this.undoRedoService.createAction(user, DELETE_USER);
-        this.undoRedoService.addAction(deleteUserActionItem);
-
-        Assertions.assertThrows(AccessDeniedException.class, () -> this.undoRedoService.undoLastAction());
-        Assertions.assertThrows(NoSuchElementException.class, () -> this.undoRedoService.redoLastAction());
-    }
-
-    @Test
-    @DirtiesContext
-    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
-    public void testEditUserAction() {
 
     }
 
     @Test
     @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testAuthorizedSaveMediaAction() {
+    public void testSaveMediaAction() {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -194,24 +187,8 @@ public class UndoRedoServiceTest {
 
     @Test
     @DirtiesContext
-    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
-    public void testUnauthorizedSaveMediaAction() {
-        // ignore FacesContext Messages that the mediaservice delete function uses
-        FacesContext context = ContextMocker.mockFacesContext();
-
-        Media media = this.mediaService.loadMedia(13L);
-
-        UndoRedoService.ActionItem saveMediaActionItem = this.undoRedoService.createAction(media, SAVE_MEDIA);
-        this.undoRedoService.addAction(saveMediaActionItem);
-
-        Assertions.assertThrows(AccessDeniedException.class, () -> this.undoRedoService.undoLastAction());
-        Assertions.assertThrows(NoSuchElementException.class, () -> this.undoRedoService.redoLastAction());
-    }
-
-    @Test
-    @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testAuthorizedDeleteMediaAction() {
+    public void testDeleteMediaAction() {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -227,37 +204,20 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
-    public void testUnauthorizedDeleteMediaAction() {
+    public void testEditMediaAction() {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
-        Media media = this.mediaService.loadMedia(13L);
-
-        UndoRedoService.ActionItem deleteMediaActionItem = this.undoRedoService.createAction(media, DELETE_MEDIA);
-        this.undoRedoService.addAction(deleteMediaActionItem);
-
-        Assertions.assertThrows(AccessDeniedException.class, () -> this.undoRedoService.undoLastAction());
-        Assertions.assertThrows(NoSuchElementException.class, () -> this.undoRedoService.redoLastAction());
-    }
-
-    @Test
-    @DirtiesContext
-    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
-    public void testAuthorizedEditMediaAction() {
 
     }
 
     @Test
     @DirtiesContext
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
-    public void testUnauthorizedEditMediaAction() {
+    public void testEditBorrowTimesAction() {
+        // ignore FacesContext Messages that the mediaservice delete function uses
+        FacesContext context = ContextMocker.mockFacesContext();
 
-    }
-
-    @Test
-    @DirtiesContext
-    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
-    public void testCreateBorrowTimesAction() {
 
     }
 
@@ -265,6 +225,9 @@ public class UndoRedoServiceTest {
     @DirtiesContext
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testAddAction() {
+        // ignore FacesContext Messages that the mediaservice delete function uses
+        FacesContext context = ContextMocker.mockFacesContext();
+
 
     }
 
