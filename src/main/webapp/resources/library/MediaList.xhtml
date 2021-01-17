@@ -63,12 +63,12 @@
                             icon="fa fa-fw fa-search"
                             value="Search"
                             action="#{searchMediaBean.doFilter}"
-                            update="@all" />
+                            update="#{cc.id}:mediaListForm" />
                     <p:commandButton
                             icon="fa fa-fw fa-times"
                             value="Clear search"
                             action="#{searchMediaBean.doResetFilter}"
-                            update="@all" />
+                            update="#{cc.id}:mediaListForm @form" />
                 </p:tab>
             </p:accordionPanel>
         </h:form>
@@ -92,7 +92,7 @@
                 <!-- END -->
 
                 <p:column headerText="" style="width: 2rem; text-align: center">
-                    <p:commandButton update="@all" oncomplete="PF('mediaDetailDialog').show()" icon="fa fa-fw fa-info-circle" title="Show details">
+                    <p:commandButton update="#{cc.id}:mediaDetailForm:mediaDetailDialog" oncomplete="PF('mediaDetailDialog').show()" icon="fa fa-fw fa-info-circle" title="Show details">
                         <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
                     </p:commandButton>
                 </p:column>
@@ -118,34 +118,28 @@
                     </h:outputText>
                 </p:column>
                 <p:column headerText="Bookmark" style="width: 5rem; text-align: center" rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed' and cc.attrs.context != 'reservations'}">
-                    <p:commandButton icon="fa fa-fw fa-bookmark#{bookmarkController.isBookmarkedForAuthenticatedUser(media) ? '' : '-o'}" action="#{bookmarkController.toggleBookmark(media)}" title="Toggle bookmark" update="@all" />
+                    <p:commandButton icon="fa fa-fw fa-bookmark#{bookmarkController.isBookmarkedForAuthenticatedUser(media) ? '' : '-o'}" action="#{bookmarkController.toggleBookmark(media)}" title="Toggle bookmark" update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup" />
                 </p:column>
                 <p:column headerText="Return" style="width: 5rem; text-align: center" rendered="#{cc.attrs.context == 'borrowed'}">
-                    <p:commandButton icon="fa fa-fw fa-times" action="#{borrowedListController.doUnBorrowMediaForAuthenticatedUser(media)}" title="Return media" update="@all" />
+                    <p:commandButton icon="fa fa-fw fa-times" action="#{borrowedListController.doUnBorrowMediaForAuthenticatedUser(media)}" title="Return media" update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup" />
                 </p:column>
 
                 <p:column headerText="Return for user" style="width: 7rem; text-align: center" rendered="#{cc.attrs.context == 'adminUserBorrowings'}">
-                    <p:commandButton icon="fa fa-fw fa-times" action="#{userBorrowedListController.doUnBorrowForUser(row)}" title="Return media" update="@all" />
+                    <p:commandButton icon="fa fa-fw fa-times" action="#{userBorrowedListController.doUnBorrowForUser(row)}" title="Return media" update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup" />
                 </p:column>
-                <p:column style="width: 6rem; text-align: center"
+                <p:column headerText="Edit | Delete" style="width: 6rem; text-align: center"
                           rendered="#{cc.attrs.context == 'mediaAdmin'}">
-                    <p:commandButton update="@all"
+                    <p:commandButton update="#{cc.id}:mediaEditForm:mediaEditDialog"
                                      oncomplete="PF('mediaEditDialog').show()" icon="fa fa-fw fa-edit"
                                      title="Edit">
                         <f:setPropertyActionListener value="#{media}"
                                                      target="#{mediaDetailController.media}" />
                     </p:commandButton>
-                    <p:commandButton update="@all"
-                                     action="#{mediaDetailController.doDeleteMedia}"
-                                     icon="fa fa-fw fa-trash" title="Delete">
-                        <f:setPropertyActionListener value="#{media}"
-                                                     target="#{mediaDetailController.media}" />
-                        <p:confirm header="Delete media"
-                                   message="Do you want to delete the media?" icon="ui-icon-alert" />
-                    </p:commandButton>
-                    <p:commandButton id="mDelBut" onclick="PF('dataChangeDlg').show()" action="#{mediaDetailController.orderASafeDelete(media)}" icon="fa fa-fw fa-eraser" title="Delete safely" >
-                        <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
+                    <p:commandButton id="mDelBut" onclick="PF('dataChangeDlg').show()" action="#{mediaDetailController.deleteMedia(media)}"
 
+                                     icon="fa fa-fw fa-eraser" title="Delete safely"
+                                     update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup">
+                        <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
                         <p:confirm header="Delete media"
                                    message="Do you want to delete the media?" icon="ui-icon-alert" />
                     </p:commandButton>
@@ -155,16 +149,18 @@
                         headerText="Borrow for user"
                         style="width: 7rem; text-align: center"
                         rendered="#{(cc.attrs.context == 'list' or cc.attrs.context == 'mediaAdmin') and sessionInfoBean.currentUserRoles != 'CUSTOMER'}">
-                    <p:commandButton update="@all" oncomplete="PF('borrowForUserDialog').show()" icon="fa fa-fw fa-user-plus" title="Borrow for user" disabled="#{!media.available}">
+                    <p:commandButton update="#{cc.id}:mediaBorrowForUserForm:borrowForUserDialog" oncomplete="PF('borrowForUserDialog').show()" icon="fa fa-fw fa-user-plus" title="Borrow for user" disabled="#{!media.available}">
                         <f:setPropertyActionListener value="#{media}" target="#{borrowForUserController.media}" />
                     </p:commandButton>
                 </p:column>
 
                 <p:column headerText="Cancel" style="width: 5rem; text-align: center" rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context == 'reservations'}">
-                    <p:commandButton icon="fa fa-fw fa-times" action="#{reservedController.doRemoveReservationForAuthenticatedUser(media)}" title="Cancel reservation" update="@all" />
+                    <p:commandButton icon="fa fa-fw fa-times" action="#{reservedController.doRemoveReservationForAuthenticatedUser(media)}" title="Cancel reservation" update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup" />
                 </p:column>
             </p:dataTable>
+        </h:form>
 
+        <h:form id="mediaDetailForm">
             <!-- Detail dialog -->
             <p:dialog header="Detail" id="mediaDetailDialog" widgetVar="mediaDetailDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="mediaData" rendered="#{not empty mediaDetailController.media}">
@@ -233,7 +229,7 @@
                             id="borrowButton"
                             icon="fa fa-fw fa-plus-square-o"
                             oncomplete="PF('mediaDetailDialog').hide()"
-                            update="@all"
+                            update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup"
                             rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed' and cc.attrs.context != 'reservations'}"
                             disabled="#{!mediaDetailController.media.available}"
                     />
@@ -243,13 +239,15 @@
                             id="reserveButton"
                             icon="fa fa-fw fa-#{reservedController.isReservedForAuthenticatedUser(mediaDetailController.media) ? 'minus' : 'plus'}-square-o"
                             oncomplete="PF('mediaDetailDialog').hide()"
-                            update="@all"
+                            update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup"
                             rendered="#{sessionInfoBean.currentUserRoles == 'CUSTOMER' and cc.attrs.context != 'borrowed' and cc.attrs.context != 'reservations'}"
                             disabled="#{mediaDetailController.media.available}"
                     />
                 </p:outputPanel>
             </p:dialog>
+        </h:form>
 
+        <h:form id="mediaEditForm">
             <!-- Edit dialog -->
             <p:dialog header="Edit Media" id="mediaEditDialog"
                       widgetVar="mediaEditDialog" modal="true" showEffect="fade"
@@ -268,7 +266,7 @@
                         <p:inputText id="mediaType" disabled="true"
                                      value="#{mediaDetailController.media.mediaType}" />
                         <p:outputLabel for="@next" value="Language:" />
-                        <p:selectOneMenu value="#{mediaDetailController.media.language}" dynamic="true" filter="true">
+                        <p:selectOneMenu value="#{mediaDetailController.media.language}" filter="true">
                             <f:selectItem itemLabel="-- select language --" itemValue="" />
                             <f:selectItems value="#{mediaDetailController.allLanguages}" var="lang" itemValue="#{lang}" itemLabel="#{mediaListController.convertLanguageHuman(lang)}" />
                         </p:selectOneMenu>
@@ -312,17 +310,19 @@
                         <p:commandButton value="Save"
                                          action="#{mediaDetailController.doSaveMedia()}"
                                          oncomplete="PF('mediaEditDialog').hide()"
-                                         update="@all">
+                                         update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup">
                         </p:commandButton>
                         <p:commandButton value="Reload"
                                          action="#{mediaDetailController.doReloadMedia()}"
-                                         update="@all" />
+                                         update="#{cc.id}:mediaEditForm:mediaEditDialog" />
                         <p:commandButton value="Cancel"
                                          onclick="PF('mediaEditDialog').hide()" />
                     </h:panelGrid>
                 </p:outputPanel>
             </p:dialog>
+        </h:form>
 
+        <h:form id="mediaConfirmForm">
             <!-- Delete dialog -->
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
                              width="300">
@@ -331,7 +331,9 @@
                 <p:commandButton value="No" type="button"
                                  styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
             </p:confirmDialog>
+        </h:form>
 
+        <h:form id="mediaBorrowForUserForm">
             <!-- Borrow for user dialog -->
             <p:dialog header="Borrow for user" id="borrowForUserDialog" widgetVar="borrowForUserDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel rendered="#{not empty borrowForUserController.media}">
@@ -349,7 +351,7 @@
                             id="borrowForUserButton"
                             icon="fa fa-fw fa-plus-square-o"
                             oncomplete="PF('borrowForUserDialog').hide()"
-                            update="@all"
+                            update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup"
                     />
                 </p:outputPanel>
             </p:dialog>

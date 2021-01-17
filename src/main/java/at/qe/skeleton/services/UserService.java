@@ -1,12 +1,13 @@
 package at.qe.skeleton.services;
 
-import at.qe.skeleton.model.Bookmark;
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.model.*;
 import at.qe.skeleton.repositories.BookmarkRepository;
 import at.qe.skeleton.repositories.BorrowedRepository;
+import at.qe.skeleton.repositories.ReservedRepository;
 import at.qe.skeleton.repositories.UserRepository;
+
+
+import at.qe.skeleton.ui.controllers.FMSpamController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,6 +41,14 @@ public class UserService {
 
 	@Autowired
 	private BookmarkRepository bookmarkRepository;
+
+	@Autowired
+	private ReservedRepository reservedRepository;
+
+	@Autowired
+	private MailService mailService;
+
+
 
 	/**
 	 * Returns a collection of all users.
@@ -223,31 +231,37 @@ public class UserService {
 
 		// TODO: potential issue, that an Admin has less rights if he has the Librarian-Role as well
 		// this problem should not occur, if only one Role is allowed in the Constructor and Setter of the User
-		FacesContext context = FacesContext.getCurrentInstance();
 		if (this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN)
 				&& user.getRoles().contains(UserRole.ADMIN)) {
-			context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Librarians may not delete Librarians or Administrators!",  "") );
-			throw new UnauthorizedActionException("Librarians may not delete Librarians or Administrators!");
+			throw new UnauthorizedActionException("Librarians may not delete Administrators!");
 
 		} else if (this.getAuthenticatedUser().getId().equals(user.getId())) {
-			context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Users may not delete themselves!",  "") );
-			throw new UnauthorizedActionException("Users may not delete themselves!");
+			throw new UnauthorizedActionException("Users may not delete themself!");
 
 		} else {
 			// Check for borrowed articles
 			List<Borrowed> still_borrowed = borrowedRepository.findByUser(user);
 
 			if (still_borrowed.size() != 0) {
-				context.addMessage("asMessage", new FacesMessage(FacesMessage.SEVERITY_WARN, "Can't delete user - some media is still borrowed",  "") );
+
 				throw new UnauthorizedActionException("User cannot be deleted: There is a Media that the user has not returned yet!");
 			} else {
 				// delete Bookmarks
 				List<Bookmark> still_bookmarked = bookmarkRepository.findByUsername(user.getUsername());
 				for (Bookmark sbm : still_bookmarked){
-					context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Deleted the user's bookmark No.: " + sbm.getBookmarkID(),  "") );
 					bookmarkRepository.delete(sbm);
 				}
-				//mailService.send "your account was deleted"
+				// delete Reservations
+				Collection<Reserved> res = new ArrayList<Reserved>();
+				res = reservedRepository.findByUser(user);
+				if(res.size() > 0){
+					for (Reserved r : res) {
+
+							reservedRepository.delete(r);
+
+					}
+				}
+				mailService.sendMail(user.getEmail(), "Your account has been removed", "Hello, your account was deleted by administrative personnel.");
 				this.userRepository.delete(user);
 			}
 

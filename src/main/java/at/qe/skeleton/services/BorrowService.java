@@ -113,7 +113,8 @@ public class BorrowService implements CommandLineRunner {
 			for (Reserved current : reservations) {
 				unreserveMedia(current);
 			}
-		};
+		}
+
 	}
 
 	/**
@@ -257,6 +258,22 @@ public class BorrowService implements CommandLineRunner {
 	}
 
 	/**
+	 * Removes a reservation of the media for the authenticated user
+	 *
+	 * @param media the media
+	 * @param user the user
+	 */
+	public void removeReservationForSpecificUser(final Media media, final User user) {
+		User specific_user = userService.loadUser(user.getUsername());
+
+		Reserved r = reservedRepository.findFirstByUserAndMedia(specific_user, media);
+
+		if (r != null) {
+			reservedRepository.delete(r);
+		}
+	}
+
+	/**
 	 * Returns whether the authenticated user has reserved this media or not
 	 *
 	 * @param media the media to search for
@@ -267,6 +284,21 @@ public class BorrowService implements CommandLineRunner {
 
 		return reservedRepository.findFirstByUserAndMedia(user, media) != null;
 	}
+
+	/**
+	 * Returns whether the authenticated user has reserved this media or not
+	 *
+	 * @param media the media to search for
+	 * @return true, if he has reserved it, false otherwise
+	 */
+	public boolean isReservedForSpecialUser(final Media media, final User user) {
+		User searched_user = userService.loadUser(user.getUsername());
+
+		return reservedRepository.findFirstByUserAndMedia(searched_user, media) != null;
+	}
+
+
+
 
 	/**
 	 * Method that unreserves a Media for a User. Automatically sends an email to
