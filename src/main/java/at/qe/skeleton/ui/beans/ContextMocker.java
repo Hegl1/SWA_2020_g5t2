@@ -1,10 +1,10 @@
 package at.qe.skeleton.ui.beans;
 
-import javax.faces.context.FacesContext;
-
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import javax.faces.context.FacesContext;
 
 // stub class to ignore Faces Messages during a Unittest
 // the unittests can now be run without throwing errors coming from

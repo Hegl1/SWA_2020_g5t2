@@ -1,18 +1,10 @@
 package at.qe.skeleton.model;
 
+import org.springframework.data.domain.Persistable;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.springframework.data.domain.Persistable;
 
 /**
  * Entity that represents a reservation.
@@ -26,7 +18,7 @@ public class Reserved implements Serializable, Persistable<Long> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name = "borrow_sequence", initialValue = 10)
+	@SequenceGenerator(name = "borrow_sequence", initialValue = 11)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "borrow_sequence")
 	private Long reservedID;
 

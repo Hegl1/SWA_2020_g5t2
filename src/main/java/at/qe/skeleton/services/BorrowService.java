@@ -1,11 +1,10 @@
 package at.qe.skeleton.services;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import at.qe.skeleton.model.*;
+import at.qe.skeleton.repositories.BorrowedRepository;
+import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
+import at.qe.skeleton.repositories.MediaRepository;
+import at.qe.skeleton.repositories.ReservedRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +14,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaBorrowTime;
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.model.Reserved;
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.repositories.BorrowedRepository;
-import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
-import at.qe.skeleton.repositories.MediaRepository;
-import at.qe.skeleton.repositories.ReservedRepository;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class that is used for the borrowing process, reservation process and
@@ -63,7 +57,7 @@ public class BorrowService implements CommandLineRunner {
 	@Autowired
 	private UserService userService;
 
-	private Logger logger = LoggerFactory.getLogger(BorrowService.class);
+	private final Logger logger = LoggerFactory.getLogger(BorrowService.class);
 
 	/**
 	 * Method that constructs a Borrowed object and saves it in the database.
@@ -72,9 +66,9 @@ public class BorrowService implements CommandLineRunner {
 	 * @param mediaToBorrow the media which gets borrowed by the user
 	 * @return true if borrowing was successfull, else false.
 	 */
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public boolean borrowMedia(final User borrower, final Media mediaToBorrow) {
-
-		if (mediaToBorrow.getTotalAvail() <= mediaToBorrow.getCurBorrowed()) {
+		if (!mediaToBorrow.getAvailable() || borrower == null) {
 			return false;
 		} else {
 			mediaToBorrow.setCurBorrowed(mediaToBorrow.getCurBorrowed() + 1);
@@ -104,7 +98,6 @@ public class BorrowService implements CommandLineRunner {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void unBorrowMedia(final Borrowed borrowed) {
-
 		if (borrowed != null) {
 			borrowedRepository.delete(borrowed);
 			borrowed.getMedia().setCurBorrowed(borrowed.getMedia().getCurBorrowed() - 1);
@@ -124,6 +117,7 @@ public class BorrowService implements CommandLineRunner {
 	 * @param borrower        user to unborrow the media for.
 	 * @param mediaToUnBorrow media that should be unborrowed.
 	 */
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void unBorrowMedia(final User borrower, final Media mediaToUnBorrow) {
 		unBorrowMedia(borrowedRepository.findFirstByUserAndMedia(borrower, mediaToUnBorrow));
 	}
@@ -157,6 +151,14 @@ public class BorrowService implements CommandLineRunner {
 	 */
 	public Collection<Borrowed> getAllBorrowsByUser(final User user) {
 		return borrowedRepository.findByUser(user);
+	}
+
+	public Collection<Borrowed> getAllBorrowsByUsername(final String username){
+		User u = userService.loadUser(username);
+
+		if(u == null) return null;
+
+		return borrowedRepository.findByUser(u);
 	}
 
 	/**
@@ -217,6 +219,15 @@ public class BorrowService implements CommandLineRunner {
 	}
 
 	/**
+	 * Method that reserves a Media for a User
+	 * 
+	 * @param reserved Reserved object to save.
+	 */
+	public void saveReserved(final Reserved reserved) {
+		reservedRepository.save(reserved);
+	}
+
+	/**
 	 * Method that reserves a Media for the currently authenticaed User.
 	 * 
 	 * @param mediaToReserve the Media which should be reserved.
@@ -230,12 +241,28 @@ public class BorrowService implements CommandLineRunner {
 	 *
 	 * @param media the media
 	 */
-	public void removeReservationForAuthenticatedUser(final Media media){
+	public void removeReservationForAuthenticatedUser(final Media media) {
 		User user = userService.loadCurrentUser();
 
 		Reserved r = reservedRepository.findFirstByUserAndMedia(user, media);
 
-		if(r != null){
+		if (r != null) {
+			reservedRepository.delete(r);
+		}
+	}
+
+	/**
+	 * Removes a reservation of the media for the authenticated user
+	 *
+	 * @param media the media
+	 * @param user the user
+	 */
+	public void removeReservationForSpecificUser(final Media media, final User user) {
+		User specific_user = userService.loadUser(user.getUsername());
+
+		Reserved r = reservedRepository.findFirstByUserAndMedia(specific_user, media);
+
+		if (r != null) {
 			reservedRepository.delete(r);
 		}
 	}
@@ -246,11 +273,26 @@ public class BorrowService implements CommandLineRunner {
 	 * @param media the media to search for
 	 * @return true, if he has reserved it, false otherwise
 	 */
-	public boolean isReservedForAuthenticatedUser(final Media media){
+	public boolean isReservedForAuthenticatedUser(final Media media) {
 		User user = userService.loadCurrentUser();
 
 		return reservedRepository.findFirstByUserAndMedia(user, media) != null;
 	}
+
+	/**
+	 * Returns whether the authenticated user has reserved this media or not
+	 *
+	 * @param media the media to search for
+	 * @return true, if he has reserved it, false otherwise
+	 */
+	public boolean isReservedForSpecialUser(final Media media, final User user) {
+		User searched_user = userService.loadUser(user.getUsername());
+
+		return reservedRepository.findFirstByUserAndMedia(searched_user, media) != null;
+	}
+
+
+
 
 	/**
 	 * Method that unreserves a Media for a User. Automatically sends an email to
@@ -266,9 +308,7 @@ public class BorrowService implements CommandLineRunner {
 		bodyBuild.append("\" is available again for borrowing.\n\n");
 		bodyBuild.append("Yours sincerely,\nThe Library Team");
 		String body = bodyBuild.toString();
-		StringBuilder headBuild = new StringBuilder("Borrowing of ");
-		headBuild.append(targetMedia.getTitle());
-		String head = headBuild.toString();
+		String head = "Borrowing of " + targetMedia.getTitle();
 		mailService.sendMail(reserved.getUser().getEmail(), head, body);
 		logger.info("Email about freed media send to " + reserved.getUser().getEmail());
 		reservedRepository.delete(reserved);
@@ -322,7 +362,9 @@ public class BorrowService implements CommandLineRunner {
 	 * @param media the media to search for
 	 * @return the count of reservations made
 	 */
-	public int getReservationCountForMedia(final Media media) { return reservedRepository.getReservationCountForMedia(media.getMediaID()); }
+	public int getReservationCountForMedia(final Media media) {
+		return reservedRepository.getReservationCountForMedia(media.getMediaID());
+	}
 
 	/**
 	 * Method that retrieves one particular Reserved object by user and media.
@@ -382,7 +424,7 @@ public class BorrowService implements CommandLineRunner {
 	 * the scheduler work from the start of the project.
 	 */
 	@Override
-	public void run(final String... args) throws Exception {
+	public void run(final String... args) {
 		// used for initial loading of the component so scheduled task starts
 		logger.info("BorrowService Component loaded at startup");
 	}

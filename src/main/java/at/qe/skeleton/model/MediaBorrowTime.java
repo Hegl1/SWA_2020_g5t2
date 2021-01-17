@@ -1,13 +1,12 @@
 package at.qe.skeleton.model;
 
-import java.io.Serializable;
+import org.springframework.data.domain.Persistable;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-
-import org.springframework.data.domain.Persistable;
+import java.io.Serializable;
 
 /**
  * Entity that relates media types with the corresponding maximum allowed
@@ -40,6 +39,8 @@ public class MediaBorrowTime implements Serializable, Persistable<MediaType> {
 	}
 
 	public void setAllowedBorrowTime(final int allowedBorrowTime) {
+		if(allowedBorrowTime <= 0) return;
+
 		this.allowedBorrowTime = allowedBorrowTime;
 	}
 

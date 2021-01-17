@@ -1,0 +1,25 @@
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:lib="http://xmlns.jcp.org/jsf/composite/library"
+	template="/WEB-INF/templates/main.xhtml"
+	xmlns:c="http://java.sun.com/jstl/core">
+	<ui:define name="content">
+		<c:set value="#{param['username']}" target="#{userBorrowedListController}" property="username" />
+
+		<h:panelGroup layout="block" rendered="#{userBorrowedListController.loaded}">
+			<h2><h:outputText value="Edit borrowings for user (#{param['username']})" /></h2>
+
+			<lib:MediaList mediaList="#{userBorrowedListController.borrowings}" context="adminUserBorrowings" />
+		</h:panelGroup>
+
+		<h:panelGroup layout="block" rendered="#{!userBorrowedListController.loaded}">
+			The user was not found
+			<h:form>
+				<h:commandLink onclick="history.go(-1)">Go back...</h:commandLink>
+			</h:form>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>

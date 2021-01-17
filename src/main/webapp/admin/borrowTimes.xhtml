@@ -1,0 +1,25 @@
+<ui:composition xmlns="http://www.w3c.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/main.xhtml">
+    <ui:define name ="content">
+        <h2>Admin borrow times</h2>
+
+        <h:form id="borrowTimesForm">
+            <p:dataTable
+                    id="borrowTimesTable" var="borrowTime" value="#{borrowTimesController.mediaBorrowTimes}">
+                <f:facet name="header">
+                    <p:commandButton update="@form :headerForm:undoRedoGroup" action="#{borrowTimesController.save}" icon="fa fa-fw fa-check" value="Save changes" />
+                </f:facet>
+                <p:column headerText="Media type">
+                    <h:outputText value="#{borrowTimesController.getMediaTypeHuman(borrowTime.mediaType)}"/>
+                </p:column>
+                <p:column headerText="Borrow time (days)" style="text-align: center; width: 10em">
+                    <p:inputText type="number" value="#{borrowTime.allowedBorrowTime}" style="width: 6em; margin-right: 10px" />
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+</ui:composition>

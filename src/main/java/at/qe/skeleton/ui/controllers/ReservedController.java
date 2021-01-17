@@ -1,12 +1,17 @@
 package at.qe.skeleton.ui.controllers;
 
 import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.Reserved;
+import at.qe.skeleton.model.User;
 import at.qe.skeleton.services.BorrowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * Controller for the borrowed list view.
@@ -31,14 +36,15 @@ public class ReservedController implements Serializable {
     }
 
     /**
-     * Method that reserves a Media for the currently authenticaed User.
+     * Method that reserves a Media for the currently authenticated User.
      *
      * @param media the Media which should be reserved.
      */
     public void doReserveMediaForAuthenticatedUser(final Media media){
         borrowService.reserveMediaForAuthenticatedUser(media);
 
-        // TODO: add growl message
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was reserved", ""));
     }
 
     /**
@@ -49,7 +55,22 @@ public class ReservedController implements Serializable {
     public void doRemoveReservationForAuthenticatedUser(final Media media){
         borrowService.removeReservationForAuthenticatedUser(media);
 
-        // TODO: add growl message
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Reservation was cancelled", ""));
+    }
+
+    /**
+     * Removes a reservation of the media for a specific user
+     *
+     * @param media the media
+     * @param user the user
+     *
+     */
+    public void doRemoveReservationForSpecificUser(final Media media, final User user){
+        borrowService.removeReservationForSpecificUser(media, user);
+
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Reservation was cancelled for a user", ""));
     }
 
     /**
@@ -73,5 +94,20 @@ public class ReservedController implements Serializable {
      */
     public boolean isReservedForAuthenticatedUser(final Media media) {
         return borrowService.isReservedForAuthenticatedUser(media);
+    }
+
+    /**
+     * Returns whether the specific user has reserved this media or not
+     *
+     * @param media the media to search for
+     * @param user the user to search for
+     * @return true, if he/she has reserved it, false otherwise
+     */
+    public boolean isReservedForSpecialUser(final Media media, final User user) {
+        return borrowService.isReservedForSpecialUser(media, user);
+    }
+
+    public Collection<Reserved> getReservedList() {
+        return borrowService.getAllReservedByAuthenticatedUser();
     }
 }

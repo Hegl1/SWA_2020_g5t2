@@ -49,6 +49,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/customer/**")
                 .hasAnyAuthority("CUSTOMER")
                 // Only access with admin role
+                .antMatchers("/admin/borrowTimes.xhtml")
+                .hasAuthority("ADMIN")
                 .antMatchers("/admin/**")
                 .hasAnyAuthority("ADMIN", "LIBRARIAN")
                 //Permit access only for some roles

@@ -1,14 +1,17 @@
 package at.qe.skeleton.ui.beans;
 
-import java.io.Serializable;
-import java.util.List;
-
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.services.MediaService;
+import at.qe.skeleton.services.UndoRedoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.services.MediaService;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.Serializable;
 
 @Component
 @Scope("view")
@@ -21,6 +24,9 @@ public class CreateMediaBean implements Serializable {
 
 	@Autowired
 	private MediaService mediaService;
+
+	@Autowired
+	private UndoRedoService undoRedoService;
 
 	private String title;
 	private int publishingDate;
@@ -45,64 +51,74 @@ public class CreateMediaBean implements Serializable {
 	 * Create different Medias.
 	 */
 
-	public void doCreateAudioBook() {
-
-		this.mediaService.createAudioBook(title, publishingDate, language, totalAvail, MediaType.AUDIOBOOK, speaker,
-				length, author, ISBN);
+	private void doCreateAudioBook() throws MediaService.TotalAvailabilitySetTooLowException {
+		Media media = this.mediaService.createAudioBook(title, publishingDate, language, totalAvail,
+				 speaker, length, author, ISBN);
+		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	public void doCreateBook() {
-
-		this.mediaService.createBook(title, publishingDate, language, totalAvail, MediaType.BOOK, author, ISBN);
+	private void doCreateBook() throws MediaService.TotalAvailabilitySetTooLowException {
+		Media media = this.mediaService.createBook(title, publishingDate, language, totalAvail, author, ISBN);
+		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	public void doCreateMagazine() {
-
-		this.mediaService.createMagazine(title, publishingDate, language, totalAvail, MediaType.MAGAZINE, series);
+	private void doCreateMagazine() throws MediaService.TotalAvailabilitySetTooLowException {
+		Media media = this.mediaService.createMagazine(title, publishingDate, language, totalAvail, series);
+		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	public void doCreateVideo() {
-
-		this.mediaService.createVideo(title, publishingDate, language, totalAvail, MediaType.VIDEO, length);
+	private void doCreateVideo() throws MediaService.TotalAvailabilitySetTooLowException {
+		Media media = this.mediaService.createVideo(title, publishingDate, language, totalAvail, length);
+		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	public void doCreateMedia() {
-		switch (mediaType) {
-		case "VIDEO":
-			doCreateVideo();
-			break;
-		case "BOOK":
-			doCreateBook();
-			break;
-		case "AUDIOBOOK":
-			doCreateAudioBook();
-			break;
-		case "MAGAZINE":
-			doCreateMagazine();
-			break;
+	public void doCreateMedia() throws MediaService.TotalAvailabilitySetTooLowException {
+
+		try{
+
+			switch (mediaType) {
+			case "VIDEO":
+				doCreateVideo();
+
+				break;
+			case "BOOK":
+				doCreateBook();
+
+				break;
+			case "AUDIOBOOK":
+				doCreateAudioBook();
+
+				break;
+			case "MAGAZINE":
+				doCreateMagazine();
+
+				break;
+			}
+
+			this.reset();
+
+			reloadPage();
+
+		} catch (IllegalStateException | IOException exception) {
 		}
+
 	}
 
-	public void setSelectedMediaTypes(List<String> selectedMediaTypes) {
-	}
+	public void reloadPage() throws java.io.IOException {
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
 
-	public MediaService getMediaService() {
-		return mediaService;
-	}
-
-	public void setMediaService(MediaService mediaService) {
-		this.mediaService = mediaService;
 	}
 
 	public String getTitle() {
 		return title;
 	}
 
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		this.title = title;
 	}
 
@@ -110,7 +126,7 @@ public class CreateMediaBean implements Serializable {
 		return publishingDate;
 	}
 
-	public void setPublishingDate(int publishingYear) {
+	public void setPublishingDate(final int publishingYear) {
 		this.publishingDate = publishingYear;
 	}
 
@@ -118,7 +134,7 @@ public class CreateMediaBean implements Serializable {
 		return language;
 	}
 
-	public void setLanguage(String language) {
+	public void setLanguage(final String language) {
 		this.language = language;
 	}
 
@@ -126,7 +142,7 @@ public class CreateMediaBean implements Serializable {
 		return totalAvail;
 	}
 
-	public void setTotalAvail(int totalAvail) {
+	public void setTotalAvail(final int totalAvail) {
 		this.totalAvail = totalAvail;
 	}
 
@@ -134,7 +150,7 @@ public class CreateMediaBean implements Serializable {
 		return mediaType;
 	}
 
-	public void setMediaType(String mediaType) {
+	public void setMediaType(final String mediaType) {
 		this.mediaType = mediaType;
 	}
 
@@ -142,7 +158,7 @@ public class CreateMediaBean implements Serializable {
 		return author;
 	}
 
-	public void setAuthor(String author) {
+	public void setAuthor(final String author) {
 		this.author = author;
 	}
 
@@ -150,7 +166,7 @@ public class CreateMediaBean implements Serializable {
 		return ISBN;
 	}
 
-	public void setISBN(String iSBN) {
+	public void setISBN(final String iSBN) {
 		ISBN = iSBN;
 	}
 
@@ -158,7 +174,7 @@ public class CreateMediaBean implements Serializable {
 		return speaker;
 	}
 
-	public void setSpeaker(String speaker) {
+	public void setSpeaker(final String speaker) {
 		this.speaker = speaker;
 	}
 
@@ -166,7 +182,7 @@ public class CreateMediaBean implements Serializable {
 		return series;
 	}
 
-	public void setSeries(String series) {
+	public void setSeries(final String series) {
 		this.series = series;
 	}
 
@@ -174,8 +190,20 @@ public class CreateMediaBean implements Serializable {
 		return length;
 	}
 
-	public void setLength(int length) {
+	public void setLength(final int length) {
 		this.length = length;
 	}
 
+	public void reset() {
+		this.title = null;
+		this.publishingDate = 0;
+		this.language = null;
+		this.totalAvail = 0;
+		this.mediaType = null;
+		this.author = null;
+		this.ISBN = null;
+		this.speaker = null;
+		this.series = null;
+		this.length = 0;
+	}
 }

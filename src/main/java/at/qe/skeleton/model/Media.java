@@ -1,19 +1,11 @@
 package at.qe.skeleton.model;
 
+import org.springframework.data.domain.Persistable;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Locale;
-
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.SequenceGenerator;
-
-import org.springframework.data.domain.Persistable;
+import java.util.Objects;
 
 /**
  * Entity representing a general Media. Only exists as in more concrete classes,
@@ -32,7 +24,7 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name = "media_sequence", initialValue = 10)
+	@SequenceGenerator(name = "media_sequence", initialValue = 21)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "media_sequence")
 	private Long mediaID;
 	private String title;
@@ -57,10 +49,8 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	 * @param publishingYear publishing year of the media
 	 * @param language       2 digit language code
 	 * @param totalAvail     number of totally available copies
-	 * @param mediaType      type of the media, see {link MediaType}
 	 */
-	public Media(final String title, final int publishingYear, final String language, final int totalAvail,
-			final MediaType mediaType) {
+	public Media(final String title, final int publishingYear, final String language, final int totalAvail) {
 
 		this.title = title;
 		this.publishingYear = publishingYear;
@@ -98,7 +88,15 @@ public abstract class Media implements Persistable<Long>, Serializable {
 		return this.language;
 	}
 
+	/**
+	 * Converts the ISO 3166-1 alpha-2 language code into a human-readable
+	 * language
+	 *
+	 * @return the converted language string
+	 */
 	public String getLanguageHuman() {
+		if(this.language == null) return null;
+
 		Locale l = new Locale(this.language);
 		return l.getDisplayLanguage();
 	}
@@ -119,7 +117,15 @@ public abstract class Media implements Persistable<Long>, Serializable {
 		return this.mediaType;
 	}
 
+	/**
+	 * Converts the media type into a formatted, human-readable
+	 * string (first letter uppercase, the rest lower case)
+	 *
+	 * @return the converted media type
+	 */
 	public String getMediaTypeHuman() {
+		if(this.mediaType == null) return null;
+
 		return this.mediaType.toString().substring(0, 1).toUpperCase()
 				+ this.mediaType.toString().substring(1).toLowerCase();
 	}
@@ -146,4 +152,57 @@ public abstract class Media implements Persistable<Long>, Serializable {
 		return this.mediaID == null;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		Media media = (Media) o;
+
+		if (this.publishingYear == media.publishingYear && this.totalAvail == media.totalAvail &&
+				this.curBorrowed == media.curBorrowed && Objects.equals(this.mediaID, media.mediaID) &&
+				Objects.equals(this.title, media.title) && Objects.equals(this.language, media.language) &&
+				this.mediaType == media.mediaType) {
+
+			switch (this.mediaType) {
+
+				case AUDIOBOOK:
+					return ((AudioBook) this).getAuthor().equals(((AudioBook) media).getAuthor()) &&
+							((AudioBook) this).getISBN().equals(((AudioBook) media).getISBN()) &&
+							((AudioBook) this).getLength() == ((AudioBook) media).getLength() &&
+							((AudioBook) this).getSpeaker().equals(((AudioBook) media).getSpeaker());
+
+				case BOOK:
+					return ((Book) this).getAuthor().equals(((Book) media).getAuthor()) &&
+							((Book) this).getISBN().equals(((Book) media).getISBN());
+
+				case MAGAZINE:
+					return ((Magazine) this).getSeries().equals(((Magazine) media).getSeries());
+
+				case VIDEO:
+					return ((Video) this).getLength() == (((Video) media).getLength());
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(mediaID, title, publishingYear, language, totalAvail, curBorrowed, mediaType);
+	}
+
+	/**
+	 * Checks whether the media is currently available (totalAvail > currently borrowed)
+	 *
+	 * @return true if there are copies available, false otherwise
+	 */
+	public boolean getAvailable() {
+		return totalAvail > curBorrowed;
+	}
 }

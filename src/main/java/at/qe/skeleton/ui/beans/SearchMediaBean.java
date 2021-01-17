@@ -1,7 +1,5 @@
 package at.qe.skeleton.ui.beans;
 
-import at.qe.skeleton.model.AudioBook;
-import at.qe.skeleton.model.Book;
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.MediaType;
 import at.qe.skeleton.services.MediaService;
@@ -9,13 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 
 @Component
 @Scope("view")
 public class SearchMediaBean implements Serializable {
+    private Collection<Media> initResults;
     private Collection<Media> results;
 
     private String search = null;
@@ -23,6 +22,11 @@ public class SearchMediaBean implements Serializable {
     private String filterLanguage = null;
     private String filterAvailable = null;
 
+    /**
+     * Returns the list of filtered results
+     *
+     * @return the collection of filtered medias
+     */
     public Collection<Media> getResults() {
         return results;
     }
@@ -30,13 +34,29 @@ public class SearchMediaBean implements Serializable {
     @Autowired
     private MediaService mediaService;
 
-    @PostConstruct
-    public void init() {
-        this.results = mediaService.getAllMedia();
+    /**
+     * Initializes the results with all media from the database
+     * (if not yet initialized)
+     */
+    private void init() {
+        if(this.initResults == null){
+            setInit(mediaService.getAllMedia());
+        }
     }
 
-    public void setResults(final Collection<Media> results) {
-        this.results = results;
+    /**
+     * Initializes the results with the given collection
+     *
+     * @param initResults the collection to initialize
+     */
+    public void setInit(Collection<Media> initResults) {
+        if(this.initResults != null) return;
+
+        if(initResults != null){
+            this.initResults = this.results = initResults;
+        }else{
+            init();
+        }
     }
 
     public String getSearch() {
@@ -44,9 +64,9 @@ public class SearchMediaBean implements Serializable {
     }
 
     public void setSearch(final String search) {
-        this.search = search == null ? null : search.trim().toLowerCase();
+        this.search = search == null ? null : search.trim();
 
-        if(this.search == ""){
+        if(search != null && this.search.isEmpty()){
             this.search = null;
         }
     }
@@ -58,7 +78,7 @@ public class SearchMediaBean implements Serializable {
     public void setFilterType(final String filterType) {
         this.filterType = filterType == null ? null : filterType.trim().toUpperCase();
 
-        if(this.filterType == ""){
+        if(filterType != null && this.filterType.isEmpty()){
             this.filterType = null;
         }
     }
@@ -70,7 +90,7 @@ public class SearchMediaBean implements Serializable {
     public void setFilterLanguage(final String filterLanguage) {
         this.filterLanguage = filterLanguage == null ? null : filterLanguage.trim();
 
-        if(this.filterLanguage == ""){
+        if(filterLanguage != null && this.filterLanguage.isEmpty()){
             this.filterLanguage = null;
         }
     }
@@ -82,7 +102,7 @@ public class SearchMediaBean implements Serializable {
     public void setFilterAvailable(final String filterAvailable) {
         this.filterAvailable = filterAvailable == null ? null : filterAvailable.trim();
 
-        if(this.filterAvailable == ""){
+        if(filterAvailable != null && this.filterAvailable.isEmpty()){
             this.filterAvailable = null;
         }
     }
@@ -99,8 +119,11 @@ public class SearchMediaBean implements Serializable {
         }
     }
 
+    /**
+     * Filteres the collection by the set filters and sets the results collection
+     */
     public void doFilter(){
-        Collection<Media> results = mediaService.getAllMedia();
+        Collection<Media> results = new ArrayList<>(initResults);
 
         if(search != null){
             results = mediaService.filterMediaByTitle(results, search);
@@ -123,12 +146,15 @@ public class SearchMediaBean implements Serializable {
         this.results = results;
     }
 
+    /**
+     * Resets the filter and result
+     */
     public void doResetFilter(){
         this.search = null;
         this.filterType = null;
         this.filterLanguage = null;
         this.filterAvailable = null;
 
-        this.init();
+        this.results = new ArrayList<>(initResults);
     }
 }

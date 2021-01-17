@@ -1,4 +1,3 @@
-
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:h="http://java.sun.com/jsf/html"
@@ -8,12 +7,7 @@
 	template="/WEB-INF/templates/main.xhtml"
 	xmlns:c="http://java.sun.com/jstl/core">
 	<ui:define name="content">
-
-		<p:messages for="asMessage" />
-		<p:growl for="asGrowl" closable="true" showDetail="true"
-			showSummary="true" redisplay="true">
-			<p:autoUpdate />
-		</p:growl>
+		<h2>Admin media</h2>
 
 		<h:form id="createMedia" style="margin-bottom: 15px">
 			<p:accordionPanel activeIndex="-2">
@@ -73,13 +67,16 @@
 						<p:outputLabel for="@next" value="Published Year: " />
 						<p:inputText
 							value="#{createMediaBean.publishingDate}" />
-						<p:outputLabel for="@next" value="Language:  " />
-						<p:inputText value="#{createMediaBean.language}" />
+						<p:outputLabel for="@next" value="Language:" />
+						<p:selectOneMenu value="#{createMediaBean.language}" dynamic="true" filter="true">
+							<f:selectItem itemLabel="-- select language --" itemValue="" />
+							<f:selectItems value="#{mediaDetailController.allLanguages}" var="lang" itemValue="#{lang}" itemLabel="#{mediaListController.convertLanguageHuman(lang)}" />
+						</p:selectOneMenu>
 						<p:outputLabel for="@next" value="totalAvail: " />
 						<p:inputText
 							value="#{createMediaBean.totalAvail}" />
 						<p:outputLabel for="@next" value="mediaType: " />
-						<p:inputText value="#{createMediaBean.mediaType}" />
+						<p:inputText disabled="true" value="#{createMediaBean.mediaType}" />
 
 
 						<c:choose>
@@ -112,31 +109,31 @@
 
 					<p:separator />
 					<h:panelGrid columns="3">
-						<p:commandButton value="Save"
-							action="#{createMediaBean.doCreateMedia()}"
-							oncomplete="PF('mediaCreateMediaDialog').hide()"
-							update=":mediaListWrapper">
+						<p:commandButton
+								value="Save" action="#{createMediaBean.doCreateMedia()}"
+								oncomplete="PF('mediaCreateMediaDialog').hide()"
+								update=":mediaListWrapper :headerForm:undoRedoGroup :createMedia:mediaCreateMediaDialog">
 						</p:commandButton>
-						<p:commandButton value="Cancel"
-							onclick="PF('mediaCreateMediaDialog').hide()" />
+						<p:commandButton
+								value="Cancel" action="#{createMediaBean.reset}"
+								oncomplete="PF('mediaCreateMediaDialog').hide()"
+								update=":createMedia:mediaCreateMediaDialog" />
 					</h:panelGrid>
 				</p:outputPanel>
 			</p:dialog>
-
 		</h:form>
 
 		<h:panelGroup id="mediaListWrapper" layout="block">
 			<lib:MediaList mediaList="#{mediaListController.media}" id="newid01"
-				context="mediaAdmin"></lib:MediaList>
+				context="mediaAdmin" />
 		</h:panelGroup>
 
-		<!--    this window is shown when the delete button is activated-->
+<!--		    this window is shown when the delete button is activated-->
 		<p:blockUI widgetVar="dataChangeDlg" trigger="newid01"  block=":newid01" >
 			<h:panelGrid  bgcolor="white"  >
 				<h:outputText value="Loading &lt;br /&gt; Please wait 20 seconds until a pop up message appears. &lt;br /&gt;
                 The media is still bookmarked by somebody and will be deleted. &lt;br /&gt;
                 In addition current users that had bookmarked it will be sent an email." escape="false" />
-
 			</h:panelGrid>
 		</p:blockUI>
 

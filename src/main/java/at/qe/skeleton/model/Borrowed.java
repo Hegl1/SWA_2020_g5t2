@@ -1,18 +1,10 @@
 package at.qe.skeleton.model;
 
+import org.springframework.data.domain.Persistable;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.springframework.data.domain.Persistable;
 
 /**
  * 
@@ -27,7 +19,7 @@ public class Borrowed implements Serializable, Persistable<Long> {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@SequenceGenerator(name = "borrow_sequence", initialValue = 10)
+	@SequenceGenerator(name = "borrow_sequence", initialValue = 11)
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "borrow_sequence")
 	private Long borrowID;
 
@@ -48,7 +40,7 @@ public class Borrowed implements Serializable, Persistable<Long> {
 	}
 
 	/**
-	 * Construcotr that sets all the fields.
+	 * Constructor that sets all the fields.
 	 * 
 	 * @param user  the user to borrow a media.
 	 * @param media the media to be borrowed.
