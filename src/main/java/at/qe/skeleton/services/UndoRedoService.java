@@ -3,11 +3,9 @@ package at.qe.skeleton.services;
 import at.qe.skeleton.model.*;
 import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
 import at.qe.skeleton.services.UserService.UnauthorizedActionException;
-import at.qe.skeleton.ui.controllers.MediaDetailController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 

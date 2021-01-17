@@ -1,23 +1,18 @@
 package at.qe.skeleton.ui.controllers;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-
 import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.Reserved;
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.BorrowService;
+import at.qe.skeleton.services.UndoRedoService;
+import at.qe.skeleton.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
-import at.qe.skeleton.services.UndoRedoService;
-import at.qe.skeleton.services.UserService;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Controller for the user detail view.

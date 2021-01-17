@@ -1,32 +1,15 @@
 package at.qe.skeleton.ui.controllers;
 
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-
-import org.primefaces.PrimeFaces;
+import at.qe.skeleton.model.*;
+import at.qe.skeleton.repositories.BookmarkRepository;
+import at.qe.skeleton.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.AudioBook;
-import at.qe.skeleton.model.Book;
-import at.qe.skeleton.model.Bookmark;
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.Magazine;
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.Video;
-import at.qe.skeleton.repositories.BookmarkRepository;
-import at.qe.skeleton.services.BookmarkService;
-import at.qe.skeleton.services.BorrowService;
-import at.qe.skeleton.services.MailService;
-import at.qe.skeleton.services.MediaService;
-import at.qe.skeleton.services.UndoRedoService;
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Controller for the media detail view.

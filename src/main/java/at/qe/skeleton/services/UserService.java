@@ -5,9 +5,6 @@ import at.qe.skeleton.repositories.BookmarkRepository;
 import at.qe.skeleton.repositories.BorrowedRepository;
 import at.qe.skeleton.repositories.ReservedRepository;
 import at.qe.skeleton.repositories.UserRepository;
-
-
-import at.qe.skeleton.ui.controllers.FMSpamController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-
 
 import java.util.*;
 import java.util.regex.Matcher;

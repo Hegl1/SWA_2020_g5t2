@@ -1,11 +1,10 @@
 package at.qe.skeleton.services;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import at.qe.skeleton.model.*;
+import at.qe.skeleton.repositories.BorrowedRepository;
+import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
+import at.qe.skeleton.repositories.MediaRepository;
+import at.qe.skeleton.repositories.ReservedRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +14,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaBorrowTime;
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.model.Reserved;
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.repositories.BorrowedRepository;
-import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
-import at.qe.skeleton.repositories.MediaRepository;
-import at.qe.skeleton.repositories.ReservedRepository;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class that is used for the borrowing process, reservation process and

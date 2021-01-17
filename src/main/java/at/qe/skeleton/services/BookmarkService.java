@@ -1,16 +1,15 @@
 package at.qe.skeleton.services;
 
-import java.util.Collection;
-import java.util.List;
-import at.qe.skeleton.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import at.qe.skeleton.model.Bookmark;
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.BookmarkRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Service for listing the customers own bookmarks.

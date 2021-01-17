@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
+
+;
 
 /**
  * Service for accessing and manipulating media data.
