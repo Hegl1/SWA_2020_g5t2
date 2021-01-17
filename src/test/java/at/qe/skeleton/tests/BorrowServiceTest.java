@@ -304,11 +304,33 @@ public class BorrowServiceTest {
     }
 
     @Test
+    @DirtiesContext
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    public void testIsReservedForSpecificUser() {
+        User user = this.userService.loadUser("csauer");
+        Media media = this.mediaService.loadMedia(6L);
+        this.borrowService.removeReservationForSpecificUser(media, user);
+
+        Assertions.assertFalse(this.borrowService.isReservedForSpecialUser(media, user));
+    }
+
+    @Test
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
     public void testIsReservedForAuthenticatedUser() {
         Media media = this.mediaService.loadMedia(6L);
 
         Assertions.assertTrue(this.borrowService.isReservedForAuthenticatedUser(media));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    public void testIsReservedForSpecialUser() {
+        User user = this.userService.loadUser("csauer");
+        Media reservedMedia = this.mediaService.loadMedia(6L);
+        Media notReservedMedia = this.mediaService.loadMedia(7L);
+
+        Assertions.assertTrue(this.borrowService.isReservedForSpecialUser(reservedMedia, user));
+        Assertions.assertFalse(this.borrowService.isReservedForSpecialUser(notReservedMedia, user));
     }
 
     @Test
