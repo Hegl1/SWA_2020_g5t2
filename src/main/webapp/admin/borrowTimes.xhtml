@@ -3,9 +3,12 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jstl/core"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
         <h2>Admin borrow times</h2>
+
+        <c:set value="#{null}" target="#{borrowTimesController}" property="mediaBorrowTimes" />
 
         <h:form id="borrowTimesForm">
             <p:dataTable

@@ -20,7 +20,6 @@ import java.util.Objects;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Media implements Persistable<Long>, Serializable {
-
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -57,7 +56,6 @@ public abstract class Media implements Persistable<Long>, Serializable {
 		this.language = language;
 		this.totalAvail = totalAvail;
 		this.curBorrowed = 0;
-		this.mediaType = mediaType;
 	}
 
 	public long getMediaID() {

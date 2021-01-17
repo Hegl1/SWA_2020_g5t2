@@ -44,5 +44,4 @@ public class Book extends Media {
 	public void setISBN(final String iSBN) {
 		this.ISBN = iSBN;
 	}
-
 }

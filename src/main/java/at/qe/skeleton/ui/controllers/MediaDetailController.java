@@ -54,6 +54,7 @@ public class MediaDetailController implements Serializable {
 	 */
 	public void setMedia(final Media media) {
 		this.media = media;
+		mediaService.refreshMedia(media);
 	}
 
 	/**
@@ -99,7 +100,7 @@ public class MediaDetailController implements Serializable {
 	 * Action to force a reload of the currently displayed media.
 	 */
 	public void doReloadMedia() {
-		this.media = this.mediaService.loadMedia(this.media.getMediaID());
+		mediaService.refreshMedia(media);
 	}
 
 	/**

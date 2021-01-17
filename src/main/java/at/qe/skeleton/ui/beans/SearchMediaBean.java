@@ -50,11 +50,10 @@ public class SearchMediaBean implements Serializable {
      * @param initResults the collection to initialize
      */
     public void setInit(Collection<Media> initResults) {
-        if(this.initResults != null) return;
-
         if(initResults != null){
             this.initResults = this.results = initResults;
         }else{
+            if(this.initResults != null) return;
             init();
         }
     }
