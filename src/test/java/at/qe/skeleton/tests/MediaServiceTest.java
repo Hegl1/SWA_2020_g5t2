@@ -3,6 +3,7 @@ package at.qe.skeleton.tests;
 import at.qe.skeleton.model.*;
 import at.qe.skeleton.services.MediaService;
 import at.qe.skeleton.ui.beans.ContextMocker;
+import at.qe.skeleton.ui.controllers.FMSpamController;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
@@ -25,10 +26,12 @@ public class MediaServiceTest {
     @Autowired
     private MediaService mediaService;
 
+
+
     @Test
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    public void testCreateAudioBook() {
+    public void testCreateAudioBook() throws MediaService.TotalAvailabilitySetTooLowException {
 
         this.mediaService.createAudioBook("Some French AudioBook", 2021, "FR", 12, "Frank Elstner", 42069, "Thomas Gottschalk", "1234-asdf");
         Media loadedNewAudioBook = this.mediaService.loadMedia(21L);
@@ -48,7 +51,7 @@ public class MediaServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    public void testCreateBook() {
+    public void testCreateBook() throws MediaService.TotalAvailabilitySetTooLowException {
 
         this.mediaService.createBook("Some Greek Book", 2020, "GR", 11, "Thomas Brezina", "5678-jkloe");
         Media loadedNewBook = this.mediaService.loadMedia(21L);
@@ -66,7 +69,7 @@ public class MediaServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    public void testCreateMagazine() {
+    public void testCreateMagazine() throws MediaService.TotalAvailabilitySetTooLowException {
 
         this.mediaService.createMagazine("Some Spanish Magazine", 2019, "ES", 10, "Test Series");
         Media loadedNewMagazine = this.mediaService.loadMedia(21L);
@@ -83,7 +86,7 @@ public class MediaServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
-    public void testCreateVideo() {
+    public void testCreateVideo() throws MediaService.TotalAvailabilitySetTooLowException {
 
         this.mediaService.createVideo("Some Portuguese Video", 2018, "PT", 9, 42068);
         Media loadedNewVideo = this.mediaService.loadMedia(21L);
@@ -116,12 +119,12 @@ public class MediaServiceTest {
     @Test
     @WithMockUser(username = "admin", authorities = { "ADMIN" })
     public void testDeleteMedia() {
-        // ignore FacesContext Messages that the mediaservice delete function uses
-        FacesContext context = ContextMocker.mockFacesContext();
-        Media toDeleteMedia = this.mediaService.loadMedia(4L);
+
+
+        Media toDeleteMedia = this.mediaService.loadMedia(1L);
         Assertions.assertNotNull(toDeleteMedia);
         this.mediaService.deleteMedia(toDeleteMedia);
-        Media notExistingMedia = this.mediaService.loadMedia(4L);
+        Media notExistingMedia = this.mediaService.loadMedia(1L);
         Assertions.assertNull(notExistingMedia);
     }
 }

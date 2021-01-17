@@ -28,6 +28,9 @@ public class BookmarkListController implements Serializable {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	FMSpamController fms;
+
 	/**
 	 * Returns a list of the current customers bookmarks.
 	 *

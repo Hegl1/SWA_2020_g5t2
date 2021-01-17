@@ -42,6 +42,9 @@ public class MediaDetailController implements Serializable {
 	BorrowService borrowService;
 
 	@Autowired
+	UndoRedoService undoRedoService;
+
+	@Autowired
 	BookmarkService bookmarkService;
 
 	@Autowired
@@ -51,7 +54,12 @@ public class MediaDetailController implements Serializable {
 	BookmarkRepository bookmarkRepository;
 
 	@Autowired
-	UndoRedoService undoRedoService;
+	ReservedController reservedController;
+
+
+	@Autowired
+	FMSpamController fms;
+
 
 	/**
 	 * Attribute to cache the currently displayed media
@@ -116,104 +124,112 @@ public class MediaDetailController implements Serializable {
 	 */
 	public void doSaveMedia() {
 		Media beforeEditMedia = mediaService.loadMedia(media.getId());
-		this.media = this.mediaService.saveMedia(this.media);
-		undoRedoService
-				.addAction(undoRedoService.createAction(beforeEditMedia, media, UndoRedoService.ActionType.EDIT_MEDIA));
+		try {
+			this.media = this.mediaService.saveMedia(this.media);
+			undoRedoService.addAction(undoRedoService.createAction(beforeEditMedia, media, UndoRedoService.ActionType.EDIT_MEDIA));
+		} catch (MediaService.TotalAvailabilitySetTooLowException e) {
+			System.out.println(e.getMessage());
+			fms.warn("It is not possible to set less available items than there are borrowed at the moment!");
+		}
 	}
 
-	/**
-	 * Action to delete the currently displayed media.
-	 */
-	public void doDeleteMedia() {
-		this.mediaService.deleteMedia(media);
-		this.media = null;
-		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage("asGrowl",
-				new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted - in Controller", ""));
-	}
+
+
+
+
+
+
+
+
 
 	/**
-	 * Intermediate function to close the loading window while safe deleting
+	 * Action to safely delete the currently displayed media.
 	 */
-	public void orderASafeDelete(final Media media) {
+	public void doDeleteMedia(final Media media) {
 
-		// a loading message is shown, as the deleting and mail sending process can take
-		// up to 20 seconds
-		doSafeDeleteMedia(media);
-		PrimeFaces.current().executeScript("PF('dataChangeDlg').hide()");
+		UndoRedoService.ActionItem deleteAction = undoRedoService.createAction(media,
+				UndoRedoService.ActionType.DELETE_MEDIA);
+
+		// Step 1: Check if the media is still borrowed
+		Collection<Borrowed> a1 = borrowService.getAllBorrowsByMedia(media);
+		if (a1.size() > 0) {
+
+			for (Borrowed a : a1) {
+
+				fms.warn("This media is still borrowed by : " + a.getUser().getUsername() + " and cannot be deleted");
+			}
+		} else {
+
+			doSafeDeleteMedia(media);
+		}
+		// optionally close the occuring loading message as the deleting and mail sending process can take a while
+		// PrimeFaces.current().executeScript("PF('dataChangeDlg').hide()");
 	}
 
 	/**
 	 * Safe delete - check if borrowings and bookmarks exist to a given media if
 	 * borrowings exist: do not delete if bookmarks exist: delete them and notify
 	 * with growl Messages and send email
-	 */
+	 * */
+
 	public void doSafeDeleteMedia(final Media media) {
 
 		UndoRedoService.ActionItem deleteAction = undoRedoService.createAction(media,
 				UndoRedoService.ActionType.DELETE_MEDIA);
 
-		// Step 1: Check if the media is still borrowed
-		FacesContext context = FacesContext.getCurrentInstance();
-		Collection<Borrowed> a1 = borrowService.getAllBorrowsByMedia(media);
-		if (a1.size() > 0) {
-			System.out.println("\nThis media is still borrowed by x " + a1.size() + " people.");
-			for (Borrowed a : a1) {
-				System.out.println("  by: " + a.getUser());
-				context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN,
-						"This media is still borrowed by : " + a.getUser().getUsername() + " and cannot be deleted.",
-						""));
+			{
+
+
+			// Step 2: Get a list of users that bookmarked this media eventually
+			Collection<Bookmark> a2 = bookmarkService.getBookmarkByMedia(media);
+			List<User> a2_s = new ArrayList<User>();
+			for (Bookmark b : a2) {
+				if (b.getMedia().getMediaID() == media.getMediaID()) {
+					a2_s.add(b.getUser());
+				}
 			}
-		} else {
-			System.out.println("\nnobody is borrowing it");
-		}
 
-		// Step 2: Get a list of users that bookmarked this media eventually
-		Collection<Bookmark> a2 = bookmarkService.getAllBookmarks();
-		List<User> a2_s = new ArrayList<User>();
-		for (Bookmark b : a2) {
-			if (b.getMedia().getMediaID() == media.getMediaID()) {
-				a2_s.add(b.getUser());
+			// Step 3: If the media is not borrowed and only bookmarked: Delete the media
+			// and bookmark entries and notify users
+			if (a2_s.size() > 0) {
+
+
+				for (User u : a2_s) {
+					bookmarkService.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(u, media));
+				}
+				for (User u : a2_s) {
+
+
+					fms.info("Media was deleted.");
+					mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
+							"The following Media is not available anymore: Title: " + media.getTitle() + ", Type: "
+									+ media.getMediaType() + ", Language: " + media.getLanguage() + ", Publishing Year: "
+									+ media.getPublishingYear());
+				}
+				// last but not least: remove reservations
+				if(reservedController.getReservationCountForMedia(media) > 0);
+				for (User u : a2_s) {
+					if(reservedController.isReservedForSpecialUser(media, u)){
+						reservedController.doRemoveReservationForSpecificUser(media, u);
+					}
+				}
+
+				undoRedoService.addAction(deleteAction);
+				this.mediaService.deleteMedia(media);
+				this.media = null;
+
+				fms.info("Media was deleted.");
+				fms.info("Please reload the page.");
+
+			} else {
+
+
+				// Step 4: Delete the media only if it has not been borrowed by somebody
+				undoRedoService.addAction(deleteAction);
+				this.mediaService.deleteMedia(media);
+				this.media = null;
+				fms.info("Please reload the page.");
 			}
-		}
-
-		// Step 3: If the media is not borrowed and only bookmarked: Delete the media
-		// and bookmark entries and notify users
-		int MediaAlreadyDeleted;
-		MediaAlreadyDeleted = 0;
-		if (a2_s.size() > 0) {
-
-			System.out.println("\nThis media is still bookmarked by some people: ");
-
-			for (User u : a2_s) {
-				System.out.println("  by: " + u.getUsername());
-				context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN,
-						"This media is still bookmarked by: " + u.getUsername(), ""));
-				bookmarkService.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(u, media));
-				mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
-						"The following Media is not available anymore: Title: " + media.getTitle() + ", Type: "
-								+ media.getMediaType() + ", Language: " + media.getLanguage() + ", Publishing Year: "
-								+ media.getPublishingYear());
-			}
-			undoRedoService.addAction(deleteAction);
-			this.mediaService.deleteMedia(media);
-			this.media = null;
-
-			System.out.println("\nMedia was deleted finally.");
-			MediaAlreadyDeleted = 1;
-			context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Please reload the page.", ""));
-
-		} else {
-			System.out.println("\nnobody is bookmarking it");
-		}
-
-		// Step 4: Delete the media only if it has not been borrowed by somebody and was
-		// not deleted in step 3
-		if ((!(a1.size() > 0) && (MediaAlreadyDeleted == 0))) {
-			undoRedoService.addAction(deleteAction);
-			this.mediaService.deleteMedia(media);
-			this.media = null;
-			context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Please reload the page.", ""));
 		}
 	}
 

@@ -80,7 +80,7 @@ public class UndoRedoService {
 	/**
 	 * Method that adds an action to the undoing queue.
 	 * The redo-queue will be emptied.
-	 * 
+	 *
 	 * @param action the action that should be prepared for undoing.
 	 */
 	public void addAction(final ActionItem action) {

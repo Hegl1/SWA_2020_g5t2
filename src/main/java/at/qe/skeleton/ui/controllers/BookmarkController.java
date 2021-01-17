@@ -21,6 +21,9 @@ public class BookmarkController implements Serializable {
 	@Autowired
 	private BookmarkService bookmarkService;
 
+	@Autowired
+	FMSpamController fms;
+
 	public void toggleBookmark(final Media media) {
 		UndoRedoService.ActionType action;
 		Bookmark target = bookmarkService.getBookmarkForAuthenticatedUserByMedia(media);
@@ -28,8 +31,10 @@ public class BookmarkController implements Serializable {
 		if (bookmarkService.toggleBookmark(media)) {
 			action = UndoRedoService.ActionType.SAVE_BOOKMARK;
 			target = bookmarkService.getBookmarkForAuthenticatedUserByMedia(media);
+			fms.info("Bookmark was added");
 		} else {
 			action = UndoRedoService.ActionType.DELETE_BOOKMARK;
+			fms.fatal("Bookmark was removed");
 		}
 
 	}
