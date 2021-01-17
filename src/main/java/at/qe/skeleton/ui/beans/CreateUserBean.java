@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import at.qe.skeleton.ui.controllers.FMSpamController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,9 +36,14 @@ public class CreateUserBean implements Serializable {
 	@Autowired
 	private UndoRedoService undoRedoService;
 
+	@Autowired
+	FMSpamController fms;
+
 	private User user;
 
 	private List<String> selectedUserRoles;
+
+
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void saveUser() {
@@ -51,8 +57,8 @@ public class CreateUserBean implements Serializable {
 		userService.saveUser(user);
 		undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.SAVE_USER));
 
-		FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_INFO, "Changes saved!", "");
-		FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
+		fms.info("Changes saved!");
+		fms.info("Please reload the page.");
 
 		this.user = null;
 	}

@@ -114,8 +114,11 @@ public class BorrowService implements CommandLineRunner {
 				unreserveMedia(current);
 			}
 		}
-
 	}
+
+
+
+
 
 	/**
 	 * Method that unborrows a Media (remove the Borrowed object from the database).
@@ -321,6 +324,8 @@ public class BorrowService implements CommandLineRunner {
 		logger.info("Email about freed media send to " + reserved.getUser().getEmail());
 		reservedRepository.delete(reserved);
 	}
+
+
 
 	/**
 	 * Method that retrieves all Reserved objects from the database.

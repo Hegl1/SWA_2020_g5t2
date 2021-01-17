@@ -76,7 +76,7 @@ public class MediaService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media createAudioBook(final String title, final int publishingYear, final String language, final int totalAvail,
-								 final String speaker, final int length, final String author, final String ISBN) {
+								 final String speaker, final int length, final String author, final String ISBN) throws TotalAvailabilitySetTooLowException {
 
 		Media newAudioBook = new AudioBook(title, publishingYear, language, totalAvail, speaker, length,
 				author, ISBN);
@@ -98,7 +98,7 @@ public class MediaService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media createBook(final String title, final int publishingYear, final String language,
-							final int totalAvail, final String author, final String ISBN) {
+							final int totalAvail, final String author, final String ISBN) throws TotalAvailabilitySetTooLowException {
 
 		Media newBook = new Book(title, publishingYear, language, totalAvail, author, ISBN);
 		this.saveMedia(newBook);
@@ -118,7 +118,7 @@ public class MediaService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media createMagazine(final String title, final int publishingYear, final String language,
-								final int totalAvail, final String series) {
+								final int totalAvail, final String series) throws TotalAvailabilitySetTooLowException {
 
 		Media newMagazine = new Magazine(title, publishingYear, language, totalAvail, series);
 		this.saveMedia(newMagazine);
@@ -138,7 +138,7 @@ public class MediaService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media createVideo(final String title, final int publishingYear, final String language,
-							 final int totalAvail, final int length) {
+							 final int totalAvail, final int length) throws TotalAvailabilitySetTooLowException {
 
 		Media newVideo = new Video(title, publishingYear, language, totalAvail, length);
 		this.saveMedia(newVideo);
@@ -219,9 +219,10 @@ public class MediaService {
 	 * @param media the media to delete
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public void deleteMedia(final Media media) {
-		this.mediaRepository.delete(media);
+	public void deleteMedia(final Media media) {		this.mediaRepository.delete(media);
 	}
+
+
 
 }
 

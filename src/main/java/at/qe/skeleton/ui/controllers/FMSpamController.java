@@ -1,5 +1,7 @@
 package at.qe.skeleton.ui.controllers;
 
+import at.qe.skeleton.ui.beans.SessionInfoBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,9 @@ import java.io.Serializable;
 @Scope("view")
 public class FMSpamController implements Serializable {
 
+    @Autowired
+    SessionInfoBean sessionInfoBean;
+
 
     /**
      * send with severity "info (green)"
@@ -21,8 +26,11 @@ public class FMSpamController implements Serializable {
      * @Param text the message
      */
     public void info(String text) {
-        FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, text, ""));
+        if(sessionInfoBean.isLoggedIn()){
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, text, ""));
+        }
+
     }
 
     /**
@@ -31,8 +39,11 @@ public class FMSpamController implements Serializable {
      * @Param text the message
      */
     public void warn(String text) {
-        FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN, text, ""));
+        if(sessionInfoBean.isLoggedIn()){
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_WARN, text, ""));
+        }
+
     }
 
     /**
@@ -41,8 +52,11 @@ public class FMSpamController implements Serializable {
      * @Param text the message
      */
     public void fatal(String text) {
-        FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_FATAL, text, ""));
+        if(sessionInfoBean.isLoggedIn()){
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_FATAL, text, ""));
+        }
+
     }
 
     /**
@@ -51,8 +65,11 @@ public class FMSpamController implements Serializable {
      * @Param text the message
      */
     public void error(String text) {
-        FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_ERROR, text, ""));
+        if(sessionInfoBean.isLoggedIn()){
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_ERROR, text, ""));
+        }
+
     }
 
 }

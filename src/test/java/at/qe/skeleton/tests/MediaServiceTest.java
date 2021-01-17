@@ -121,10 +121,10 @@ public class MediaServiceTest {
     public void testDeleteMedia() {
 
 
-        Media toDeleteMedia = this.mediaService.loadMedia(1L);
+        Media toDeleteMedia = this.mediaService.loadMedia(19L);
         Assertions.assertNotNull(toDeleteMedia);
         this.mediaService.deleteMedia(toDeleteMedia);
-        Media notExistingMedia = this.mediaService.loadMedia(1L);
+        Media notExistingMedia = this.mediaService.loadMedia(19L);
         Assertions.assertNull(notExistingMedia);
     }
 }

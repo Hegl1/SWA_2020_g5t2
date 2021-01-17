@@ -128,8 +128,7 @@ public class MediaDetailController implements Serializable {
 			this.media = this.mediaService.saveMedia(this.media);
 			undoRedoService.addAction(undoRedoService.createAction(beforeEditMedia, media, UndoRedoService.ActionType.EDIT_MEDIA));
 		} catch (MediaService.TotalAvailabilitySetTooLowException e) {
-			System.out.println(e.getMessage());
-			fms.warn("It is not possible to set less available items than there are borrowed at the moment!");
+			fms.warn(e.getMessage());
 		}
 	}
 
@@ -145,7 +144,7 @@ public class MediaDetailController implements Serializable {
 	/**
 	 * Action to safely delete the currently displayed media.
 	 */
-	public void doDeleteMedia(final Media media) {
+	public void deleteMedia(final Media media) {
 
 		UndoRedoService.ActionItem deleteAction = undoRedoService.createAction(media,
 				UndoRedoService.ActionType.DELETE_MEDIA);
@@ -179,7 +178,6 @@ public class MediaDetailController implements Serializable {
 
 			{
 
-
 			// Step 2: Get a list of users that bookmarked this media eventually
 			Collection<Bookmark> a2 = bookmarkService.getBookmarkByMedia(media);
 			List<User> a2_s = new ArrayList<User>();
@@ -196,11 +194,9 @@ public class MediaDetailController implements Serializable {
 
 				for (User u : a2_s) {
 					bookmarkService.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(u, media));
+					fms.info("The Bookmark for this Media was deleted from user: "+u.getUsername());
 				}
 				for (User u : a2_s) {
-
-
-					fms.info("Media was deleted.");
 					mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
 							"The following Media is not available anymore: Title: " + media.getTitle() + ", Type: "
 									+ media.getMediaType() + ", Language: " + media.getLanguage() + ", Publishing Year: "
@@ -211,6 +207,7 @@ public class MediaDetailController implements Serializable {
 				for (User u : a2_s) {
 					if(reservedController.isReservedForSpecialUser(media, u)){
 						reservedController.doRemoveReservationForSpecificUser(media, u);
+						fms.info("The Reservation for this Media was deleted from user: "+u.getUsername());
 					}
 				}
 
@@ -222,7 +219,6 @@ public class MediaDetailController implements Serializable {
 				fms.info("Please reload the page.");
 
 			} else {
-
 
 				// Step 4: Delete the media only if it has not been borrowed by somebody
 				undoRedoService.addAction(deleteAction);
