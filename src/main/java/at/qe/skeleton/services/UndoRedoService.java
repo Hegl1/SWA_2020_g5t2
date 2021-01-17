@@ -3,11 +3,9 @@ package at.qe.skeleton.services;
 import at.qe.skeleton.model.*;
 import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
 import at.qe.skeleton.services.UserService.UnauthorizedActionException;
-import at.qe.skeleton.ui.controllers.MediaDetailController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigurationPackage;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -193,7 +191,7 @@ public class UndoRedoService {
 	 * @return the constructed ActionItem or null if the wrong action type is used.
 	 */
 	public ActionItem createAction(final User user, final ActionType type) {
-		if (type.equals(ActionType.EDIT_MEDIA)) {
+		if (type.equals(ActionType.EDIT_USER)) {
 			logger.error("Action could not be saved for user " + user.getUsername()
 					+ " - wrong action type in wrong method");
 			return null;
@@ -354,7 +352,7 @@ public class UndoRedoService {
 				recacheMediaForBorrowed();
 
 				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
-					borrowService.unBorrowMedia(borrowed);
+					borrowService.unBorrowMedia(borrowed.getUser(), borrowed.getMedia());
 				} else {
 					borrowService.unBorrowMediaForAuthenticatedUser(borrowed.getMedia());
 				}

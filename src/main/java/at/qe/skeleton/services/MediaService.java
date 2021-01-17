@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
+
+;
 
 /**
  * Service for accessing and manipulating media data.
@@ -164,7 +166,7 @@ public class MediaService {
 	 * @param isAvailable
 	 * @return collection of filtered media
 	 */
-    public Collection<Media> filterMediaByAvailability(Collection<Media> filteredMedia, boolean isAvailable) {
+    public Collection<Media> filterMediaByAvailability(final Collection<Media> filteredMedia, final boolean isAvailable) {
         return filteredMedia.stream().filter(x ->
 				isAvailable == x.getAvailable()).collect(Collectors.toCollection(ArrayList::new));
     }

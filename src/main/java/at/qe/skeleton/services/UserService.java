@@ -5,9 +5,6 @@ import at.qe.skeleton.repositories.BookmarkRepository;
 import at.qe.skeleton.repositories.BorrowedRepository;
 import at.qe.skeleton.repositories.ReservedRepository;
 import at.qe.skeleton.repositories.UserRepository;
-
-
-import at.qe.skeleton.ui.controllers.FMSpamController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,7 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -34,7 +30,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
 	@Autowired
-	UserRepository userRepository;
+	private UserRepository userRepository;
 
 	@Autowired
 	private BorrowedRepository borrowedRepository;
@@ -46,7 +42,7 @@ public class UserService {
 	private ReservedRepository reservedRepository;
 
 	@Autowired
-	MailService mailService;
+	private MailService mailService;
 
 
 
@@ -245,7 +241,6 @@ public class UserService {
 			if (still_borrowed.size() != 0) {
 
 				throw new UnauthorizedActionException("User cannot be deleted: There is a Media that the user has not returned yet!");
-
 			} else {
 				// delete Bookmarks
 				List<Bookmark> still_bookmarked = bookmarkRepository.findByUsername(user.getUsername());

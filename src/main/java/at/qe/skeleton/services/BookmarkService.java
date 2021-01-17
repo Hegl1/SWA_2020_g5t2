@@ -1,16 +1,15 @@
 package at.qe.skeleton.services;
 
-import java.util.Collection;
-import java.util.List;
-import at.qe.skeleton.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import at.qe.skeleton.model.Bookmark;
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.BookmarkRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Service for listing the customers own bookmarks.
@@ -21,14 +20,10 @@ import at.qe.skeleton.repositories.BookmarkRepository;
 public class BookmarkService {
 
 	@Autowired
-	BookmarkRepository bookmarkRepository;
+	private BookmarkRepository bookmarkRepository;
 
 	@Autowired
-	UserService userService;
-
-	@Autowired
-	UserRepository userRepository;
-
+	private UserService userService;
 
 	/**
 	 * Returns a collection of all the bookmarks.
@@ -71,51 +66,6 @@ public class BookmarkService {
 		return bookmark.getMedia().getTitle();
 	}
 
-	public String getMediaInfo(final Bookmark bookmark) {
-
-		switch (bookmark.getMedia().getMediaType().toString()) {
-		case "BOOK":
-			return "Book - author";
-
-		case "AUDIOBOOK":
-			return "Audiobook - author";
-
-		case "MAGAZINE":
-			return "Magazine - series";
-
-		case "VIDEO":
-			return "Video - length";
-
-		default:
-			return "Media type not defined";
-		}
-	}
-
-	/**
-	 * Display if a bookmark is currently borrowed
-	 *
-	 * @param bookmark of the wanted bookmark
-	 * @return 0 (available) or 1 (not available)
-	 */
-	public String getIfCurrentBorrowed(final Bookmark bookmark) {
-
-		switch (bookmark.getMedia().getCurBorrowed()) {
-		case 0:
-			return "available";
-
-		case 1:
-			return "not available";
-
-		default:
-			return "availability status not defined";
-		}
-	}
-	/**
-	 * Check if the current user has bookmarked a media
-	 *
-	 * @param media
-	 * @return true if it is bookmarked
-	 */
 	public boolean isBookmarkedForAuthenticatedUser(final Media media) {
 		User myUser = userService.loadCurrentUser();
 		Bookmark b_check = bookmarkRepository.findFirstByUserAndMedia(myUser, media);
@@ -150,7 +100,6 @@ public class BookmarkService {
 			mark.setUser(myUser);
 			bookmarkRepository.save(mark);
 		}
-
 	}
 
 	/**
@@ -199,7 +148,7 @@ public class BookmarkService {
 	 *
 	 * @param bookmark
 	 */
-	public void addBookmark(final Bookmark bookmark) {
+	public void saveBookmark(final Bookmark bookmark) {
 		bookmarkRepository.save(bookmark);
 	}
 

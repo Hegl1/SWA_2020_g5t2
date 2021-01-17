@@ -1,22 +1,17 @@
 package at.qe.skeleton.ui.beans;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.List;
-
-import at.qe.skeleton.ui.controllers.FMSpamController;
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.services.MediaService;
+import at.qe.skeleton.services.UndoRedoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.services.MediaService;
-import at.qe.skeleton.services.UndoRedoService;
-
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.Serializable;
 
 @Component
 @Scope("view")
