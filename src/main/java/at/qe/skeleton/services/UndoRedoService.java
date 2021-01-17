@@ -190,7 +190,7 @@ public class UndoRedoService {
 	 * @return the constructed ActionItem or null if the wrong action type is used.
 	 */
 	public ActionItem createAction(final User user, final ActionType type) {
-		if (type.equals(ActionType.EDIT_MEDIA)) {
+		if (type.equals(ActionType.EDIT_USER)) {
 			logger.error("Action could not be saved for user " + user.getUsername()
 					+ " - wrong action type in wrong method");
 			return null;
@@ -351,7 +351,7 @@ public class UndoRedoService {
 				recacheMediaForBorrowed();
 
 				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
-					borrowService.unBorrowMedia(borrowed);
+					borrowService.unBorrowMedia(borrowed.getUser(), borrowed.getMedia());
 				} else {
 					borrowService.unBorrowMediaForAuthenticatedUser(borrowed.getMedia());
 				}
