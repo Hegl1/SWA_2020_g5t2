@@ -9,6 +9,6 @@
     <ui:define name="content">
         <h2>List media</h2>
 
-        <lib:MediaList mediaList="#{searchMediaBean.results}" context="list" id="mediaList"></lib:MediaList>
+        <lib:MediaList mediaList="#{mediaListController.media}" context="list" id="mediaList" />
     </ui:define>
 </ui:composition>

@@ -207,5 +207,7 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	 *
 	 * @return true if there are copies available, false otherwise
 	 */
-	public boolean getAvailable() { return totalAvail - curBorrowed > 0; }
+	public boolean getAvailable() {
+		return totalAvail > curBorrowed;
+	}
 }
