@@ -1,19 +1,15 @@
 package at.qe.skeleton.services;
 
-import java.util.Collection;
-import java.util.List;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import at.qe.skeleton.model.Bookmark;
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.BookmarkRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Service for listing the customers own bookmarks.
@@ -70,40 +66,6 @@ public class BookmarkService {
 		return bookmark.getMedia().getTitle();
 	}
 
-	public String getMediaInfo(final Bookmark bookmark) {
-
-		switch (bookmark.getMedia().getMediaType().toString()) {
-		case "BOOK":
-			return "Book - author";
-
-		case "AUDIOBOOK":
-			return "Audiobook - author";
-
-		case "MAGAZINE":
-			return "Magazine - series";
-
-		case "VIDEO":
-			return "Video - length";
-
-		default:
-			return "Media type not defined";
-		}
-	}
-
-	public String getIfCurrentBorrowed(final Bookmark bookmark) {
-
-		switch (bookmark.getMedia().getCurBorrowed()) {
-		case 0:
-			return "available";
-
-		case 1:
-			return "not available";
-
-		default:
-			return "availability status not defined";
-		}
-	}
-
 	public boolean isBookmarkedForAuthenticatedUser(final Media media) {
 		User myUser = userService.loadCurrentUser();
 		Bookmark b_check = bookmarkRepository.findFirstByUserAndMedia(myUser, media);
@@ -122,8 +84,6 @@ public class BookmarkService {
 		}
 
 		bookmarkRepository.delete(bookmark);
-		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_FATAL, "Bookmark was removed.", ""));
 	}
 
 	/**
@@ -139,12 +99,6 @@ public class BookmarkService {
 			mark.setMedia(media);
 			mark.setUser(myUser);
 			bookmarkRepository.save(mark);
-			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "Bookmark was added.", ""));
-		} else {
-			FacesContext context = FacesContext.getCurrentInstance();
-			FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_WARN, "Bookmark was already made!", "");
-			FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
 		}
 	}
 
@@ -179,21 +133,44 @@ public class BookmarkService {
 		return bookmarkRepository.findFirstByUserAndMedia(myUser, media);
 	}
 
+	/**
+	 * Returns the bookmarks that fit to a given media
+	 *
+	 * @param media the media to search for
+	 * @return a list of bookmarks of that media
+	 */
 	public List<Bookmark> getBookmarkByMedia(final Media media) {
 		return bookmarkRepository.findByMedia(media);
 	}
 
-	public void addBookmark(final Bookmark bookmark) {
+	/**
+	 * add a bookmark to the repository
+	 *
+	 * @param bookmark
+	 */
+	public void saveBookmark(final Bookmark bookmark) {
 		bookmarkRepository.save(bookmark);
 	}
 
+	/**
+	 * add a bookmark for a specified user to the repository
+	 *
+	 * @param user
+	 * @param media
+	 */
 	public void addBookmark(final User user, final Media media) {
 		Bookmark bookmark = new Bookmark();
 		bookmark.setMedia(media);
 		bookmark.setUser(user);
 		bookmarkRepository.save(bookmark);
 	}
-
+	/**
+	 * return a bookmark that fits to a specific user and media
+	 *
+	 * @param user
+	 * @param media
+	 * @return bookmark
+	 */
 	public Bookmark getBookmarkByUserAndMedia(final User user, final Media media) {
 		return this.bookmarkRepository.findFirstByUserAndMedia(user, media);
 	}

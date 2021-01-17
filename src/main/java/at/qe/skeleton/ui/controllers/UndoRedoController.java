@@ -1,5 +1,6 @@
 package at.qe.skeleton.ui.controllers;
 
+import at.qe.skeleton.services.MediaService;
 import at.qe.skeleton.services.UndoRedoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -37,10 +38,8 @@ public class UndoRedoController implements Serializable {
 	/**
 	 * Method that undoes the last saved action and
 	 * outputs a growl message for it
-	 *
-	 * @return the undid action-type
 	 */
-	public void undoLastAction(){
+	public void undoLastAction() throws MediaService.TotalAvailabilitySetTooLowException {
 		UndoRedoService.ActionType type = undoRedoService.undoLastAction();
 
 		String message;
@@ -89,10 +88,8 @@ public class UndoRedoController implements Serializable {
 	/**
 	 * Method that redoes the last action and
 	 * outputs a growl message for it
-	 *
-	 * @return the redid action-type
 	 */
-	public void redoLastAction(){
+	public void redoLastAction() throws MediaService.TotalAvailabilitySetTooLowException {
 		UndoRedoService.ActionType type = undoRedoService.redoLastAction();
 
 		String message;

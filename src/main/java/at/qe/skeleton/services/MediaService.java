@@ -7,8 +7,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -44,13 +42,22 @@ public class MediaService {
 	 *
 	 * @return saved media
 	 */
-	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public Media saveMedia(final Media media) {
+	public Media saveMedia(final Media media) throws TotalAvailabilitySetTooLowException {
 
-		if (media.getTotalAvail() < media.getCurBorrowed()){
-			//TODO: throw Exception
+		if (media.getTotalAvail() < media.getCurBorrowed()) {
+			throw new TotalAvailabilitySetTooLowException("You cannot set less available items than are currently borrowed by persons");
+		} else{
+			return this.mediaRepository.save(media);
 		}
-		return this.mediaRepository.save(media);
+
+	}
+
+	public static class TotalAvailabilitySetTooLowException extends Exception {
+		private static final long serialVersionUID = 1L;
+
+		public TotalAvailabilitySetTooLowException(final String message) {
+			super(message);
+		}
 	}
 
 	/**
@@ -69,7 +76,7 @@ public class MediaService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media createAudioBook(final String title, final int publishingYear, final String language, final int totalAvail,
-								 final String speaker, final int length, final String author, final String ISBN) {
+								 final String speaker, final int length, final String author, final String ISBN) throws TotalAvailabilitySetTooLowException {
 
 		Media newAudioBook = new AudioBook(title, publishingYear, language, totalAvail, speaker, length,
 				author, ISBN);
@@ -91,7 +98,7 @@ public class MediaService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media createBook(final String title, final int publishingYear, final String language,
-							final int totalAvail, final String author, final String ISBN) {
+							final int totalAvail, final String author, final String ISBN) throws TotalAvailabilitySetTooLowException {
 
 		Media newBook = new Book(title, publishingYear, language, totalAvail, author, ISBN);
 		this.saveMedia(newBook);
@@ -111,7 +118,7 @@ public class MediaService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media createMagazine(final String title, final int publishingYear, final String language,
-								final int totalAvail, final String series) {
+								final int totalAvail, final String series) throws TotalAvailabilitySetTooLowException {
 
 		Media newMagazine = new Magazine(title, publishingYear, language, totalAvail, series);
 		this.saveMedia(newMagazine);
@@ -131,7 +138,7 @@ public class MediaService {
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public Media createVideo(final String title, final int publishingYear, final String language,
-							 final int totalAvail, final int length) {
+							 final int totalAvail, final int length) throws TotalAvailabilitySetTooLowException {
 
 		Media newVideo = new Video(title, publishingYear, language, totalAvail, length);
 		this.saveMedia(newVideo);
@@ -154,10 +161,10 @@ public class MediaService {
 	 * Filters a selected collection of media by availability
 	 *
 	 * @param filteredMedia the collection which gets filtered
-	 * @param isAvailable
+	 * @param isAvailable whether the media must be available or not available
 	 * @return collection of filtered media
 	 */
-    public Collection<Media> filterMediaByAvailability(Collection<Media> filteredMedia, boolean isAvailable) {
+    public Collection<Media> filterMediaByAvailability(final Collection<Media> filteredMedia, final boolean isAvailable) {
         return filteredMedia.stream().filter(x ->
 				isAvailable == x.getAvailable()).collect(Collectors.toCollection(ArrayList::new));
     }
@@ -212,11 +219,7 @@ public class MediaService {
 	 * @param media the media to delete
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public void deleteMedia(final Media media) {
-		this.mediaRepository.delete(media);
-		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage("asGrowl",
-				new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted - in Service", ""));
+	public void deleteMedia(final Media media) {		this.mediaRepository.delete(media);
 	}
 
 	/**

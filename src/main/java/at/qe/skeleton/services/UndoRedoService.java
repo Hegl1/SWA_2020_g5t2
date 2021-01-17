@@ -37,13 +37,13 @@ public class UndoRedoService {
 	 * Double ended Queue that holds ActionItems to undo. Is basically used as a
 	 * stack.
 	 */
-	private Deque<ActionItem> unDoQueue;
+	private final Deque<ActionItem> unDoQueue;
 
 	/**
 	 * Double ended Queue that holds ActionItems to redo. Is basically used as a
 	 * stack.
 	 */
-	private Deque<ActionItem> reDoQueue;
+	private final Deque<ActionItem> reDoQueue;
 
 	@Autowired
 	private UserService userService;
@@ -60,7 +60,8 @@ public class UndoRedoService {
 	@Autowired
 	private MediaBorrowTimeRepository mediaBorrowTimeRepository;
 
-	private Logger logger = LoggerFactory.getLogger(UndoRedoService.class);
+
+	private final Logger logger = LoggerFactory.getLogger(UndoRedoService.class);
 
 	/**
 	 * Constant that represents the number of maximum states that can be undone.
@@ -71,16 +72,16 @@ public class UndoRedoService {
 	 * Default constructor for UndoRedoService. Instantiates dequeues for undoing
 	 * and redoing.
 	 */
-	@Autowired(required = true)
+	@Autowired
 	public UndoRedoService() {
-		unDoQueue = new ArrayDeque<ActionItem>(MAX_SAVED_STATES + 1);
-		reDoQueue = new ArrayDeque<ActionItem>(MAX_SAVED_STATES + 1);
+		unDoQueue = new ArrayDeque<>(MAX_SAVED_STATES + 1);
+		reDoQueue = new ArrayDeque<>(MAX_SAVED_STATES + 1);
 	}
 
 	/**
 	 * Method that adds an action to the undoing queue.
 	 * The redo-queue will be emptied.
-	 * 
+	 *
 	 * @param action the action that should be prepared for undoing.
 	 */
 	public void addAction(final ActionItem action) {
@@ -97,7 +98,7 @@ public class UndoRedoService {
 	 *
 	 * @return the undid action-type
 	 */
-	public ActionType undoLastAction() {
+	public ActionType undoLastAction() throws MediaService.TotalAvailabilitySetTooLowException {
 		ActionItem action = unDoQueue.pop();
 		if (action != null) {
 			action.performUndoAction();
@@ -117,7 +118,7 @@ public class UndoRedoService {
 	 *
 	 * @return the redid action-type
 	 */
-	public ActionType redoLastAction() {
+	public ActionType redoLastAction() throws MediaService.TotalAvailabilitySetTooLowException {
 		ActionItem action = reDoQueue.pop();
 		if (action != null) {
 			action.performRedoAction();
@@ -190,7 +191,7 @@ public class UndoRedoService {
 	 * @return the constructed ActionItem or null if the wrong action type is used.
 	 */
 	public ActionItem createAction(final User user, final ActionType type) {
-		if (type.equals(ActionType.EDIT_MEDIA)) {
+		if (type.equals(ActionType.EDIT_USER)) {
 			logger.error("Action could not be saved for user " + user.getUsername()
 					+ " - wrong action type in wrong method");
 			return null;
@@ -279,7 +280,7 @@ public class UndoRedoService {
 	 * undoing and redoing the saved action.
 	 *
 	 */
-	public abstract class ActionItem {
+	public abstract static class ActionItem {
 
 		/**
 		 * Type that is used to choose the correct counter action
@@ -289,12 +290,12 @@ public class UndoRedoService {
 		/**
 		 * method that undoes the recent action.
 		 */
-		abstract void performUndoAction();
+		abstract void performUndoAction() throws MediaService.TotalAvailabilitySetTooLowException;
 
 		/**
 		 * method that redoes the recent action.
 		 */
-		abstract void performRedoAction();
+		abstract void performRedoAction() throws MediaService.TotalAvailabilitySetTooLowException;
 	}
 
 	// TODO: fix authorization errors for customers in undo/redo
@@ -351,7 +352,7 @@ public class UndoRedoService {
 				recacheMediaForBorrowed();
 
 				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
-					borrowService.unBorrowMedia(borrowed);
+					borrowService.unBorrowMedia(borrowed.getUser(), borrowed.getMedia());
 				} else {
 					borrowService.unBorrowMediaForAuthenticatedUser(borrowed.getMedia());
 				}
@@ -501,7 +502,7 @@ public class UndoRedoService {
 		}
 
 		@Override
-		void performUndoAction() {
+		void performUndoAction() throws MediaService.TotalAvailabilitySetTooLowException {
 			if (type.equals(ActionType.SAVE_MEDIA)) {
 				saveMetaInfo();
 				mediaService.deleteMedia(beforeEditMedia);
@@ -517,7 +518,7 @@ public class UndoRedoService {
 		}
 
 		@Override
-		void performRedoAction() {
+		void performRedoAction() throws MediaService.TotalAvailabilitySetTooLowException {
 			if (type.equals(ActionType.SAVE_MEDIA)) {
 				restoreMetaInfo();
 				beforeEditMedia = mediaService.saveMedia(beforeEditMedia);

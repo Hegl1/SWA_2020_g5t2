@@ -1,24 +1,20 @@
 package at.qe.skeleton.ui.beans;
 
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.services.UndoRedoService;
+import at.qe.skeleton.services.UserService;
+import at.qe.skeleton.ui.controllers.FMSpamController;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
-import at.qe.skeleton.services.UndoRedoService;
-import at.qe.skeleton.services.UserService;
-import net.bytebuddy.utility.RandomString;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Component
 @Scope("view")
@@ -35,9 +31,14 @@ public class CreateUserBean implements Serializable {
 	@Autowired
 	private UndoRedoService undoRedoService;
 
+	@Autowired
+	FMSpamController fms;
+
 	private User user;
 
 	private List<String> selectedUserRoles;
+
+
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void saveUser() {
@@ -51,8 +52,8 @@ public class CreateUserBean implements Serializable {
 		userService.saveUser(user);
 		undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.SAVE_USER));
 
-		FacesMessage asGrowl = new FacesMessage(FacesMessage.SEVERITY_INFO, "Changes saved!", "");
-		FacesContext.getCurrentInstance().addMessage("asGrowl", asGrowl);
+		fms.info("Changes saved!");
+		fms.info("Please reload the page.");
 
 		this.user = null;
 	}

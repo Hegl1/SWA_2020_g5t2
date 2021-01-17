@@ -5,6 +5,7 @@ import org.springframework.data.domain.Persistable;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Entity representing a general Media. Only exists as in more concrete classes,
@@ -147,6 +148,51 @@ public abstract class Media implements Persistable<Long>, Serializable {
 	@Override
 	public boolean isNew() {
 		return this.mediaID == null;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+
+		Media media = (Media) o;
+
+		if (this.publishingYear == media.publishingYear && this.totalAvail == media.totalAvail &&
+				this.curBorrowed == media.curBorrowed && Objects.equals(this.mediaID, media.mediaID) &&
+				Objects.equals(this.title, media.title) && Objects.equals(this.language, media.language) &&
+				this.mediaType == media.mediaType) {
+
+			switch (this.mediaType) {
+
+				case AUDIOBOOK:
+					return ((AudioBook) this).getAuthor().equals(((AudioBook) media).getAuthor()) &&
+							((AudioBook) this).getISBN().equals(((AudioBook) media).getISBN()) &&
+							((AudioBook) this).getLength() == ((AudioBook) media).getLength() &&
+							((AudioBook) this).getSpeaker().equals(((AudioBook) media).getSpeaker());
+
+				case BOOK:
+					return ((Book) this).getAuthor().equals(((Book) media).getAuthor()) &&
+							((Book) this).getISBN().equals(((Book) media).getISBN());
+
+				case MAGAZINE:
+					return ((Magazine) this).getSeries().equals(((Magazine) media).getSeries());
+
+				case VIDEO:
+					return ((Video) this).getLength() == (((Video) media).getLength());
+			}
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(mediaID, title, publishingYear, language, totalAvail, curBorrowed, mediaType);
 	}
 
 	/**

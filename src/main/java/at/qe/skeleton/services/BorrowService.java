@@ -1,11 +1,10 @@
 package at.qe.skeleton.services;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import at.qe.skeleton.model.*;
+import at.qe.skeleton.repositories.BorrowedRepository;
+import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
+import at.qe.skeleton.repositories.MediaRepository;
+import at.qe.skeleton.repositories.ReservedRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +14,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaBorrowTime;
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.model.Reserved;
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.repositories.BorrowedRepository;
-import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
-import at.qe.skeleton.repositories.MediaRepository;
-import at.qe.skeleton.repositories.ReservedRepository;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class that is used for the borrowing process, reservation process and
@@ -66,7 +60,7 @@ public class BorrowService implements CommandLineRunner {
 	@Autowired
 	private UserService userService;
 
-	private Logger logger = LoggerFactory.getLogger(BorrowService.class);
+	private final Logger logger = LoggerFactory.getLogger(BorrowService.class);
 
 	/**
 	 * Method that constructs a Borrowed object and saves it in the database.
@@ -235,7 +229,7 @@ public class BorrowService implements CommandLineRunner {
 	 * 
 	 * @param reserved Reserved object to save.
 	 */
-	public void reserveMedia(final Reserved reserved) {
+	public void saveReserved(final Reserved reserved) {
 		reservedRepository.save(reserved);
 	}
 
@@ -264,6 +258,22 @@ public class BorrowService implements CommandLineRunner {
 	}
 
 	/**
+	 * Removes a reservation of the media for the authenticated user
+	 *
+	 * @param media the media
+	 * @param user the user
+	 */
+	public void removeReservationForSpecificUser(final Media media, final User user) {
+		User specific_user = userService.loadUser(user.getUsername());
+
+		Reserved r = reservedRepository.findFirstByUserAndMedia(specific_user, media);
+
+		if (r != null) {
+			reservedRepository.delete(r);
+		}
+	}
+
+	/**
 	 * Returns whether the authenticated user has reserved this media or not
 	 *
 	 * @param media the media to search for
@@ -274,6 +284,21 @@ public class BorrowService implements CommandLineRunner {
 
 		return reservedRepository.findFirstByUserAndMedia(user, media) != null;
 	}
+
+	/**
+	 * Returns whether the authenticated user has reserved this media or not
+	 *
+	 * @param media the media to search for
+	 * @return true, if he has reserved it, false otherwise
+	 */
+	public boolean isReservedForSpecialUser(final Media media, final User user) {
+		User searched_user = userService.loadUser(user.getUsername());
+
+		return reservedRepository.findFirstByUserAndMedia(searched_user, media) != null;
+	}
+
+
+
 
 	/**
 	 * Method that unreserves a Media for a User. Automatically sends an email to
@@ -289,9 +314,7 @@ public class BorrowService implements CommandLineRunner {
 		bodyBuild.append("\" is available again for borrowing.\n\n");
 		bodyBuild.append("Yours sincerely,\nThe Library Team");
 		String body = bodyBuild.toString();
-		StringBuilder headBuild = new StringBuilder("Borrowing of ");
-		headBuild.append(targetMedia.getTitle());
-		String head = headBuild.toString();
+		String head = "Borrowing of " + targetMedia.getTitle();
 		mailService.sendMail(reserved.getUser().getEmail(), head, body);
 		logger.info("Email about freed media send to " + reserved.getUser().getEmail());
 		reservedRepository.delete(reserved);
@@ -407,7 +430,7 @@ public class BorrowService implements CommandLineRunner {
 	 * the scheduler work from the start of the project.
 	 */
 	@Override
-	public void run(final String... args) throws Exception {
+	public void run(final String... args) {
 		// used for initial loading of the component so scheduled task starts
 		logger.info("BorrowService Component loaded at startup");
 	}

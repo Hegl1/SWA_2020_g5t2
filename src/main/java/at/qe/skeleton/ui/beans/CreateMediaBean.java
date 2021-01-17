@@ -1,16 +1,17 @@
 package at.qe.skeleton.ui.beans;
 
-import java.io.Serializable;
-import java.util.List;
-
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.services.MediaService;
+import at.qe.skeleton.services.UndoRedoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.services.MediaService;
-import at.qe.skeleton.services.UndoRedoService;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.Serializable;
 
 @Component
 @Scope("view")
@@ -50,48 +51,67 @@ public class CreateMediaBean implements Serializable {
 	 * Create different Medias.
 	 */
 
-	private void doCreateAudioBook() {
+	private void doCreateAudioBook() throws MediaService.TotalAvailabilitySetTooLowException {
 		Media media = this.mediaService.createAudioBook(title, publishingDate, language, totalAvail,
 				 speaker, length, author, ISBN);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	private void doCreateBook() {
+	private void doCreateBook() throws MediaService.TotalAvailabilitySetTooLowException {
 		Media media = this.mediaService.createBook(title, publishingDate, language, totalAvail, author, ISBN);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	private void doCreateMagazine() {
+	private void doCreateMagazine() throws MediaService.TotalAvailabilitySetTooLowException {
 		Media media = this.mediaService.createMagazine(title, publishingDate, language, totalAvail, series);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	private void doCreateVideo() {
+	private void doCreateVideo() throws MediaService.TotalAvailabilitySetTooLowException {
 		Media media = this.mediaService.createVideo(title, publishingDate, language, totalAvail, length);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	public void doCreateMedia() {
-		switch (mediaType) {
-		case "VIDEO":
-			doCreateVideo();
-			break;
-		case "BOOK":
-			doCreateBook();
-			break;
-		case "AUDIOBOOK":
-			doCreateAudioBook();
-			break;
-		case "MAGAZINE":
-			doCreateMagazine();
-			break;
+	public void doCreateMedia() throws MediaService.TotalAvailabilitySetTooLowException {
+
+		try{
+
+			switch (mediaType) {
+			case "VIDEO":
+				doCreateVideo();
+
+				break;
+			case "BOOK":
+				doCreateBook();
+
+				break;
+			case "AUDIOBOOK":
+				doCreateAudioBook();
+
+				break;
+			case "MAGAZINE":
+				doCreateMagazine();
+
+				break;
+			}
+
+			this.reset();
+
+			reloadPage();
+
+		} catch (IllegalStateException | IOException exception) {
 		}
 
-		this.reset();
+	}
+
+	public void reloadPage() throws java.io.IOException {
+		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+
 	}
 
 	public String getTitle() {
