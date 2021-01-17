@@ -25,9 +25,12 @@ public class BorrowTimesController implements Serializable {
 	@Autowired
 	private UndoRedoService undoRedoService;
 
-	@PostConstruct
-	public void init() {
-		this.mediaBorrowTimes = mediaBorrowTimeRepository.findAll();
+	public void setMediaBorrowTimes(Collection<MediaBorrowTime> mediaBorrowTimes) {
+		if(mediaBorrowTimes == null){
+			this.mediaBorrowTimes = mediaBorrowTimeRepository.findAll();
+		}else{
+			this.mediaBorrowTimes = mediaBorrowTimes;
+		}
 	}
 
 	public Collection<MediaBorrowTime> getMediaBorrowTimes() {

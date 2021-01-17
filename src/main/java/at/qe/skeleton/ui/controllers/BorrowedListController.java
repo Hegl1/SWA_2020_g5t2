@@ -31,14 +31,6 @@ public class BorrowedListController implements Serializable {
 	private BorrowService borrowService;
 
 	@Autowired
-	private MediaRepository mediaRepository;
-
-	private Borrowed borrowed;
-
-	@Autowired
-	private UserService userService;
-
-	@Autowired
 	private MediaBorrowTimeRepository mediaBorrowTimeRepository;
 
 	@Autowired
