@@ -1,19 +1,10 @@
 package at.qe.skeleton.model;
 
+import org.springframework.data.domain.Persistable;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Locale;
-
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.SequenceGenerator;
-
-import org.springframework.data.domain.Persistable;
 
 /**
  * Entity representing a general Media. Only exists as in more concrete classes,
@@ -28,7 +19,6 @@ import org.springframework.data.domain.Persistable;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Media implements Persistable<Long>, Serializable {
-
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -65,7 +55,6 @@ public abstract class Media implements Persistable<Long>, Serializable {
 		this.language = language;
 		this.totalAvail = totalAvail;
 		this.curBorrowed = 0;
-		this.mediaType = mediaType;
 	}
 
 	public long getMediaID() {

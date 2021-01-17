@@ -49,6 +49,9 @@ public class BorrowService implements CommandLineRunner {
 	private BorrowedRepository borrowedRepository;
 
 	@Autowired
+	private MediaService mediaService;
+
+	@Autowired
 	private ReservedRepository reservedRepository;
 
 	@Autowired
@@ -70,10 +73,12 @@ public class BorrowService implements CommandLineRunner {
 	 * 
 	 * @param borrower      the user who borrows the media.
 	 * @param mediaToBorrow the media which gets borrowed by the user
-	 * @return true if borrowing was successfull, else false.
+	 * @return true if borrowing was successful, else false.
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public boolean borrowMedia(final User borrower, final Media mediaToBorrow) {
+		mediaService.refreshMedia(mediaToBorrow);
+
 		if (!mediaToBorrow.getAvailable() || borrower == null) {
 			return false;
 		} else {
@@ -89,8 +94,8 @@ public class BorrowService implements CommandLineRunner {
 	 * Method that constructs a Borrowed object and saves it in the database, uses
 	 * the authenticated user for Borrows user.
 	 * 
-	 * @param media the media to borro
-	 * @return true if borrowing was successfull, else false.
+	 * @param media the media to borrow
+	 * @return true if borrowing was successful, else false.
 	 */
 	public boolean borrowMediaForAuthenticatedUser(final Media media) {
 		User borrower = userService.loadCurrentUser();
@@ -106,6 +111,7 @@ public class BorrowService implements CommandLineRunner {
 	public void unBorrowMedia(final Borrowed borrowed) {
 		if (borrowed != null) {
 			borrowedRepository.delete(borrowed);
+			mediaService.refreshMedia(borrowed.getMedia());
 			borrowed.getMedia().setCurBorrowed(borrowed.getMedia().getCurBorrowed() - 1);
 			mediaRepository.save(borrowed.getMedia());
 			Collection<Reserved> reservations = reservedRepository.findByMedia(borrowed.getMedia());
@@ -178,7 +184,7 @@ public class BorrowService implements CommandLineRunner {
 	}
 
 	/**
-	 * Method that retrieves all Borrowed objects related to a certian media.
+	 * Method that retrieves all Borrowed objects related to a certain media.
 	 * 
 	 * @param media the Media to get the Borrowed objects for.
 	 * @return a Collection of all stored Borrowed objects for the given media.
@@ -234,7 +240,7 @@ public class BorrowService implements CommandLineRunner {
 	}
 
 	/**
-	 * Method that reserves a Media for the currently authenticaed User.
+	 * Method that reserves a Media for the currently authenticated User.
 	 * 
 	 * @param mediaToReserve the Media which should be reserved.
 	 */

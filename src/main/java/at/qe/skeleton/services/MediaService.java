@@ -219,5 +219,52 @@ public class MediaService {
 				new FacesMessage(FacesMessage.SEVERITY_INFO, "Media was deleted - in Service", ""));
 	}
 
+	/**
+	 * Refreshes the media with data from the database
+	 *
+	 * @param media the media to refresh
+	 */
+	public void refreshMedia(final Media media) {
+		if(media.isNew()) return;
+
+		Media refresh = this.mediaRepository.findFirstByMediaID(media.getMediaID());
+
+		media.setTitle(refresh.getTitle());
+		media.setPublishingYear(refresh.getPublishingYear());
+		media.setLanguage(refresh.getLanguage());
+		media.setTotalAvail(refresh.getTotalAvail());
+		media.setCurBorrowed(refresh.getCurBorrowed());
+
+		switch(media.getMediaType()){
+			case BOOK:
+				Book book = (Book) media;
+				Book refreshBook = (Book) refresh;
+
+				book.setAuthor(refreshBook.getAuthor());
+				book.setISBN(refreshBook.getISBN());
+				break;
+			case AUDIOBOOK:
+				AudioBook audiobook = (AudioBook) media;
+				AudioBook refreshAudioBook = (AudioBook) refresh;
+
+				audiobook.setSpeaker(refreshAudioBook.getSpeaker());
+				audiobook.setLength(refreshAudioBook.getLength());
+				audiobook.setAuthor(refreshAudioBook.getAuthor());
+				audiobook.setISBN(refreshAudioBook.getISBN());
+				break;
+			case MAGAZINE:
+				Magazine magazine = (Magazine) media;
+				Magazine refreshMagazine = (Magazine) refresh;
+
+				magazine.setSeries(refreshMagazine.getSeries());
+				break;
+			case VIDEO:
+				Video video = (Video) media;
+				Video refreshVideo = (Video) refresh;
+
+				video.setLength(refreshVideo.getLength());
+				break;
+		}
+	}
 }
 

@@ -1,7 +1,6 @@
 package at.qe.skeleton.ui.controllers;
 
 import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaType;
 import at.qe.skeleton.services.MediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
