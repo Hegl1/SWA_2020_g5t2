@@ -51,7 +51,7 @@ public class UserDetailController implements Serializable {
 	 * targeted by any further calls of {@link #doReloadUser()},
 	 * {@link #doSaveUser()} and {@link #doDeleteUser()}.
 	 *
-	 * @param user
+	 * @param user the user to set
 	 */
 	public void setUser(final User user) {
 		this.user = user;
@@ -61,7 +61,7 @@ public class UserDetailController implements Serializable {
 	/**
 	 * Returns the currently displayed user.
 	 *
-	 * @return
+	 * @return the set user
 	 */
 	public User getUser() {
 		return this.user;

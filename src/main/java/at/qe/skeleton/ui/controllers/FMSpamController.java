@@ -23,7 +23,7 @@ public class FMSpamController implements Serializable {
     /**
      * send with severity "info (green)"
      *
-     * @Param text the message
+     * @param text the message
      */
     public void info(String text) {
         if(sessionInfoBean.isLoggedIn()){
@@ -36,7 +36,7 @@ public class FMSpamController implements Serializable {
     /**
      * send with severity "warning (yellow)"
      *
-     * @Param text the message
+     * @param text the message
      */
     public void warn(String text) {
         if(sessionInfoBean.isLoggedIn()){
@@ -49,7 +49,7 @@ public class FMSpamController implements Serializable {
     /**
      * send with severity "fatal (red)"
      *
-     * @Param text the message
+     * @param text the message
      */
     public void fatal(String text) {
         if(sessionInfoBean.isLoggedIn()){
@@ -62,7 +62,7 @@ public class FMSpamController implements Serializable {
     /**
      * send with severity "fatal (red)"
      *
-     * @Param text the message
+     * @param text the message
      */
     public void error(String text) {
         if(sessionInfoBean.isLoggedIn()){

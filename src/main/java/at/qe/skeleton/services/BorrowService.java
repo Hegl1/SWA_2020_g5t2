@@ -57,7 +57,7 @@ public class BorrowService implements CommandLineRunner {
 	@Autowired
 	private UserService userService;
 
-	private Logger logger = LoggerFactory.getLogger(BorrowService.class);
+	private final Logger logger = LoggerFactory.getLogger(BorrowService.class);
 
 	/**
 	 * Method that constructs a Borrowed object and saves it in the database.
@@ -308,9 +308,7 @@ public class BorrowService implements CommandLineRunner {
 		bodyBuild.append("\" is available again for borrowing.\n\n");
 		bodyBuild.append("Yours sincerely,\nThe Library Team");
 		String body = bodyBuild.toString();
-		StringBuilder headBuild = new StringBuilder("Borrowing of ");
-		headBuild.append(targetMedia.getTitle());
-		String head = headBuild.toString();
+		String head = "Borrowing of " + targetMedia.getTitle();
 		mailService.sendMail(reserved.getUser().getEmail(), head, body);
 		logger.info("Email about freed media send to " + reserved.getUser().getEmail());
 		reservedRepository.delete(reserved);
@@ -426,7 +424,7 @@ public class BorrowService implements CommandLineRunner {
 	 * the scheduler work from the start of the project.
 	 */
 	@Override
-	public void run(final String... args) throws Exception {
+	public void run(final String... args) {
 		// used for initial loading of the component so scheduled task starts
 		logger.info("BorrowService Component loaded at startup");
 	}

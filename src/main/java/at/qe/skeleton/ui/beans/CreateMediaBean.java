@@ -76,7 +76,7 @@ public class CreateMediaBean implements Serializable {
 		// this.doReloadMedia();
 	}
 
-	public void doCreateMedia() throws MediaService.TotalAvailabilitySetTooLowException, IOException {
+	public void doCreateMedia() throws MediaService.TotalAvailabilitySetTooLowException {
 
 		try{
 
@@ -103,9 +103,7 @@ public class CreateMediaBean implements Serializable {
 
 			reloadPage();
 
-		} catch (IllegalStateException exception) {
-		}
-		catch(java.io.IOException e){
+		} catch (IllegalStateException | IOException exception) {
 		}
 
 	}

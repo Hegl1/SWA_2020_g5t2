@@ -38,7 +38,7 @@ public class SearchUserBean implements Serializable {
     public void setFilterUsername(final String filterUsername) {
         this.filterUsername = filterUsername == null ? null : filterUsername.trim().toLowerCase();
 
-        if(this.filterUsername == ""){
+        if(this.filterUsername != null && this.filterUsername.equals("")){
             this.filterUsername = null;
         }
     }
@@ -50,7 +50,7 @@ public class SearchUserBean implements Serializable {
     public void setFilterEmail(final String filterEmail) {
         this.filterEmail = filterEmail == null ? null : filterEmail.trim().toLowerCase();
 
-        if(this.filterEmail == ""){
+        if(this.filterEmail != null && this.filterEmail.equals("")){
             this.filterEmail = null;
         }
     }
@@ -62,7 +62,7 @@ public class SearchUserBean implements Serializable {
     public void setFilterRole(final String filterRole) {
         this.filterRole = filterRole == null ? null : filterRole.trim().toUpperCase();
 
-        if(this.filterRole == ""){
+        if(this.filterRole != null && this.filterRole.equals("")){
             this.filterRole = null;
         }
     }

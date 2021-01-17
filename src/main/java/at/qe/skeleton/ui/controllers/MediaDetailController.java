@@ -163,7 +163,7 @@ public class MediaDetailController implements Serializable {
 
 			// Step 2: Get a list of users that bookmarked this media eventually
 			Collection<Bookmark> a2 = bookmarkService.getBookmarkByMedia(media);
-			List<User> a2_s = new ArrayList<User>();
+			List<User> a2_s = new ArrayList<>();
 			for (Bookmark b : a2) {
 				if (b.getMedia().getMediaID() == media.getMediaID()) {
 					a2_s.add(b.getUser());

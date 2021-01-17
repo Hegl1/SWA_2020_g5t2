@@ -38,8 +38,6 @@ public class UndoRedoController implements Serializable {
 	/**
 	 * Method that undoes the last saved action and
 	 * outputs a growl message for it
-	 *
-	 * @return the undid action-type
 	 */
 	public void undoLastAction() throws MediaService.TotalAvailabilitySetTooLowException {
 		UndoRedoService.ActionType type = undoRedoService.undoLastAction();
@@ -90,8 +88,6 @@ public class UndoRedoController implements Serializable {
 	/**
 	 * Method that redoes the last action and
 	 * outputs a growl message for it
-	 *
-	 * @return the redid action-type
 	 */
 	public void redoLastAction() throws MediaService.TotalAvailabilitySetTooLowException {
 		UndoRedoService.ActionType type = undoRedoService.redoLastAction();

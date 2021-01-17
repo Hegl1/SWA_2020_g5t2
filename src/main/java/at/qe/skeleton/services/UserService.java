@@ -248,8 +248,7 @@ public class UserService {
 					bookmarkRepository.delete(sbm);
 				}
 				// delete Reservations
-				Collection<Reserved> res = new ArrayList<Reserved>();
-				res = reservedRepository.findByUser(user);
+				Collection<Reserved> res = reservedRepository.findByUser(user);
 				if(res.size() > 0){
 					for (Reserved r : res) {
 

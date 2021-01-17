@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-;
-
 /**
  * Service for accessing and manipulating media data.
  */
@@ -163,7 +161,7 @@ public class MediaService {
 	 * Filters a selected collection of media by availability
 	 *
 	 * @param filteredMedia the collection which gets filtered
-	 * @param isAvailable
+	 * @param isAvailable whether the media must be available or not available
 	 * @return collection of filtered media
 	 */
     public Collection<Media> filterMediaByAvailability(final Collection<Media> filteredMedia, final boolean isAvailable) {

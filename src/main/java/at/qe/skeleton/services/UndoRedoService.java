@@ -37,13 +37,13 @@ public class UndoRedoService {
 	 * Double ended Queue that holds ActionItems to undo. Is basically used as a
 	 * stack.
 	 */
-	private Deque<ActionItem> unDoQueue;
+	private final Deque<ActionItem> unDoQueue;
 
 	/**
 	 * Double ended Queue that holds ActionItems to redo. Is basically used as a
 	 * stack.
 	 */
-	private Deque<ActionItem> reDoQueue;
+	private final Deque<ActionItem> reDoQueue;
 
 	@Autowired
 	private UserService userService;
@@ -61,7 +61,7 @@ public class UndoRedoService {
 	private MediaBorrowTimeRepository mediaBorrowTimeRepository;
 
 
-	private Logger logger = LoggerFactory.getLogger(UndoRedoService.class);
+	private final Logger logger = LoggerFactory.getLogger(UndoRedoService.class);
 
 	/**
 	 * Constant that represents the number of maximum states that can be undone.
@@ -72,10 +72,10 @@ public class UndoRedoService {
 	 * Default constructor for UndoRedoService. Instantiates dequeues for undoing
 	 * and redoing.
 	 */
-	@Autowired(required = true)
+	@Autowired
 	public UndoRedoService() {
-		unDoQueue = new ArrayDeque<ActionItem>(MAX_SAVED_STATES + 1);
-		reDoQueue = new ArrayDeque<ActionItem>(MAX_SAVED_STATES + 1);
+		unDoQueue = new ArrayDeque<>(MAX_SAVED_STATES + 1);
+		reDoQueue = new ArrayDeque<>(MAX_SAVED_STATES + 1);
 	}
 
 	/**
@@ -280,7 +280,7 @@ public class UndoRedoService {
 	 * undoing and redoing the saved action.
 	 *
 	 */
-	public abstract class ActionItem {
+	public abstract static class ActionItem {
 
 		/**
 		 * Type that is used to choose the correct counter action
