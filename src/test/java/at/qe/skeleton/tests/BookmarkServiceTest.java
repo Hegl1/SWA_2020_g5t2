@@ -41,11 +41,10 @@ public class BookmarkServiceTest {
     public void testGetAllBookmarks() {
         Collection<Bookmark> bookmarks = this.bookmarkService.getAllBookmarks();
 
-        Assertions.assertEquals(10, bookmarks.size());
+        Assertions.assertEquals(9, bookmarks.size());
         Assertions.assertTrue(bookmarks.stream().anyMatch(bookmark -> bookmark.getMedia().getMediaID() == 1 && bookmark.getUser().getId().equals("lkalt")));
         Assertions.assertTrue(bookmarks.stream().anyMatch(bookmark -> bookmark.getMedia().getMediaID() == 2 && bookmark.getUser().getId().equals("csauer")));
         Assertions.assertTrue(bookmarks.stream().anyMatch(bookmark -> bookmark.getMedia().getMediaID() == 2 && bookmark.getUser().getId().equals("mfeld")));
-        Assertions.assertTrue(bookmarks.stream().anyMatch(bookmark -> bookmark.getMedia().getMediaID() == 3 && bookmark.getUser().getId().equals("lkalt")));
         Assertions.assertTrue(bookmarks.stream().anyMatch(bookmark -> bookmark.getMedia().getMediaID() == 4 && bookmark.getUser().getId().equals("mfeld")));
         Assertions.assertTrue(bookmarks.stream().anyMatch(bookmark -> bookmark.getMedia().getMediaID() == 4 && bookmark.getUser().getId().equals("lkalt")));
         Assertions.assertTrue(bookmarks.stream().anyMatch(bookmark -> bookmark.getMedia().getMediaID() == 6 && bookmark.getUser().getId().equals("mfeld")));

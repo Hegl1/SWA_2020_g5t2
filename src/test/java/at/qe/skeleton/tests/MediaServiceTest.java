@@ -3,6 +3,7 @@ package at.qe.skeleton.tests;
 import at.qe.skeleton.model.*;
 import at.qe.skeleton.services.MediaService;
 import at.qe.skeleton.ui.beans.ContextMocker;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -60,6 +61,15 @@ public class MediaServiceTest {
         Assertions.assertEquals(42069, ((AudioBook) loadedNewAudioBook).getLength(), "--wrong length--");
         Assertions.assertEquals("Thomas Gottschalk", ((AudioBook) loadedNewAudioBook).getAuthor(), "--wrong author--");
         Assertions.assertEquals("1234-asdf", ((AudioBook) loadedNewAudioBook).getISBN(), "--wrong ISBN--");
+    }
+
+    @Test
+    @DirtiesContext
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    public void testSaveMediaExceptionThrow() throws MediaService.TotalAvailabilitySetTooLowException {
+        Media media = this.mediaService.loadMedia(5L);
+        media.setTotalAvail(2);
+        Assertions.assertThrows(MediaService.TotalAvailabilitySetTooLowException.class, () -> this.mediaService.saveMedia(media));
     }
 
     @Test
