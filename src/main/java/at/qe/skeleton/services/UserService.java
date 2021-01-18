@@ -132,19 +132,10 @@ public class UserService {
 
 		if (user.isNew()) {
 			user.setCreateDate(new Date());
-//			user.setCreateUser(getAuthenticatedUser());
 		} else {
 			user.setUpdateDate(new Date());
-//			user.setUpdateUser(getAuthenticatedUser());
-			// if password was changed, then encrypt it again
-			Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2a?\\$\\d\\d\\$[./0-9A-Za-z]{53}");
-			if (BCRYPT_PATTERN.matcher(user.getPassword()).matches()) {
-				// stringToCheck is an encoded bcrypt password.
-			} else {
-				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-				String newencodedPassword = passwordEncoder.encode(user.getPassword());
-				user.setPassword(newencodedPassword);
-			}
+			user.setPassword(user.getPassword());
+
 		}
 		return userRepository.save(user);
 	}

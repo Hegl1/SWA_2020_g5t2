@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Entity representing users. Very similar to the User class of the skeleton
@@ -68,9 +69,16 @@ public class User implements Persistable<String>, Serializable {
 			final Boolean enabled, final UserRole roles, final String email) {
 
 		this();
-		PasswordEncoder pwEncoder = new BCryptPasswordEncoder(9);
 		this.username = username;
-		this.password = pwEncoder.encode(password);
+
+		Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2a?\\$\\d\\d\\$[./0-9A-Za-z]{53}");
+		if (BCRYPT_PATTERN.matcher(password).matches()) {
+
+		} else {
+			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(9);
+			this.password = passwordEncoder.encode(password);
+		}
+
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.enabled = enabled;
@@ -92,7 +100,15 @@ public class User implements Persistable<String>, Serializable {
 
 	public void setPassword(final String password) {
 		if (password != null && password != "") {
-			this.password = password;
+
+			// if password was changed, then encrypt it again
+			Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2a?\\$\\d\\d\\$[./0-9A-Za-z]{53}");
+			if (BCRYPT_PATTERN.matcher(password).matches()) {
+				// stringToCheck is an encoded bcrypt password.
+			} else {
+				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+				this.password = passwordEncoder.encode(password);
+			}
 		}
 	}
 
