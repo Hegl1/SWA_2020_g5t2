@@ -1,18 +1,16 @@
 package at.qe.skeleton.ui.controllers;
 
-import at.qe.skeleton.model.MediaBorrowTime;
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
-import at.qe.skeleton.services.UndoRedoService;
+import java.io.Serializable;
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import java.io.Serializable;
-import java.util.Collection;
+import at.qe.skeleton.model.MediaBorrowTime;
+import at.qe.skeleton.model.MediaType;
+import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
+import at.qe.skeleton.services.UndoRedoService;
 
 @Component
 @Scope("view")
@@ -25,10 +23,13 @@ public class BorrowTimesController implements Serializable {
 	@Autowired
 	private UndoRedoService undoRedoService;
 
-	public void setMediaBorrowTimes(Collection<MediaBorrowTime> mediaBorrowTimes) {
-		if(mediaBorrowTimes == null){
+	@Autowired
+	private FMSpamController fms;
+
+	public void setMediaBorrowTimes(final Collection<MediaBorrowTime> mediaBorrowTimes) {
+		if (mediaBorrowTimes == null) {
 			this.mediaBorrowTimes = mediaBorrowTimeRepository.findAll();
-		}else{
+		} else {
 			this.mediaBorrowTimes = mediaBorrowTimes;
 		}
 	}
@@ -53,8 +54,7 @@ public class BorrowTimesController implements Serializable {
 			mediaBorrowTimeRepository.save(bt);
 		}
 
-		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "The borrow times were edited", ""));
+		fms.info("The borrow times were edited");
 	}
 
 	/**

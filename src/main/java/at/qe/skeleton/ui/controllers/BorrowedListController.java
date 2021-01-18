@@ -1,22 +1,19 @@
 package at.qe.skeleton.ui.controllers;
 
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
-import at.qe.skeleton.repositories.MediaRepository;
-import at.qe.skeleton.services.BorrowService;
-import at.qe.skeleton.services.UndoRedoService;
-import at.qe.skeleton.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import at.qe.skeleton.model.Borrowed;
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
+import at.qe.skeleton.services.BorrowService;
+import at.qe.skeleton.services.UndoRedoService;
 
 /**
  * Controller for the borrowed list view.
@@ -35,6 +32,9 @@ public class BorrowedListController implements Serializable {
 
 	@Autowired
 	private UndoRedoService undoRedoService;
+
+	@Autowired
+	private FMSpamController fms;
 
 	/**
 	 * Returns a list of the current customers borrowed articles.
@@ -60,8 +60,7 @@ public class BorrowedListController implements Serializable {
 		borrowService.unBorrowMediaForAuthenticatedUser(mediaToUnBorrow);
 		undoRedoService.addAction(undoRedoService.createAction(borrow, UndoRedoService.ActionType.UNBORROW));
 
-		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "The media was returned.", ""));
+		fms.info("The media was returned.");
 	}
 
 	public void doBorrowMediaForAuthenticatedUser(final Media media) {
@@ -69,7 +68,6 @@ public class BorrowedListController implements Serializable {
 		Borrowed borrow = borrowService.loadBorrowedForAuthenticatedUser(media);
 		undoRedoService.addAction(undoRedoService.createAction(borrow, UndoRedoService.ActionType.BORROW));
 
-		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "The media was borrowed.", ""));
+		fms.info("The media was borrowed.");
 	}
 }
