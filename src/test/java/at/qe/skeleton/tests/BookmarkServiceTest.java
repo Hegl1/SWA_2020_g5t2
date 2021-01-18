@@ -93,20 +93,6 @@ public class BookmarkServiceTest {
 
     @Test
     @WithMockUser(username = "csauer", authorities = {"Customer"})
-    public void testGetMediaInfo() {
-
-        // TODO: determine the usefulness of the method to test
-    }
-
-    @Test
-    @WithMockUser(username = "csauer", authorities = {"Customer"})
-    public void testIfCurrentBorrowed() {
-
-        // TODO: determine the usefulness of the method to test
-    }
-
-    @Test
-    @WithMockUser(username = "csauer", authorities = {"Customer"})
     public void testIsBookmarkedForAuthenticatedUser() {
         Media bookmarkedMedia = this.mediaService.loadMedia(2L);
         Media notBookmarkedMedia = this.mediaService.loadMedia(3L);

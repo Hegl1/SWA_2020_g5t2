@@ -41,7 +41,7 @@ public class CreateUserBean implements Serializable {
 
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public void saveUser() {
+	public void saveUser(){
 		RandomString passwordGen = new RandomString(8);
 
 		String password = passwordGen.nextString();
@@ -49,7 +49,13 @@ public class CreateUserBean implements Serializable {
 		user.setEnabled(true);
 
 		setUserRoles();
-		userService.saveUser(user);
+
+		try {
+			userService.saveUser(user);
+		} catch (UserService.UnallowedInputException e) {
+			fms.warn(e.getMessage());
+		}
+
 		undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.SAVE_USER));
 
 		fms.info("Changes saved!");
