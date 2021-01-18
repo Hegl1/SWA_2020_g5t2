@@ -70,15 +70,7 @@ public class User implements Persistable<String>, Serializable {
 
 		this();
 		this.username = username;
-
-		Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2a?\\$\\d\\d\\$[./0-9A-Za-z]{53}");
-		if (BCRYPT_PATTERN.matcher(password).matches()) {
-
-		} else {
-			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(9);
-			this.password = passwordEncoder.encode(password);
-		}
-
+		this.setPassword(password);
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.enabled = enabled;
@@ -103,9 +95,7 @@ public class User implements Persistable<String>, Serializable {
 
 			// if password was changed, then encrypt it again
 			Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2a?\\$\\d\\d\\$[./0-9A-Za-z]{53}");
-			if (BCRYPT_PATTERN.matcher(password).matches()) {
-				// stringToCheck is an encoded bcrypt password.
-			} else {
+			if (!BCRYPT_PATTERN.matcher(password).matches()) {
 				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 				this.password = passwordEncoder.encode(password);
 			}

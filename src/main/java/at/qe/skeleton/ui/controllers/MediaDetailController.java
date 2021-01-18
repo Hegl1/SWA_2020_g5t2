@@ -180,6 +180,8 @@ public class MediaDetailController implements Serializable {
 					bookmarkService.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(u, media));
 				}
 				for (User u : a2_s) {
+
+					// TODO: refactor email contents
 					mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
 							"The following Media is not available anymore: Title: " + media.getTitle() + ", Type: "
 									+ media.getMediaType() + ", Language: " + media.getLanguage()
