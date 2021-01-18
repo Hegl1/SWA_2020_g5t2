@@ -1,15 +1,32 @@
 package at.qe.skeleton.ui.controllers;
 
-import at.qe.skeleton.model.*;
-import at.qe.skeleton.repositories.BookmarkRepository;
-import at.qe.skeleton.services.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
+import at.qe.skeleton.model.AudioBook;
+import at.qe.skeleton.model.Book;
+import at.qe.skeleton.model.Bookmark;
+import at.qe.skeleton.model.Borrowed;
+import at.qe.skeleton.model.Magazine;
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.MediaType;
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.Video;
+import at.qe.skeleton.repositories.BookmarkRepository;
+import at.qe.skeleton.services.BookmarkService;
+import at.qe.skeleton.services.BorrowService;
+import at.qe.skeleton.services.MailService;
+import at.qe.skeleton.services.MediaService;
+import at.qe.skeleton.services.UndoRedoService;
 
 /**
  * Controller for the media detail view.
@@ -39,10 +56,8 @@ public class MediaDetailController implements Serializable {
 	@Autowired
 	ReservedController reservedController;
 
-
 	@Autowired
 	FMSpamController fms;
-
 
 	/**
 	 * Attribute to cache the currently displayed media
@@ -110,20 +125,12 @@ public class MediaDetailController implements Serializable {
 		Media beforeEditMedia = mediaService.loadMedia(media.getId());
 		try {
 			this.media = this.mediaService.saveMedia(this.media);
-			undoRedoService.addAction(undoRedoService.createAction(beforeEditMedia, media, UndoRedoService.ActionType.EDIT_MEDIA));
+			undoRedoService.addAction(
+					undoRedoService.createAction(beforeEditMedia, media, UndoRedoService.ActionType.EDIT_MEDIA));
 		} catch (MediaService.TotalAvailabilitySetTooLowException e) {
-			fms.warn(e.getMessage());
+			fms.warn("Availability cannot be set: Too many medias are borrowed at the moment.");
 		}
 	}
-
-
-
-
-
-
-
-
-
 
 	/**
 	 * Action to safely delete the currently displayed media.
@@ -145,7 +152,8 @@ public class MediaDetailController implements Serializable {
 
 			doSafeDeleteMedia(media);
 		}
-		// optionally close the occuring loading message as the deleting and mail sending process can take a while
+		// optionally close the occuring loading message as the deleting and mail
+		// sending process can take a while
 		// PrimeFaces.current().executeScript("PF('dataChangeDlg').hide()");
 	}
 
@@ -153,14 +161,14 @@ public class MediaDetailController implements Serializable {
 	 * Safe delete - check if borrowings and bookmarks exist to a given media if
 	 * borrowings exist: do not delete if bookmarks exist: delete them and notify
 	 * with growl Messages and send email
-	 * */
+	 */
 
 	public void doSafeDeleteMedia(final Media media) {
 
 		UndoRedoService.ActionItem deleteAction = undoRedoService.createAction(media,
 				UndoRedoService.ActionType.DELETE_MEDIA);
 
-			{
+		{
 
 			// Step 2: Get a list of users that bookmarked this media eventually
 			Collection<Bookmark> a2 = bookmarkService.getBookmarkByMedia(media);
@@ -175,23 +183,24 @@ public class MediaDetailController implements Serializable {
 			// and bookmark entries and notify users
 			if (a2_s.size() > 0) {
 
-
 				for (User u : a2_s) {
 					bookmarkService.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(u, media));
-					fms.info("The Bookmark for this Media was deleted from user: "+u.getUsername());
+					fms.info("The Bookmark for this Media was deleted from user: " + u.getUsername());
 				}
 				for (User u : a2_s) {
 					mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
 							"The following Media is not available anymore: Title: " + media.getTitle() + ", Type: "
-									+ media.getMediaType() + ", Language: " + media.getLanguage() + ", Publishing Year: "
-									+ media.getPublishingYear());
+									+ media.getMediaType() + ", Language: " + media.getLanguage()
+									+ ", Publishing Year: " + media.getPublishingYear());
 				}
 				// last but not least: remove reservations
-				if(reservedController.getReservationCountForMedia(media) > 0);
+				if (reservedController.getReservationCountForMedia(media) > 0) {
+					;
+				}
 				for (User u : a2_s) {
-					if(reservedController.isReservedForSpecialUser(media, u)){
+					if (reservedController.isReservedForSpecialUser(media, u)) {
 						reservedController.doRemoveReservationForSpecificUser(media, u);
-						fms.info("The Reservation for this Media was deleted from user: "+u.getUsername());
+						fms.info("The Reservation for this Media was deleted from user: " + u.getUsername());
 					}
 				}
 
