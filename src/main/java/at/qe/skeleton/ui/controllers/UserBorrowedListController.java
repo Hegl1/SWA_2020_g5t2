@@ -1,21 +1,20 @@
 package at.qe.skeleton.ui.controllers;
 
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import at.qe.skeleton.model.Borrowed;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
 import at.qe.skeleton.services.BorrowService;
 import at.qe.skeleton.services.UndoRedoService;
 import at.qe.skeleton.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
 
 /**
  * Controller for the borrowed list view.
@@ -40,6 +39,9 @@ public class UserBorrowedListController implements Serializable {
 
 	@Autowired
 	private UndoRedoService undoRedoService;
+
+	@Autowired
+	private FMSpamController fms;
 
 	/**
 	 * Returns a list of the current customers borrowed articles.
@@ -68,32 +70,34 @@ public class UserBorrowedListController implements Serializable {
 
 	/**
 	 * Unborrowes the media for the set user
+	 * 
 	 * @param borrow the borrow-object to unborrow
 	 */
 	public void doUnBorrowForUser(final Borrowed borrow) {
 		borrowService.unBorrowMedia(borrow);
 		undoRedoService.addAction(undoRedoService.createAction(borrow, UndoRedoService.ActionType.UNBORROW));
 
-		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, "The media was returned.", ""));
+		fms.info("The media was returned.");
 	}
 
 	/**
-	 * Sets the username and fetches the user with that username
-	 * If the user was not found, it will display an error message
+	 * Sets the username and fetches the user with that username If the user was not
+	 * found, it will display an error message
+	 * 
 	 * @param username the username to set
 	 */
-	public void setUsername(String username) {
-		if(username == null) return;
+	public void setUsername(final String username) {
+		if (username == null) {
+			return;
+		}
 
 		loaded = false;
 
 		this.user = userService.loadUser(username);
 
-		if(this.user == null){
-			FacesContext context = FacesContext.getCurrentInstance();
-			context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_ERROR, "This user does not exist", ""));
-		}else{
+		if (this.user == null) {
+			fms.error("This user does not exist");
+		} else {
 			loaded = true;
 		}
 	}
