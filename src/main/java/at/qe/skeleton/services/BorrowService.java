@@ -1,10 +1,11 @@
 package at.qe.skeleton.services;
 
-import at.qe.skeleton.model.*;
-import at.qe.skeleton.repositories.BorrowedRepository;
-import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
-import at.qe.skeleton.repositories.MediaRepository;
-import at.qe.skeleton.repositories.ReservedRepository;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +15,16 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import at.qe.skeleton.model.Borrowed;
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.MediaBorrowTime;
+import at.qe.skeleton.model.MediaType;
+import at.qe.skeleton.model.Reserved;
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.repositories.BorrowedRepository;
+import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
+import at.qe.skeleton.repositories.MediaRepository;
+import at.qe.skeleton.repositories.ReservedRepository;
 
 /**
  * Class that is used for the borrowing process, reservation process and
@@ -63,14 +69,14 @@ public class BorrowService implements CommandLineRunner {
 	private final Logger logger = LoggerFactory.getLogger(BorrowService.class);
 
 	/**
-	 * Method that constructs a Borrowed object and saves it in the database.
+	 * Method that constructs a Borrowed object and saves it in the database
 	 * 
 	 * @param borrower      the user who borrows the media.
 	 * @param mediaToBorrow the media which gets borrowed by the user
-	 * @return true if borrowing was successful, else false.
+	 * @param date          the date on which the media gets borrowed
+	 * @return true if borrowing was successful, else false
 	 */
-	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public boolean borrowMedia(final User borrower, final Media mediaToBorrow) {
+	public boolean borrowMediaOnDate(final User borrower, final Media mediaToBorrow, final Date date) {
 		mediaService.refreshMedia(mediaToBorrow);
 
 		if (!mediaToBorrow.getAvailable() || borrower == null) {
@@ -78,7 +84,7 @@ public class BorrowService implements CommandLineRunner {
 		} else {
 			mediaToBorrow.setCurBorrowed(mediaToBorrow.getCurBorrowed() + 1);
 			mediaRepository.save(mediaToBorrow);
-			Borrowed borrow = new Borrowed(borrower, mediaToBorrow, new Date());
+			Borrowed borrow = new Borrowed(borrower, mediaToBorrow, date);
 			borrowedRepository.save(borrow);
 			return true;
 		}
@@ -89,11 +95,36 @@ public class BorrowService implements CommandLineRunner {
 	 * the authenticated user for Borrows user.
 	 * 
 	 * @param media the media to borrow
+	 * @param date  the date on which the media gets borrowed
+	 * @return true if borrowing was successful, else false
+	 */
+	public boolean borrowMediaForAuthenticatedUserOnDate(final Media media, final Date date) {
+		User borrower = userService.loadCurrentUser();
+		return borrowMediaOnDate(borrower, media, date);
+	}
+
+	/**
+	 * Method that constructs a Borrowed object using the current date and saves it
+	 * in the database.
+	 * 
+	 * @param borrower      the user who borrows the media.
+	 * @param mediaToBorrow the media which gets borrowed by the user
+	 * @return true if borrowing was successful, else false.
+	 */
+	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
+	public boolean borrowMedia(final User borrower, final Media mediaToBorrow) {
+		return borrowMediaOnDate(borrower, mediaToBorrow, new Date());
+	}
+
+	/**
+	 * Method that constructs a Borrowed object and saves it in the database, uses
+	 * the authenticated user for Borrows user and the current date.
+	 * 
+	 * @param media the media to borrow
 	 * @return true if borrowing was successful, else false.
 	 */
 	public boolean borrowMediaForAuthenticatedUser(final Media media) {
-		User borrower = userService.loadCurrentUser();
-		return borrowMedia(borrower, media);
+		return borrowMediaForAuthenticatedUserOnDate(media, new Date());
 	}
 
 	/**
@@ -159,10 +190,12 @@ public class BorrowService implements CommandLineRunner {
 		return borrowedRepository.findByUser(user);
 	}
 
-	public Collection<Borrowed> getAllBorrowsByUsername(final String username){
+	public Collection<Borrowed> getAllBorrowsByUsername(final String username) {
 		User u = userService.loadUser(username);
 
-		if(u == null) return null;
+		if (u == null) {
+			return null;
+		}
 
 		return borrowedRepository.findByUser(u);
 	}
@@ -261,7 +294,7 @@ public class BorrowService implements CommandLineRunner {
 	 * Removes a reservation of the media for the authenticated user
 	 *
 	 * @param media the media
-	 * @param user the user
+	 * @param user  the user
 	 */
 	public void removeReservationForSpecificUser(final Media media, final User user) {
 		User specific_user = userService.loadUser(user.getUsername());
@@ -296,9 +329,6 @@ public class BorrowService implements CommandLineRunner {
 
 		return reservedRepository.findFirstByUserAndMedia(searched_user, media) != null;
 	}
-
-
-
 
 	/**
 	 * Method that unreserves a Media for a User. Automatically sends an email to
