@@ -1,18 +1,19 @@
 package at.qe.skeleton.ui.controllers;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import at.qe.skeleton.model.Borrowed;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.BorrowService;
 import at.qe.skeleton.services.UndoRedoService;
 import at.qe.skeleton.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Controller for the user detail view.
@@ -36,8 +37,6 @@ public class UserDetailController implements Serializable {
 
 	@Autowired
 	BorrowService borrowService;
-
-
 
 	/**
 	 * Attribute to cache the currently displayed user
@@ -89,8 +88,6 @@ public class UserDetailController implements Serializable {
 			// TODO: Exception-Handling
 		}
 		this.doReloadUser();
-		fms.info("A new user with the username: "+ username +" was created!");
-		fms.info("Please reload the page.");
 	}
 
 	/**
@@ -117,19 +114,19 @@ public class UserDetailController implements Serializable {
 
 		Collection<Borrowed> d1 = borrowService.getAllBorrowsByUser(this.user);
 		if (d1.size() > 0) {
-				fms.warn("This user has still borrowed: " + d1.size() + " article(s) and cannot be deleted yet.");
+			fms.warn("This user has still borrowed: " + d1.size() + " article(s) and cannot be deleted yet.");
 		} else {
-				try {
-					this.userService.deleteUser(this.user);
-					this.undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.DELETE_USER));
-
-				} catch (UserService.UnauthorizedActionException unauthorizedActionException) {
-					System.out.println(unauthorizedActionException.getMessage());
-
-				}
-				this.user = null;
+			try {
 				fms.info("The user was deleted and all his bookmarks and reserved media has been deleted");
-				fms.info("Please reload the page.");
+				this.userService.deleteUser(this.user);
+				this.undoRedoService
+						.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.DELETE_USER));
+
+			} catch (UserService.UnauthorizedActionException unauthorizedActionException) {
+				fms.warn("Cannot delete onw user.");
+
+			}
+			this.user = null;
 		}
 
 	}
@@ -143,7 +140,7 @@ public class UserDetailController implements Serializable {
 		return userService;
 	}
 
-	public void setUserService(UserService userService) {
+	public void setUserService(final UserService userService) {
 		this.userService = userService;
 	}
 }

@@ -137,17 +137,10 @@ public class MediaDetailController implements Serializable {
 	 */
 	public void deleteMedia(final Media media) {
 
-		UndoRedoService.ActionItem deleteAction = undoRedoService.createAction(media,
-				UndoRedoService.ActionType.DELETE_MEDIA);
-
 		// Step 1: Check if the media is still borrowed
 		Collection<Borrowed> a1 = borrowService.getAllBorrowsByMedia(media);
 		if (a1.size() > 0) {
-
-			for (Borrowed a : a1) {
-
-				fms.warn("This media is still borrowed by : " + a.getUser().getUsername() + " and cannot be deleted");
-			}
+			fms.warn("This media is still borrowed Users and cannot be deleted.");
 		} else {
 
 			doSafeDeleteMedia(media);
@@ -185,7 +178,6 @@ public class MediaDetailController implements Serializable {
 
 				for (User u : a2_s) {
 					bookmarkService.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(u, media));
-					fms.info("The Bookmark for this Media was deleted from user: " + u.getUsername());
 				}
 				for (User u : a2_s) {
 					mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
@@ -195,21 +187,18 @@ public class MediaDetailController implements Serializable {
 				}
 				// last but not least: remove reservations
 				if (reservedController.getReservationCountForMedia(media) > 0) {
-					;
+
 				}
 				for (User u : a2_s) {
 					if (reservedController.isReservedForSpecialUser(media, u)) {
 						reservedController.doRemoveReservationForSpecificUser(media, u);
-						fms.info("The Reservation for this Media was deleted from user: " + u.getUsername());
 					}
 				}
 
 				undoRedoService.addAction(deleteAction);
 				this.mediaService.deleteMedia(media);
 				this.media = null;
-
 				fms.info("Media was deleted.");
-				fms.info("Please reload the page.");
 
 			} else {
 
@@ -217,7 +206,7 @@ public class MediaDetailController implements Serializable {
 				undoRedoService.addAction(deleteAction);
 				this.mediaService.deleteMedia(media);
 				this.media = null;
-				fms.info("Please reload the page.");
+				fms.info("Media was deleted.");
 			}
 		}
 	}
