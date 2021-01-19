@@ -26,12 +26,12 @@
             
 			<p:dataTable id="userTables" var="user" value="#{sessionInfoBean.currentUser}">
                 <p:column style="width:100px;text-align: center">
-                        <p:commandButton update=":userDataForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="ui-icon-pencil" title="Edit core data" value="Edit personal data">
+                        <p:commandButton update=":userDataForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="fa fa-fw fa-pencil" title="Edit core data" value="Edit personal data">
                             <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                         </p:commandButton>
                 </p:column>
                 <p:column style="width:100px;text-align: center">
-                        <p:commandButton update=":userDataForm:passwordEditDialog" oncomplete="PF('passwordEditDialog').show()" icon="ui-icon-key" title="Change password" value="Change password">
+                        <p:commandButton update=":userDataForm:passwordEditDialog" oncomplete="PF('passwordEditDialog').show()" icon="fa fa-fw fa-key" title="Change password" value="Change password">
                             <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                         </p:commandButton>
                 </p:column>

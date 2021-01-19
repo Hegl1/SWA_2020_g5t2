@@ -67,7 +67,7 @@
                     </p:commandButton>
                     <p:commandButton action="#{userDetailController.doDeleteUser}" icon="fa fa-fw fa-trash" title="Delete" update=":userForm:usersTable :headerForm:undoRedoGroup">
                         <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
-                        <p:confirm header="Delete user" message="Are you sure? User gets deleted irreversible!" icon="ui-icon-alert" />
+                        <p:confirm header="Delete user" message="User will be deleted permanently" icon="fa fa-fw fa-warning" />
                     </p:commandButton>
                     <p:linkButton outcome="/admin/userBorrowings" icon="fa fa-fw fa-briefcase" title="Edit borrowings for user" rendered="#{user.hasRole('CUSTOMER')}">
                         <f:param name="username" value="#{user.username}" />
@@ -121,8 +121,8 @@
 
             <!-- delete Dialog-->
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
-                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
-                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-fw fa-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-fw fa-times" />
             </p:confirmDialog>
 
             <!-- New User Dialog -->

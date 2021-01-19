@@ -141,7 +141,7 @@
                                      update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup">
                         <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
                         <p:confirm header="Delete media"
-                                   message="Do you want to delete the media?" icon="ui-icon-alert" />
+                                   message="Do you want to delete the media?" icon="fa fa-fw fa-warning" />
                     </p:commandButton>
                 </p:column>
 
@@ -327,9 +327,9 @@
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
                              width="300">
                 <p:commandButton value="Yes" type="button"
-                                 styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                 styleClass="ui-confirmdialog-yes" icon="fa fa-fw fa-check" />
                 <p:commandButton value="No" type="button"
-                                 styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                 styleClass="ui-confirmdialog-no" icon="fa fa-fw fa-times" />
             </p:confirmDialog>
         </h:form>
 
