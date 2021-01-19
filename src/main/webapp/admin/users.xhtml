@@ -3,9 +3,12 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jstl/core"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
         <h2>Admin users</h2>
+
+        <c:set value="#{null}" target="#{searchUserBean}" property="init" />
 
         <h:form id="filter" style="margin-bottom: 15px">
             <p:accordionPanel activeIndex="-2">
@@ -46,7 +49,7 @@
                             update=":userForm:userAddDialog" oncomplete="PF('userAddDialog').show()"
                             icon="fa fa-fw fa-plus" title="Create new user" value="Create new user" />
                 </f:facet>
-                <p:column headerText="User name">
+                <p:column headerText="Username">
                     <h:outputText value="#{user.username}"/>
                 </p:column>
                 <p:column headerText="First name">
@@ -81,7 +84,7 @@
             <p:dialog header="Edit user" id="userEditDialog" widgetVar="userEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                 <p:outputPanel id="userData" rendered="#{not empty userDetailController.user}">
                     <h:panelGrid columns="2">
-                        <p:outputLabel for="username" value="User name: " />
+                        <p:outputLabel for="username" value="Username: " />
                         <p:inputText id="username" value="#{userDetailController.user.username}" disabled="true"/>
                     </h:panelGrid>
                     <p:separator />
@@ -133,7 +136,7 @@
                         <p:inputText id="regFirstName" value="#{createUserBean.user.firstName}"/>
                         <p:outputLabel for="regLastName" value="Last name: " />
                         <p:inputText id="regLastName" value="#{createUserBean.user.lastName}"/>
-                        <p:outputLabel for="regUsername" value="User name: " />
+                        <p:outputLabel for="regUsername" value="Username: " />
                         <p:inputText id="regUsername" value="#{createUserBean.user.username}"/>
                         <p:outputLabel for="regEmail" value="E-mail: " />
                         <p:inputText id="regEmail" value="#{createUserBean.user.email}"/>
@@ -148,7 +151,7 @@
                 <h:panelGrid columns="2">
                     <p:commandButton
                             value="Create user" action="#{createUserBean.saveUser()}" oncomplete="PF('userAddDialog').hide()"
-                            update=":userForm:usersTable :userForm:userAddDialog :headerForm:undoRedoGroup" />
+                            update="@all" />
                     <p:commandButton
                             value="Cancel" action="#{createUserBean.reset}" oncomplete="PF('userAddDialog').hide()"
                             update=":userForm:userAddDialog" />

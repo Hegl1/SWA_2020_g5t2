@@ -19,6 +19,10 @@ public class SearchUserBean implements Serializable {
     private String filterEmail = null;
     private String filterRole = null;
 
+    public void setInit(Collection<User> init) {
+        this.doFilter();
+    }
+
     public Collection<User> getResults() {
         return results;
     }
@@ -68,7 +72,7 @@ public class SearchUserBean implements Serializable {
     }
 
     public void doFilter(){
-        Collection<User> results = this.results = userService.getAllUsersForAuthority();
+        Collection<User> results = userService.getAllUsersForAuthority();
 
         if(filterUsername != null){
             results = userService.filterUserByUsername(results, filterUsername);
