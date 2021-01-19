@@ -91,13 +91,18 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public void setPassword(final String password) {
-		if (password != null && password != "") {
-
-			// if password was changed, then encrypt it again
-			Pattern BCRYPT_PATTERN = Pattern.compile("\\A\\$2a?\\$\\d\\d\\$[./0-9A-Za-z]{53}");
-			if (!BCRYPT_PATTERN.matcher(password).matches()) {
-				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-				this.password = passwordEncoder.encode(password);
+		if(password != this.password){
+			if(password != null && !password.equals("")){
+				// if password was changed, then encrypt it again
+				Pattern BCRYPT_PATTERN = Pattern.compile("^\\$2[ayb]\\$.{56}$");
+				if (!BCRYPT_PATTERN.matcher(password).matches()) {
+					BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(9);
+					this.password = passwordEncoder.encode(password);
+				}else{
+					this.password = password;
+				}
+			}else{
+				this.password = null;
 			}
 		}
 	}
