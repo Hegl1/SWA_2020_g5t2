@@ -54,10 +54,10 @@ public class UserServiceTest {
 	@Test
 	@DirtiesContext
 	@WithMockUser(username = "admin", authorities = { "ADMIN" })
-	public void testSaveUser() {
+	public void testSaveUser() throws UserService.UnallowedInputException {
 
 		User newUser = new User("testUser", "passwd", "Max", "Mustermann", true, UserRole.ADMIN, "tester@email.com");
-		userService.saveUser(newUser);
+		this.userService.saveUser(newUser);
 		User loadedNewUser = this.userService.loadUser("testUser");
 
 		Assertions.assertNotNull(loadedNewUser, "New user could not be loaded");
@@ -169,7 +169,7 @@ public class UserServiceTest {
 
 		Assertions.assertEquals("Clemens", user.getFirstName(), "Retrieval of first name did not work");
 		Assertions.assertEquals("Sauerwein", user.getLastName(), "Retrieval of last name did not work");
-		Assertions.assertEquals("c.sauerwein@swa.at", user.getEmail(), "Retrieval of email did not work");
+		Assertions.assertEquals("swa.grp.5.2@gmail.com", user.getEmail(), "Retrieval of email did not work");
 		Assertions.assertTrue(user.getRoles().contains(UserRole.CUSTOMER), "Retrieval of user role did not work");
 	}
 
@@ -325,7 +325,7 @@ public class UserServiceTest {
 	@Test
 	@WithMockUser(username = "admin", authorities = { "ADMIN" })
 	public void testFilterUserByEmail() {
-		Collection<User> filteredUsers = this.userService.filterUserByEmail(this.userService.getAllUsers(), "c.sauerwein@swa.at");
+		Collection<User> filteredUsers = this.userService.filterUserByEmail(this.userService.getAllUsers(), "swa.grp.5.2@gmail.com");
 
 		Assertions.assertEquals(1, filteredUsers.size());
 		Assertions.assertTrue(filteredUsers.contains(this.userService.loadUser("csauer")));

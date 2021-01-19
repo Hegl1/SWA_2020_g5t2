@@ -20,6 +20,4 @@ public interface MediaRepository extends AbstractRepository<Media, Long> {
 	@Query("SELECT DISTINCT language FROM Media")
 	List<String> getAllLanguages();
 
-	// TODO: add queries as needed
-
 }

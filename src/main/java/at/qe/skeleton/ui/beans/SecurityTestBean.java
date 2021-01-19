@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 @Scope("request")
 public class SecurityTestBean {
 
+    // TODO: probably delete Bean
+
     private boolean showOkDialog = false;
     private String performedAction = "NONE";
 
@@ -30,7 +32,7 @@ public class SecurityTestBean {
         if(testString.length() <= 10) {
             this.testString = testString;
         } else {
-            // TODO: throw an Exception
+
             this.testString = testString.substring(0,9);
         }
     }

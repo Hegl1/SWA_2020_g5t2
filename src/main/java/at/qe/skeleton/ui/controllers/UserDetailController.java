@@ -33,10 +33,10 @@ public class UserDetailController implements Serializable {
 	private UndoRedoService undoRedoService;
 
 	@Autowired
-	FMSpamController fms;
+	private FMSpamController fms;
 
 	@Autowired
-	BorrowService borrowService;
+	private BorrowService borrowService;
 
 	/**
 	 * Attribute to cache the currently displayed user
@@ -84,8 +84,7 @@ public class UserDetailController implements Serializable {
 			this.userService.createUser(username, password, firstName, lastName, enabled, roles, email);
 			this.undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.SAVE_USER));
 		} catch (UserService.UnauthorizedActionException | UserService.UnallowedInputException e) {
-			System.out.println(e.getMessage());
-			// TODO: Exception-Handling
+			fms.warn(e.getMessage());
 		}
 		this.doReloadUser();
 	}
@@ -103,7 +102,12 @@ public class UserDetailController implements Serializable {
 	public void doSaveUser() {
 		this.undoRedoService.addAction(undoRedoService.createAction(userService.loadUser(this.user.getUsername()), user,
 				UndoRedoService.ActionType.EDIT_USER));
-		this.user = this.userService.saveUser(this.user);
+		try{
+			this.user = this.userService.saveUser(this.user);
+		} catch (UserService.UnallowedInputException e) {
+			fms.warn(e.getMessage());
+		}
+
 		fms.info("Changes saved");
 	}
 

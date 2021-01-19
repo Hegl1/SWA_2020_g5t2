@@ -64,7 +64,7 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
-    public void testIsRedoActionAvailable() throws MediaService.TotalAvailabilitySetTooLowException {
+    public void testIsRedoActionAvailable() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
         Assertions.assertFalse(this.undoRedoService.isRedoActionAvailable());
 
         Bookmark bookmark = this.bookmarkService.loadBookmark(11L);
@@ -78,7 +78,7 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
-    public void testSaveBookmarkAction() throws MediaService.TotalAvailabilitySetTooLowException {
+    public void testSaveBookmarkAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -102,7 +102,7 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testDeleteBookmarkAction() throws MediaService.TotalAvailabilitySetTooLowException {
+    public void testDeleteBookmarkAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -122,7 +122,7 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testBorrowAction() throws MediaService.TotalAvailabilitySetTooLowException {
+    public void testBorrowAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -143,9 +143,7 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testUnBorrowAction() throws MediaService.TotalAvailabilitySetTooLowException {
-        // TODO: FIX
-
+    public void testUnBorrowAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -168,7 +166,7 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testSaveUserAction() throws MediaService.TotalAvailabilitySetTooLowException {
+    public void testSaveUserAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -187,7 +185,7 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testDeleteUserAction() throws UserService.UnauthorizedActionException, MediaService.TotalAvailabilitySetTooLowException {
+    public void testDeleteUserAction() throws UserService.UnauthorizedActionException, MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -206,7 +204,7 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testEditUserAction() throws MediaService.TotalAvailabilitySetTooLowException {
+    public void testEditUserAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -233,7 +231,7 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testSaveMediaAction() throws MediaService.TotalAvailabilitySetTooLowException {
+    public void testSaveMediaAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -252,7 +250,7 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testDeleteMediaAction() throws MediaService.TotalAvailabilitySetTooLowException {
+    public void testDeleteMediaAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -272,7 +270,7 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testEditMediaAction() throws MediaService.TotalAvailabilitySetTooLowException {
+    public void testEditMediaAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 
@@ -302,7 +300,7 @@ public class UndoRedoServiceTest {
     @Test
     @DirtiesContext
     @WithMockUser(username = "amuss", authorities = { "ADMIN" })
-    public void testEditBorrowTimesAction() throws MediaService.TotalAvailabilitySetTooLowException {
+    public void testEditBorrowTimesAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
         // ignore FacesContext Messages that the mediaservice delete function uses
         FacesContext context = ContextMocker.mockFacesContext();
 

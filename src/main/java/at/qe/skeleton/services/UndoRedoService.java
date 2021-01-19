@@ -104,7 +104,7 @@ public class UndoRedoService {
 	 *
 	 * @return the undid action-type
 	 */
-	public ActionType undoLastAction() throws MediaService.TotalAvailabilitySetTooLowException {
+	public ActionType undoLastAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
 		ActionItem action = unDoQueue.pop();
 		if (action != null) {
 			action.performUndoAction();
@@ -124,7 +124,7 @@ public class UndoRedoService {
 	 *
 	 * @return the redid action-type
 	 */
-	public ActionType redoLastAction() throws MediaService.TotalAvailabilitySetTooLowException {
+	public ActionType redoLastAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
 		ActionItem action = reDoQueue.pop();
 		if (action != null) {
 			action.performRedoAction();
@@ -296,12 +296,12 @@ public class UndoRedoService {
 		/**
 		 * method that undoes the recent action.
 		 */
-		abstract void performUndoAction() throws MediaService.TotalAvailabilitySetTooLowException;
+		abstract void performUndoAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException;
 
 		/**
 		 * method that redoes the recent action.
 		 */
-		abstract void performRedoAction() throws MediaService.TotalAvailabilitySetTooLowException;
+		abstract void performRedoAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException;
 	}
 
 	/**
@@ -436,7 +436,7 @@ public class UndoRedoService {
 		}
 
 		@Override
-		void performUndoAction() {
+		void performUndoAction() throws UserService.UnallowedInputException {
 			if (type.equals(ActionType.SAVE_USER)) {
 				try {
 					userService.deleteUser(beforeEditUser);
@@ -454,7 +454,7 @@ public class UndoRedoService {
 		}
 
 		@Override
-		void performRedoAction() {
+		void performRedoAction() throws UserService.UnallowedInputException {
 			if (type.equals(ActionType.SAVE_USER)) {
 				userService.saveUser(beforeEditUser);
 			} else if (type.equals(ActionType.DELETE_USER)) {
