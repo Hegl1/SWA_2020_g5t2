@@ -2,6 +2,7 @@ package at.qe.skeleton.ui.beans;
 
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.services.MailService;
 import at.qe.skeleton.services.UndoRedoService;
 import at.qe.skeleton.services.UserService;
 import at.qe.skeleton.ui.controllers.FMSpamController;
@@ -32,28 +33,36 @@ public class CreateUserBean implements Serializable {
 	private UndoRedoService undoRedoService;
 
 	@Autowired
-	FMSpamController fms;
+	private FMSpamController fms;
+
+	@Autowired
+	private MailService mailService;
 
 	private User user;
 
 	private List<String> selectedUserRoles;
 
-
-
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public void saveUser() {
+	public void saveUser(){
 		RandomString passwordGen = new RandomString(8);
 
 		String password = passwordGen.nextString();
-		user.setPassword("passwd");
+		user.setPassword(password);
 		user.setEnabled(true);
 
 		setUserRoles();
-		userService.saveUser(user);
-		undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.SAVE_USER));
 
-		fms.info("Changes saved!");
-		fms.info("Please reload the page.");
+		try {
+			userService.saveUser(user);
+			mailService.sendMail(user.getEmail(), "Your account was created",
+					"Dear User,\nyour account has been created successfully." +
+							"\nYou can login with the following data:\nusername: " + user.getUsername() + "\n" +
+							"password: " + password + "\n Yours sincerely \n Your Library Team");
+			undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.SAVE_USER));
+
+		} catch (UserService.UnallowedInputException e) {
+			fms.warn(e.getMessage());
+		}
 
 		this.user = null;
 	}

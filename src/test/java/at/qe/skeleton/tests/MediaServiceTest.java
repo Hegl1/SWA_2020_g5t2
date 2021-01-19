@@ -209,4 +209,18 @@ public class MediaServiceTest {
         Media notExistingMedia = this.mediaService.loadMedia(18L);
         Assertions.assertNull(notExistingMedia);
     }
+
+    @Test
+    @DirtiesContext
+    @WithMockUser(username = "admin", authorities = { "ADMIN" })
+    public void testRefreshMedia() {
+        Media media = this.mediaService.loadMedia(16L);
+
+        Assertions.assertEquals("Ein verheißenes Land", media.getTitle());
+        media.setTitle("Harry Potter");
+        Assertions.assertEquals("Harry Potter", media.getTitle());
+        this.mediaService.refreshMedia(media);
+        Assertions.assertEquals("Ein verheißenes Land", media.getTitle());
+
+    }
 }

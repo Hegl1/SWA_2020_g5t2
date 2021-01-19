@@ -34,30 +34,30 @@ import at.qe.skeleton.services.UndoRedoService;
 @Component
 @Scope("view")
 public class MediaDetailController implements Serializable {
-	// TODO: set private
-	@Autowired
-	MediaService mediaService;
 
 	@Autowired
-	BorrowService borrowService;
+	private MediaService mediaService;
 
 	@Autowired
-	UndoRedoService undoRedoService;
+	private BorrowService borrowService;
 
 	@Autowired
-	BookmarkService bookmarkService;
+	private UndoRedoService undoRedoService;
 
 	@Autowired
-	MailService mailservice;
+	private BookmarkService bookmarkService;
 
 	@Autowired
-	BookmarkRepository bookmarkRepository;
+	private MailService mailservice;
 
 	@Autowired
-	ReservedController reservedController;
+	private BookmarkRepository bookmarkRepository;
 
 	@Autowired
-	FMSpamController fms;
+	private ReservedController reservedController;
+
+	@Autowired
+	private FMSpamController fms;
 
 	/**
 	 * Attribute to cache the currently displayed media
@@ -180,6 +180,8 @@ public class MediaDetailController implements Serializable {
 					bookmarkService.deleteBookmark(bookmarkRepository.findFirstByUserAndMedia(u, media));
 				}
 				for (User u : a2_s) {
+
+					// TODO: refactor email contents
 					mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
 							"The following Media is not available anymore: Title: " + media.getTitle() + ", Type: "
 									+ media.getMediaType() + ", Language: " + media.getLanguage()
