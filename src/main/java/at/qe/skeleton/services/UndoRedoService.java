@@ -1,17 +1,24 @@
 package at.qe.skeleton.services;
 
-import at.qe.skeleton.model.*;
-import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
-import at.qe.skeleton.services.UserService.UnauthorizedActionException;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Deque;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Deque;
+import at.qe.skeleton.model.Bookmark;
+import at.qe.skeleton.model.Borrowed;
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.model.MediaBorrowTime;
+import at.qe.skeleton.model.Reserved;
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
+import at.qe.skeleton.services.UserService.UnauthorizedActionException;
 
 /**
  * Class that provides a Service to undo and redo certain actions. As the class
@@ -60,7 +67,6 @@ public class UndoRedoService {
 	@Autowired
 	private MediaBorrowTimeRepository mediaBorrowTimeRepository;
 
-
 	private final Logger logger = LoggerFactory.getLogger(UndoRedoService.class);
 
 	/**
@@ -79,8 +85,8 @@ public class UndoRedoService {
 	}
 
 	/**
-	 * Method that adds an action to the undoing queue.
-	 * The redo-queue will be emptied.
+	 * Method that adds an action to the undoing queue. The redo-queue will be
+	 * emptied.
 	 *
 	 * @param action the action that should be prepared for undoing.
 	 */
@@ -298,8 +304,6 @@ public class UndoRedoService {
 		abstract void performRedoAction() throws MediaService.TotalAvailabilitySetTooLowException;
 	}
 
-	// TODO: fix authorization errors for customers in undo/redo
-
 	/**
 	 * Class that represents a borrowing action.
 	 */
@@ -329,9 +333,9 @@ public class UndoRedoService {
 				recacheMediaForBorrowed();
 
 				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
-					borrowService.borrowMedia(borrowed.getUser(), borrowed.getMedia());
+					borrowService.borrowMediaOnDate(borrowed.getUser(), borrowed.getMedia(), borrowed.getBorrowDate());
 				} else {
-					borrowService.borrowMediaForAuthenticatedUser(borrowed.getMedia());
+					borrowService.borrowMediaForAuthenticatedUserOnDate(borrowed.getMedia(), borrowed.getBorrowDate());
 				}
 			} else {
 				logger.error("Error while undoing borrow action, wrong action type");
@@ -344,9 +348,9 @@ public class UndoRedoService {
 				recacheMediaForBorrowed();
 
 				if (!userService.loadCurrentUser().getRoles().contains(UserRole.CUSTOMER)) {
-					borrowService.borrowMedia(borrowed.getUser(), borrowed.getMedia());
+					borrowService.borrowMediaOnDate(borrowed.getUser(), borrowed.getMedia(), borrowed.getBorrowDate());
 				} else {
-					borrowService.borrowMediaForAuthenticatedUser(borrowed.getMedia());
+					borrowService.borrowMediaForAuthenticatedUserOnDate(borrowed.getMedia(), borrowed.getBorrowDate());
 				}
 			} else if (type.equals(ActionType.UNBORROW)) {
 				recacheMediaForBorrowed();
@@ -361,7 +365,7 @@ public class UndoRedoService {
 			}
 		}
 
-		private void recacheMediaForBorrowed(){
+		private void recacheMediaForBorrowed() {
 			this.borrowed.setMedia(mediaService.loadMedia(this.borrowed.getMedia().getMediaID()));
 		}
 	}

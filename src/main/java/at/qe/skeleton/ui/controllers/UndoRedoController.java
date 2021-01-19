@@ -1,14 +1,13 @@
 package at.qe.skeleton.ui.controllers;
 
-import at.qe.skeleton.services.MediaService;
-import at.qe.skeleton.services.UndoRedoService;
+import java.io.Serializable;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import java.io.Serializable;
+import at.qe.skeleton.services.MediaService;
+import at.qe.skeleton.services.UndoRedoService;
 
 @Component
 @Scope("view")
@@ -17,12 +16,15 @@ public class UndoRedoController implements Serializable {
 	@Autowired
 	private UndoRedoService undoRedoService;
 
+	@Autowired
+	private FMSpamController fms;
+
 	/**
 	 * Method that checks whether an undo action is available.
 	 *
 	 * @return true if an action is available, else false.
 	 */
-	public boolean getUndoActionAvailable(){
+	public boolean getUndoActionAvailable() {
 		return undoRedoService.isUndoActionAvailable();
 	}
 
@@ -31,20 +33,20 @@ public class UndoRedoController implements Serializable {
 	 *
 	 * @return true if an action is available, else false.
 	 */
-	public boolean getRedoActionAvailable(){
+	public boolean getRedoActionAvailable() {
 		return undoRedoService.isRedoActionAvailable();
 	}
 
 	/**
-	 * Method that undoes the last saved action and
-	 * outputs a growl message for it
+	 * Method that undoes the last saved action and outputs a growl message for it
 	 */
-	public void undoLastAction() throws MediaService.TotalAvailabilitySetTooLowException {
-		UndoRedoService.ActionType type = undoRedoService.undoLastAction();
+	public void undoLastAction() {
+		try {
+			UndoRedoService.ActionType type = undoRedoService.undoLastAction();
 
-		String message;
+			String message;
 
-		switch(type){
+			switch (type) {
 			case UNBORROW:
 				message = "Undid last un-borrowing action";
 				break;
@@ -78,23 +80,27 @@ public class UndoRedoController implements Serializable {
 			case EDIT_MEDIA_BORROW_TIME:
 				message = "Undid editing media borrow time";
 				break;
-			default: return;
-		}
+			default:
+				return;
+			}
 
-		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, message, ""));
+			fms.info(message);
+
+		} catch (MediaService.TotalAvailabilitySetTooLowException e) {
+			fms.warn("Availability cannot be set: Too many medias are borrowed at the moment.");
+		}
 	}
 
 	/**
-	 * Method that redoes the last action and
-	 * outputs a growl message for it
+	 * Method that redoes the last action and outputs a growl message for it
 	 */
-	public void redoLastAction() throws MediaService.TotalAvailabilitySetTooLowException {
-		UndoRedoService.ActionType type = undoRedoService.redoLastAction();
+	public void redoLastAction() {
+		try {
+			UndoRedoService.ActionType type = undoRedoService.redoLastAction();
 
-		String message;
+			String message;
 
-		switch(type){
+			switch (type) {
 			case UNBORROW:
 				message = "Redid last undone un-borrowing action";
 				break;
@@ -128,10 +134,13 @@ public class UndoRedoController implements Serializable {
 			case EDIT_MEDIA_BORROW_TIME:
 				message = "Redid editing media borrow time";
 				break;
-			default: return;
-		}
+			default:
+				return;
+			}
 
-		FacesContext context = FacesContext.getCurrentInstance();
-		context.addMessage("asGrowl", new FacesMessage(FacesMessage.SEVERITY_INFO, message, ""));
+			fms.info(message);
+		} catch (MediaService.TotalAvailabilitySetTooLowException e) {
+			fms.warn("Availability cannot be set: Too many medias are borrowed at the moment.");
+		}
 	}
 }

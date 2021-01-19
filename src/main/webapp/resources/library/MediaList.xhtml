@@ -135,7 +135,7 @@
                         <f:setPropertyActionListener value="#{media}"
                                                      target="#{mediaDetailController.media}" />
                     </p:commandButton>
-                    <p:commandButton id="mDelBut" onclick="PF('dataChangeDlg').show()" action="#{mediaDetailController.deleteMedia(media)}"
+                    <p:commandButton id="mDelBut" action="#{mediaDetailController.deleteMedia(media)}"
 
                                      icon="fa fa-fw fa-eraser" title="Delete safely"
                                      update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup">

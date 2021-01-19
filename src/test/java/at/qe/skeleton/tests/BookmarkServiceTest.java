@@ -8,6 +8,7 @@ import at.qe.skeleton.services.BookmarkService;
 import at.qe.skeleton.services.MediaService;
 import at.qe.skeleton.services.UserService;
 import at.qe.skeleton.ui.beans.ContextMocker;
+import at.qe.skeleton.ui.beans.SessionInfoBean;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -21,6 +22,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import javax.faces.context.FacesContext;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -35,6 +37,9 @@ public class BookmarkServiceTest {
 
     @Autowired
     private MediaService mediaService;
+
+    @Autowired
+    SessionInfoBean sessionInfoBean;
 
     @Test
     @WithMockUser(username = "csauer", authorities = {"Customer"})
@@ -162,6 +167,44 @@ public class BookmarkServiceTest {
         Assertions.assertFalse(this.bookmarkService.isBookmarkedForAuthenticatedUser(media));
         this.bookmarkService.addBookmark(user, media);
         Assertions.assertTrue(this.bookmarkService.isBookmarkedForAuthenticatedUser(media));
+    }
+
+    @Test
+    @DirtiesContext
+    @WithMockUser(username = "customer2", authorities = { "CUSTOMER" })
+    public void bookmarkAddTest() {
+
+        Collection<Bookmark> bcoll_sql = bookmarkService.getAllBookmarks();
+        Media media1 = mediaService.loadMedia(4L);
+        bookmarkService.addBookmark(media1);
+        Collection<Bookmark> bcoll_new = bookmarkService.getAllBookmarks();
+        for (Bookmark bookmark0 : bcoll_sql) {
+            System.out.println(">> Bookmark ID: " + bookmark0.getBookmarkID() + ", Media: " + bookmark0.getMedia()
+                    + ", User: " + bookmark0.getUser() + " <<");
+        }
+        for (Bookmark bookmark : bcoll_new) {
+            System.out.println(">> Bookmark ID: " + bookmark.getBookmarkID() + ", Media: " + bookmark.getMedia()
+                    + ", User: " + bookmark.getUser() + " <<");
+        }
+
+        Assertions.assertEquals(bcoll_sql.size()+1,bcoll_new.size());
+    }
+
+    @Test
+    @DirtiesContext
+    @WithMockUser(username = "csauer", authorities = { "CUSTOMER" })
+    public void bookmarkRemoveTest() {
+
+        // ignore FacesContext Messages that some our the services use during test
+        //FacesContext context = ContextMocker.mockFacesContext();
+
+        Collection<Bookmark> bcoll_sql_start = bookmarkService.getBookmarksByUser(sessionInfoBean.getCurrentUser());
+        Optional<Bookmark> firstElement = bcoll_sql_start.stream().findFirst();
+        bookmarkService.loadBookmark(firstElement.get().getBookmarkID());
+        bookmarkService.deleteBookmark(firstElement.get());
+        Collection<Bookmark> bcoll_sql_end = bookmarkService.getBookmarksByUser(sessionInfoBean.getCurrentUser());
+
+        Assertions.assertEquals(bcoll_sql_start.size()-1,bcoll_sql_end.size());
     }
 
     @Test
