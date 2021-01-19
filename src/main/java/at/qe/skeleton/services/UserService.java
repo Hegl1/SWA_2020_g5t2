@@ -117,7 +117,6 @@ public class UserService {
 	 * @param user the user to save
 	 * @return the updated user
 	 */
-	// TODO: Move PasswordEncoder
 	public User saveUser(final User user) throws UnallowedInputException {
 
 		// source of following monstrosity:
