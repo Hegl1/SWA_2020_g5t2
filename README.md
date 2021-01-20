@@ -9,3 +9,6 @@ It models an online library with the possibility (mainly) to search and borrow m
 - Philip Eckhart
 - David Spleit
 - Matthias Thalmann
+
+## Known problems
+- No growl-messages shown on undo/redo in Chrome, Safari, Edge (works in Firefox)
