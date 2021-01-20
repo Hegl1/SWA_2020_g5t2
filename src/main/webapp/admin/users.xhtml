@@ -98,8 +98,8 @@
                             <p:inputText id="email" value="#{userDetailController.user.email}"/>
 
                             <h:panelGrid columns="3">
-                                <p:commandButton value="Admin" action="#{userDetailController.setAsAdmin}"/>
-                                <p:commandButton value="Librarian" action="#{userDetailController.setAsLibrarian}"/>
+                                <p:commandButton value="Admin" action="#{userDetailController.setAsAdmin}" disabled="#{!sessionInfoBean.hasRole('ADMIN')}"/>
+                                <p:commandButton value="Librarian" action="#{userDetailController.setAsLibrarian}" disabled="#{!sessionInfoBean.hasRole('ADMIN')}"/>
                                 <p:commandButton value="Customer" action="#{userDetailController.setAsCustomer}"/>
                             </h:panelGrid>
 
@@ -113,7 +113,6 @@
                         <p:separator />
                         <h:panelGrid columns="3">
                             <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update=":userForm:usersTable :headerForm:undoRedoGroup">
-                                <f:actionListener binding="#{userDetailController.changeUserRoles()}" />
                             </p:commandButton>
                             <p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}" update=":userForm:userData"/>
                             <p:commandButton value="Cancel" onclick="PF('userEditDialog').hide()"/>
