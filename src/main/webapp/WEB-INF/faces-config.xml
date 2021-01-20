@@ -12,4 +12,12 @@
         <exception-handler-factory>org.primefaces.application.exceptionhandler.PrimeExceptionHandlerFactory</exception-handler-factory>
     </factory>
 
+    <render-kit>
+        <renderer>
+            <component-family>org.primefaces.component</component-family>
+            <renderer-type>org.primefaces.component.InputTextRenderer</renderer-type>
+            <renderer-class>at.qe.skeleton.primefaces.CustomInputTextRenderer</renderer-class>
+        </renderer>
+    </render-kit>
+
 </faces-config>
