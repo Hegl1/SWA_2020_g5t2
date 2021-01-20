@@ -40,10 +40,11 @@ public class CreateUserBean implements Serializable {
 
 	private User user;
 
-	private List<String> selectedUserRoles;
+	private String selectedUserRoles;
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public void saveUser(){
+
 		RandomString passwordGen = new RandomString(8);
 
 		String password = passwordGen.nextString();
@@ -59,6 +60,7 @@ public class CreateUserBean implements Serializable {
 							"\nYou can login with the following data:\nusername: " + user.getUsername() + "\n" +
 							"password: " + password + "\n Yours sincerely \n Your Library Team");
 			undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.SAVE_USER));
+			fms.info("A new user was created.");
 
 		} catch (UserService.UnallowedInputException e) {
 			fms.warn(e.getMessage());
@@ -70,8 +72,8 @@ public class CreateUserBean implements Serializable {
 	private void setUserRoles() {
 		Set<UserRole> userRole = new HashSet<>();
 
-		for (String selected : selectedUserRoles) {
-			switch (selected) {
+
+		switch (selectedUserRoles) {
 			case "librarian":
 				userRole.add(UserRole.LIBRARIAN);
 				break;
@@ -82,8 +84,8 @@ public class CreateUserBean implements Serializable {
 				userRole.add(UserRole.CUSTOMER);
 				break;
 			default: return;
-			}
 		}
+
 
 		user.setRoles(userRole);
 	}
@@ -100,11 +102,11 @@ public class CreateUserBean implements Serializable {
 		this.user = user;
 	}
 
-	public List<String> getSelectedUserRoles() {
+	public String getSelectedUserRoles() {
 		return selectedUserRoles;
 	}
 
-	public void setSelectedUserRoles(final List<String> selectedUserRoles) {
+	public void setSelectedUserRoles(final String selectedUserRoles) {
 		this.selectedUserRoles = selectedUserRoles;
 	}
 

@@ -96,15 +96,15 @@
                             <p:inputText id="lastName" value="#{userDetailController.user.lastName}"/>
                             <p:outputLabel for="email" value="E-mail: " />
                             <p:inputText id="email" value="#{userDetailController.user.email}"/>
-
+                        </h:panelGrid>
                             <h:panelGrid columns="3">
                                 <p:commandButton value="Admin" action="#{userDetailController.setAsAdmin}" disabled="#{!sessionInfoBean.hasRole('ADMIN')}"/>
-                                <p:commandButton value="Librarian" action="#{userDetailController.setAsLibrarian}" disabled="#{!sessionInfoBean.hasRole('ADMIN')}"/>
+                                <p:commandButton value="Librarian" action="#{userDetailController.setAsLibrarian}" disabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
                                 <p:commandButton value="Customer" action="#{userDetailController.setAsCustomer}"/>
                             </h:panelGrid>
 
 
-                        </h:panelGrid>
+
                         <p:separator />
                         <h:panelGrid columns="2">
                             <p:outputLabel for="enabled" value="Enabled: " />
@@ -139,11 +139,11 @@
                             <p:outputLabel for="regEmail" value="E-mail: " />
                             <p:inputText id="regEmail" value="#{createUserBean.user.email}"/>
                             <h:outputText value="User permissions:" />
-                            <p:selectManyButton value="#{createUserBean.selectedUserRoles}">
-                                <f:selectItem itemLabel="Librarian" itemValue="librarian" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                            <p:selectOneButton value="#{createUserBean.selectedUserRoles}">
                                 <f:selectItem itemLabel="Admin" itemValue="admin" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                                <f:selectItem itemLabel="Librarian" itemValue="librarian" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
                                 <f:selectItem itemLabel="Customer" itemValue="customer" />
-                            </p:selectManyButton>
+                            </p:selectOneButton>
                         </h:panelGrid>
                     </p:outputPanel>
                     <h:panelGrid columns="2">
