@@ -97,13 +97,11 @@
                             <p:outputLabel for="email" value="E-mail: " />
                             <p:inputText id="email" value="#{userDetailController.user.email}"/>
 
-                            <p:selectManyButton value="#{userDetailController.newRolesString}">
-                                <f:selectItem itemLabel="Librarian" itemValue="librarian" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
-                                <f:selectItem itemLabel="Admin" itemValue="admin" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
-                                <f:selectItem itemLabel="Customer" itemValue="customer" />
-                            </p:selectManyButton>
-
-
+                            <h:panelGrid columns="3">
+                                <p:commandButton value="Admin" action="#{userDetailController.setAsAdmin}"/>
+                                <p:commandButton value="Librarian" action="#{userDetailController.setAsLibrarian}"/>
+                                <p:commandButton value="Customer" action="#{userDetailController.setAsCustomer}"/>
+                            </h:panelGrid>
 
 
                         </h:panelGrid>

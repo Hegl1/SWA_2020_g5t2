@@ -115,7 +115,7 @@ public class UserServiceTest {
 	@Test
 	@DirtiesContext
 	@WithMockUser(username = "admin", authorities = { "ADMIN" })
-	public void testUserRoleChange() {
+	public void testUserRoleChange() throws UserService.UnallowedInputException {
 		User user = this.userService.loadUser("csauer");
 
 		List<String> roleList = new ArrayList<>();

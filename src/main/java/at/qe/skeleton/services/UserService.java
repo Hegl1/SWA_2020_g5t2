@@ -45,7 +45,6 @@ public class UserService {
 	private MailService mailService;
 
 
-
 	/**
 	 * Returns a collection of all users.
 	 *
@@ -66,7 +65,7 @@ public class UserService {
 	public Collection<User> getAllUsersForAuthority() {
 		User currentUser = this.getAuthenticatedUser();
 
-		if(currentUser.hasRole("LIBRARIAN")){
+		if (currentUser.hasRole("LIBRARIAN")) {
 			return this.userRepository.findByRole(UserRole.CUSTOMER);
 		}
 
@@ -109,7 +108,9 @@ public class UserService {
 	 * @return the list of customers
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public List<User> loadCustomers() { return this.userRepository.findByRole(UserRole.CUSTOMER); }
+	public List<User> loadCustomers() {
+		return this.userRepository.findByRole(UserRole.CUSTOMER);
+	}
 
 	/**
 	 * Saves the user in the user repository.
@@ -159,24 +160,35 @@ public class UserService {
 	/**
 	 * Changes the set of roles a user possesses.
 	 *
-	 * @param user     The user whose roles should be changed
+	 * @param user           The user whose roles should be changed
 	 * @param newRolesString List of new roles
 	 * @return if the change was successful.
 	 */
-	public boolean changeUserRoles(final User user, final List<String> newRolesString) {
+	public boolean changeUserRoles(final User user, final List<String> newRolesString) throws UnallowedInputException {
 		Set<UserRole> newRolesSet = new HashSet<>();
 
-		for (String selected : newRolesString) {
-			switch (selected.toLowerCase()) {
-				case "librarian": 	newRolesSet.add(UserRole.LIBRARIAN); break;
-				case "admin": 		newRolesSet.add(UserRole.ADMIN); break;
-				case "customer": 	newRolesSet.add(UserRole.CUSTOMER); break;
-				default: return false;
-			}
-		}
 		user.setRoles(newRolesSet);
+		if (newRolesString.size() == 1) {
+			switch (newRolesString.get(0)) {
+				case "librarian":
+					newRolesSet.add(UserRole.LIBRARIAN);
+					break;
+				case "admin":
+					newRolesSet.add(UserRole.ADMIN);
+					break;
+				case "customer":
+					newRolesSet.add(UserRole.CUSTOMER);
+					break;
+				default:
+					return false;
+			}
 
-		return true;
+			user.setRoles(newRolesSet);
+			return true;
+
+		} else {
+			throw new UnallowedInputException("Multiple roles do not work.");
+		}
 	}
 
 	/**
