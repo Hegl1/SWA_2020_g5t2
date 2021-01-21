@@ -1,22 +1,31 @@
 package at.qe.skeleton.services;
 
-import at.qe.skeleton.model.*;
-import at.qe.skeleton.repositories.BookmarkRepository;
-import at.qe.skeleton.repositories.BorrowedRepository;
-import at.qe.skeleton.repositories.ReservedRepository;
-import at.qe.skeleton.repositories.UserRepository;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import at.qe.skeleton.model.Bookmark;
+import at.qe.skeleton.model.Borrowed;
+import at.qe.skeleton.model.Reserved;
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.model.UserRole;
+import at.qe.skeleton.repositories.BookmarkRepository;
+import at.qe.skeleton.repositories.BorrowedRepository;
+import at.qe.skeleton.repositories.ReservedRepository;
+import at.qe.skeleton.repositories.UserRepository;
 
 /**
  * Service for accessing and manipulating user data.
@@ -44,7 +53,6 @@ public class UserService {
 	@Autowired
 	private MailService mailService;
 
-
 	/**
 	 * Returns a collection of all users.
 	 *
@@ -56,8 +64,8 @@ public class UserService {
 	}
 
 	/**
-	 * For admins: returns a collection of all users
-	 * For librarians: returns a collection of all customers
+	 * For admins: returns a collection of all users For librarians: returns a
+	 * collection of all customers
 	 *
 	 * @return the collection of users
 	 */
@@ -130,6 +138,10 @@ public class UserService {
 			throw new UnallowedInputException("Unallowed input for Email!");
 		}
 
+		if (userRepository.findFirstByUsername(user.getUsername()) != null) {
+			throw new UnallowedInputException("Username already exists");
+		}
+
 		if (user.isNew()) {
 			user.setCreateDate(new Date());
 		} else {
@@ -170,17 +182,17 @@ public class UserService {
 		user.setRoles(newRolesSet);
 		if (newRolesString.size() == 1) {
 			switch (newRolesString.get(0)) {
-				case "librarian":
-					newRolesSet.add(UserRole.LIBRARIAN);
-					break;
-				case "admin":
-					newRolesSet.add(UserRole.ADMIN);
-					break;
-				case "customer":
-					newRolesSet.add(UserRole.CUSTOMER);
-					break;
-				default:
-					return false;
+			case "librarian":
+				newRolesSet.add(UserRole.LIBRARIAN);
+				break;
+			case "admin":
+				newRolesSet.add(UserRole.ADMIN);
+				break;
+			case "customer":
+				newRolesSet.add(UserRole.CUSTOMER);
+				break;
+			default:
+				return false;
 			}
 
 			user.setRoles(newRolesSet);
@@ -194,19 +206,19 @@ public class UserService {
 	/**
 	 * Creates a new user and saves it in the user repository.
 	 *
-	 * @param username 	the username for the new user
-	 * @param password 	the password for the new user
+	 * @param username  the username for the new user
+	 * @param password  the password for the new user
 	 * @param firstName the first name of the new user
-	 * @param lastName 	the last name of the new user
-	 * @param enabled 	the status of the new user (enabled or disabled)
-	 * @param roles 	the role for the new user
-	 * @param email 	the email of the new user
+	 * @param lastName  the last name of the new user
+	 * @param enabled   the status of the new user (enabled or disabled)
+	 * @param roles     the role for the new user
+	 * @param email     the email of the new user
 	 *
 	 * @return the newly created user
 	 */
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
 	public User createUser(final String username, final String password, final String firstName, final String lastName,
-						   final Boolean enabled, final UserRole roles, final String email)
+			final Boolean enabled, final UserRole roles, final String email)
 			throws UnauthorizedActionException, UnallowedInputException {
 
 		if (this.getAuthenticatedUser().getRoles().contains(UserRole.LIBRARIAN)
@@ -251,26 +263,27 @@ public class UserService {
 
 			if (still_borrowed.size() != 0) {
 
-				throw new UnauthorizedActionException("User cannot be deleted: There is a Media that the user has not returned yet!");
+				throw new UnauthorizedActionException(
+						"User cannot be deleted: There is a Media that the user has not returned yet!");
 			} else {
 				// delete Bookmarks
 				List<Bookmark> still_bookmarked = bookmarkRepository.findByUsername(user.getUsername());
-				for (Bookmark sbm : still_bookmarked){
+				for (Bookmark sbm : still_bookmarked) {
 					bookmarkRepository.delete(sbm);
 				}
 				// delete Reservations
 				Collection<Reserved> res = reservedRepository.findByUser(user);
-				if(res.size() > 0){
+				if (res.size() > 0) {
 					for (Reserved r : res) {
 
-							reservedRepository.delete(r);
+						reservedRepository.delete(r);
 
 					}
 				}
-				mailService.sendMail(user.getEmail(), "Your account has been removed", "Hello, your account was deleted by administrative personnel.");
+				mailService.sendMail(user.getEmail(), "Your account has been removed",
+						"Hello, your account was deleted by administrative personnel.");
 				this.userRepository.delete(user);
 			}
-
 
 		}
 	}
@@ -289,7 +302,7 @@ public class UserService {
 	 * Filters a collection of users by the given username
 	 *
 	 * @param filteredUser the collection of users to be filtered
-	 * @param username the username to filter by
+	 * @param username     the username to filter by
 	 *
 	 * @return the filtered collection of users
 	 */
@@ -302,7 +315,7 @@ public class UserService {
 	 * Filters a collection of users by the given email
 	 *
 	 * @param filteredUser the collection of users to be filtered
-	 * @param email the email to filter by
+	 * @param email        the email to filter by
 	 *
 	 * @return the filtered collection of users
 	 */
@@ -315,13 +328,12 @@ public class UserService {
 	 * Filters a collection of users by the given user-role
 	 *
 	 * @param filteredUser the collection of users to be filtered
-	 * @param role the role to filter by (given as string)
+	 * @param role         the role to filter by (given as string)
 	 *
 	 * @return the filtered collection of users
 	 */
 	public Collection<User> filterUserByRole(final Collection<User> filteredUser, final String role) {
-		return filteredUser.stream().filter(x -> x.hasRole(role))
-				.collect(Collectors.toCollection(ArrayList::new));
+		return filteredUser.stream().filter(x -> x.hasRole(role)).collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	/**
@@ -343,7 +355,5 @@ public class UserService {
 			super(message);
 		}
 	}
-
-
 
 }
