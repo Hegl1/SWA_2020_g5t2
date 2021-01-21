@@ -77,18 +77,22 @@ public class CreateUserBean implements Serializable {
 	private void setUserRoles() {
 		Set<UserRole> userRole = new HashSet<>();
 
-		switch (selectedUserRoles) {
-		case "librarian":
-			userRole.add(UserRole.LIBRARIAN);
-			break;
-		case "admin":
-			userRole.add(UserRole.ADMIN);
-			break;
-		case "customer":
+		if (selectedUserRoles != null) {
+			switch (selectedUserRoles) {
+				case "librarian":
+					userRole.add(UserRole.LIBRARIAN);
+					break;
+				case "admin":
+					userRole.add(UserRole.ADMIN);
+					break;
+				case "customer":
+					userRole.add(UserRole.CUSTOMER);
+					break;
+				default:
+					return;
+			}
+		} else {
 			userRole.add(UserRole.CUSTOMER);
-			break;
-		default:
-			return;
 		}
 
 		user.setRoles(userRole);
