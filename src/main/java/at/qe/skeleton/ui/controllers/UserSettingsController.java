@@ -1,13 +1,15 @@
 package at.qe.skeleton.ui.controllers;
 
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.services.UndoRedoService;
-import at.qe.skeleton.services.UserService;
+import java.io.Serializable;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
+import at.qe.skeleton.model.User;
+import at.qe.skeleton.services.UndoRedoService;
+import at.qe.skeleton.services.UserService;
+import at.qe.skeleton.utils.UnallowedInputException;
 
 @Component
 @Scope("view")
@@ -24,16 +26,16 @@ public class UserSettingsController implements Serializable {
 
 	private User user = null;
 
-	public void setUser(final User user){
-		if(user == null){
+	public void setUser(final User user) {
+		if (user == null) {
 			this.user = userService.loadCurrentUser();
-		}else{
+		} else {
 			this.user = user;
 		}
 	}
 
 	public User getUser() {
-		if(user == null){
+		if (user == null) {
 			user = userService.loadCurrentUser();
 		}
 
@@ -44,10 +46,10 @@ public class UserSettingsController implements Serializable {
 		this.undoRedoService.addAction(undoRedoService.createAction(userService.loadUser(this.user.getUsername()), user,
 				UndoRedoService.ActionType.EDIT_USER));
 
-		try{
+		try {
 			this.userService.saveUser(this.user);
 			fms.info("Changes saved");
-		} catch (UserService.UnallowedInputException e) {
+		} catch (UnallowedInputException e) {
 			fms.warn(e.getMessage());
 		}
 

@@ -27,6 +27,7 @@ import at.qe.skeleton.services.BorrowService;
 import at.qe.skeleton.services.MailService;
 import at.qe.skeleton.services.MediaService;
 import at.qe.skeleton.services.UndoRedoService;
+import at.qe.skeleton.utils.UnallowedInputException;
 
 /**
  * Controller for the media detail view.
@@ -120,6 +121,8 @@ public class MediaDetailController implements Serializable {
 
 	/**
 	 * Action to save the currently displayed media.
+	 * 
+	 * @throws UnallowedInputException
 	 */
 	public void doSaveMedia() {
 		Media beforeEditMedia = mediaService.loadMedia(media.getId());
@@ -129,6 +132,8 @@ public class MediaDetailController implements Serializable {
 					undoRedoService.createAction(beforeEditMedia, media, UndoRedoService.ActionType.EDIT_MEDIA));
 		} catch (MediaService.TotalAvailabilitySetTooLowException e) {
 			fms.warn("Availability cannot be set: Too many medias are borrowed at the moment.");
+		} catch (UnallowedInputException e) {
+			fms.warn(e.getMessage());
 		}
 	}
 

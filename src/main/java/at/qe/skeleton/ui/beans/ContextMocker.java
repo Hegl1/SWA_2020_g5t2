@@ -6,10 +6,11 @@ import org.mockito.stubbing.Answer;
 
 import javax.faces.context.FacesContext;
 
-// stub class to ignore Faces Messages during a Unittest
-// the unittests can now be run without throwing errors coming from
-// thanks to Alan B.Dee https://stackoverflow.com/questions/4252353/mocking-facescontext
-
+/**
+ * stub class to ignore Faces Messages during a Unittest
+ * the unittests can now be run without throwing errors coming from
+ * thanks to Alan B.Dee https://stackoverflow.com/questions/4252353/mocking-facescontext
+ */
 public abstract class ContextMocker extends FacesContext {
     private ContextMocker() {
     }

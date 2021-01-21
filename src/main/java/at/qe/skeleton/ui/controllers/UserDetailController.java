@@ -13,6 +13,7 @@ import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.BorrowService;
 import at.qe.skeleton.services.UndoRedoService;
 import at.qe.skeleton.services.UserService;
+import at.qe.skeleton.utils.UnallowedInputException;
 
 /**
  * Controller for the user detail view.
@@ -25,22 +26,22 @@ import at.qe.skeleton.services.UserService;
 @Scope("view")
 public class UserDetailController implements Serializable {
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    @Autowired
-    private UndoRedoService undoRedoService;
+	@Autowired
+	private UndoRedoService undoRedoService;
 
-    @Autowired
-    private FMSpamController fms;
+	@Autowired
+	private FMSpamController fms;
 
-    @Autowired
-    private BorrowService borrowService;
+	@Autowired
+	private BorrowService borrowService;
 
-    /**
-     * Attribute to cache the currently displayed user
-     */
-    private User user;
+	/**
+	 * Attribute to cache the currently displayed user
+	 */
+	private User user;
 
     /**
      * Sets the currently displayed user and reloads it form db. This user is
@@ -53,14 +54,14 @@ public class UserDetailController implements Serializable {
         this.userService.refreshUser(user);
     }
 
-    /**
-     * Returns the currently displayed user.
-     *
-     * @return the set user
-     */
-    public User getUser() {
-        return this.user;
-    }
+	/**
+	 * Returns the currently displayed user.
+	 *
+	 * @return the set user
+	 */
+	public User getUser() {
+		return this.user;
+	}
 
     public String getUserRole(){
         if(this.user == null) return null;
@@ -98,44 +99,44 @@ public class UserDetailController implements Serializable {
         this.user.setRoles(new HashSet<>(Collections.singletonList(userRole)));
     }
 
-    /**
-     * Action to save the currently displayed user.
-     */
-    public void doSaveUser() {
-        this.undoRedoService.addAction(undoRedoService.createAction(userService.loadUser(this.user.getUsername()), user,
-                UndoRedoService.ActionType.EDIT_USER));
-        try {
-            this.user = this.userService.saveUser(this.user);
-        } catch (UserService.UnallowedInputException e) {
-            fms.warn(e.getMessage());
-        }
+	/**
+	 * Action to save the currently displayed user.
+	 */
+	public void doSaveUser() {
+		this.undoRedoService.addAction(undoRedoService.createAction(userService.loadUser(this.user.getUsername()), user,
+				UndoRedoService.ActionType.EDIT_USER));
+		try {
+			this.user = this.userService.saveUser(this.user);
+		} catch (UnallowedInputException e) {
+			fms.warn(e.getMessage());
+		}
 
-        fms.info("Changes saved");
-    }
+		fms.info("Changes saved");
+	}
 
-    /**
-     * Action to delete the currently displayed user.
-     */
-    public void doDeleteUser() {
+	/**
+	 * Action to delete the currently displayed user.
+	 */
+	public void doDeleteUser() {
 
-        Collection<Borrowed> d1 = borrowService.getAllBorrowsByUser(this.user);
-        if (d1.size() > 0) {
-            fms.warn("This user has still borrowed: " + d1.size() + " article(s) and cannot be deleted yet.");
-        } else {
-            try {
-                fms.info("The user was deleted and all his bookmarks and reserved media has been deleted");
-                this.userService.deleteUser(this.user);
-                this.undoRedoService
-                        .addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.DELETE_USER));
+		Collection<Borrowed> d1 = borrowService.getAllBorrowsByUser(this.user);
+		if (d1.size() > 0) {
+			fms.warn("This user has still borrowed: " + d1.size() + " article(s) and cannot be deleted yet.");
+		} else {
+			try {
+				fms.info("The user was deleted and all his bookmarks and reserved media has been deleted");
+				this.userService.deleteUser(this.user);
+				this.undoRedoService
+						.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.DELETE_USER));
 
-            } catch (UserService.UnauthorizedActionException unauthorizedActionException) {
-                fms.warn("Cannot delete onw user.");
+			} catch (UserService.UnauthorizedActionException unauthorizedActionException) {
+				fms.warn("Cannot delete onw user.");
 
-            }
-            this.user = null;
-        }
+			}
+			this.user = null;
+		}
 
-    }
+	}
 
     public void reset(){
         this.user = null;
