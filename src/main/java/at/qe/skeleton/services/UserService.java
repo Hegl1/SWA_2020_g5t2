@@ -177,7 +177,7 @@ public class UserService {
 
 		user.setRoles(newRolesSet);
 		if (newRolesString.size() == 1) {
-			switch (newRolesString.get(0)) {
+			switch (newRolesString.get(0).toLowerCase()) {
 			case "librarian":
 				newRolesSet.add(UserRole.LIBRARIAN);
 				break;
