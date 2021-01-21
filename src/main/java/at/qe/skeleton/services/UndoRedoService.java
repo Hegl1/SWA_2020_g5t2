@@ -511,7 +511,7 @@ public class UndoRedoService {
 		}
 
 		@Override
-		void performUndoAction() throws MediaService.TotalAvailabilitySetTooLowException {
+		void performUndoAction() throws MediaService.TotalAvailabilitySetTooLowException, UnallowedInputException {
 			if (type.equals(ActionType.SAVE_MEDIA)) {
 				saveMetaInfo();
 				mediaService.deleteMedia(beforeEditMedia);
@@ -527,7 +527,7 @@ public class UndoRedoService {
 		}
 
 		@Override
-		void performRedoAction() throws MediaService.TotalAvailabilitySetTooLowException {
+		void performRedoAction() throws MediaService.TotalAvailabilitySetTooLowException, UnallowedInputException {
 			if (type.equals(ActionType.SAVE_MEDIA)) {
 				restoreMetaInfo();
 				beforeEditMedia = mediaService.saveMedia(beforeEditMedia);
