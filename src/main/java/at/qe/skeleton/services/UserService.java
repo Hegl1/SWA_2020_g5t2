@@ -138,10 +138,6 @@ public class UserService {
 			throw new UnallowedInputException("Unallowed input for Email!");
 		}
 
-		if (userRepository.findFirstByUsername(user.getUsername()) != null) {
-			throw new UnallowedInputException("Username already exists");
-		}
-
 		if (user.isNew()) {
 			user.setCreateDate(new Date());
 		} else {

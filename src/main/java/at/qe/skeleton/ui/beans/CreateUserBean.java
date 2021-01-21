@@ -1,5 +1,14 @@
 package at.qe.skeleton.ui.beans;
 
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Component;
+
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.MailService;
@@ -7,15 +16,6 @@ import at.qe.skeleton.services.UndoRedoService;
 import at.qe.skeleton.services.UserService;
 import at.qe.skeleton.ui.controllers.FMSpamController;
 import net.bytebuddy.utility.RandomString;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @Component
 @Scope("view")
@@ -43,7 +43,7 @@ public class CreateUserBean implements Serializable {
 	private String selectedUserRoles;
 
 	@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('LIBRARIAN')")
-	public void saveUser(){
+	public void saveUser() {
 
 		RandomString passwordGen = new RandomString(8);
 
@@ -53,12 +53,17 @@ public class CreateUserBean implements Serializable {
 
 		setUserRoles();
 
+		if (userService.loadUser(user.getUsername()) != null) {
+			fms.warn("Username already in use");
+			return;
+		}
+
 		try {
 			userService.saveUser(user);
 			mailService.sendMail(user.getEmail(), "Your account was created",
-					"Dear User,\nyour account has been created successfully." +
-							"\nYou can login with the following data:\nusername: " + user.getUsername() + "\n" +
-							"password: " + password + "\n Yours sincerely \n Your Library Team");
+					"Dear User,\nyour account has been created successfully."
+							+ "\nYou can login with the following data:\nusername: " + user.getUsername() + "\n"
+							+ "password: " + password + "\n Yours sincerely \n Your Library Team");
 			undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.SAVE_USER));
 			fms.info("A new user was created.");
 
@@ -72,26 +77,25 @@ public class CreateUserBean implements Serializable {
 	private void setUserRoles() {
 		Set<UserRole> userRole = new HashSet<>();
 
-
 		switch (selectedUserRoles) {
-			case "librarian":
-				userRole.add(UserRole.LIBRARIAN);
-				break;
-			case "admin":
-				userRole.add(UserRole.ADMIN);
-				break;
-			case "customer":
-				userRole.add(UserRole.CUSTOMER);
-				break;
-			default: return;
+		case "librarian":
+			userRole.add(UserRole.LIBRARIAN);
+			break;
+		case "admin":
+			userRole.add(UserRole.ADMIN);
+			break;
+		case "customer":
+			userRole.add(UserRole.CUSTOMER);
+			break;
+		default:
+			return;
 		}
-
 
 		user.setRoles(userRole);
 	}
 
 	public User getUser() {
-		if(this.user == null){
+		if (this.user == null) {
 			this.user = new User();
 		}
 
@@ -110,7 +114,7 @@ public class CreateUserBean implements Serializable {
 		this.selectedUserRoles = selectedUserRoles;
 	}
 
-	public void reset(){
+	public void reset() {
 		this.user = null;
 	}
 }
