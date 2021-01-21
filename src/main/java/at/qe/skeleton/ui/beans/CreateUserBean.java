@@ -79,19 +79,20 @@ public class CreateUserBean implements Serializable {
 
 		if (selectedUserRoles != null) {
 			switch (selectedUserRoles) {
-				case "librarian":
-					userRole.add(UserRole.LIBRARIAN);
-					break;
-				case "admin":
-					userRole.add(UserRole.ADMIN);
-					break;
-				case "customer":
-					userRole.add(UserRole.CUSTOMER);
-					break;
-				default:
-					return;
+			case "librarian":
+				userRole.add(UserRole.LIBRARIAN);
+				break;
+			case "admin":
+				userRole.add(UserRole.ADMIN);
+				break;
+			case "customer":
+				userRole.add(UserRole.CUSTOMER);
+				break;
+			default:
+				return;
 			}
 		} else {
+			fms.warn("No user role selected - using customer as default.");
 			userRole.add(UserRole.CUSTOMER);
 		}
 
