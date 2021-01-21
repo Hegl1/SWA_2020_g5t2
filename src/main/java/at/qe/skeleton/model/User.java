@@ -135,8 +135,14 @@ public class User implements Persistable<String>, Serializable {
 		return this.roles;
 	}
 
+	/**
+	 * Returns whether the user has the given role or not
+	 *
+	 * @param role the role given as string
+	 * @return true, if it has the role, false otherwise
+	 */
 	public boolean hasRole(String role){
-		switch(role){
+		switch(role.toUpperCase()){
 			case "ADMIN": return getRoles().contains(UserRole.ADMIN);
 			case "CUSTOMER": return getRoles().contains(UserRole.CUSTOMER);
 			case "LIBRARIAN": return getRoles().contains(UserRole.LIBRARIAN);

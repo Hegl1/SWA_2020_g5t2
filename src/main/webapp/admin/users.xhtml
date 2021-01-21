@@ -59,8 +59,8 @@
                     <p:column headerText="Last name">
                         <h:outputText value="#{user.lastName}"/>
                     </p:column>
-                    <p:column headerText="User permissions">
-                        <h:outputText value="#{user.roles}"/>
+                    <p:column headerText="User role">
+                        <h:outputText value="#{userListController.getUserRoleHuman(user.roles)}"/>
                     </p:column>
                     <p:column headerText="Enabled">
                         <h:selectBooleanCheckbox value="#{user.enabled}" disabled="true"/>
@@ -83,48 +83,36 @@
 
                 <!-- Edit User Dialog-->
                 <p:dialog header="Edit user" id="userEditDialog" widgetVar="userEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-                    <p:outputPanel id="userData" rendered="#{not empty userDetailController.user}">
+                    <p:outputPanel id="editUserData" rendered="#{not empty userDetailController.user}">
                         <h:panelGrid columns="2">
-                            <p:outputLabel for="username" value="Username: " />
-                            <p:inputText id="username" value="#{userDetailController.user.username}" disabled="true"/>
-                        </h:panelGrid>
-                        <p:separator />
-                        <h:panelGrid columns="2">
-                            <p:outputLabel for="firstName" value="First name: " />
-                            <p:inputText id="firstName" value="#{userDetailController.user.firstName}"/>
-                            <p:outputLabel for="firstName" value="Last name: " />
-                            <p:inputText id="lastName" value="#{userDetailController.user.lastName}"/>
-                            <p:outputLabel for="email" value="E-mail: " />
-                            <p:inputText id="email" value="#{userDetailController.user.email}"/>
-                        </h:panelGrid>
-                            <h:panelGrid columns="3">
-                                <p:commandButton value="Admin" action="#{userDetailController.setAsAdmin}" disabled="#{!sessionInfoBean.hasRole('ADMIN')}"/>
-                                <p:commandButton value="Librarian" action="#{userDetailController.setAsLibrarian}" disabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
-                                <p:commandButton value="Customer" action="#{userDetailController.setAsCustomer}"/>
-                            </h:panelGrid>
+                            <p:outputLabel for="@next" value="First name: " />
+                            <p:inputText value="#{userDetailController.user.username}" disabled="true" />
+                            <p:outputLabel for="@next" value="Last name: " />
+                            <p:inputText value="#{userDetailController.user.lastName}"/>
+                            <p:outputLabel for="@next" value="Username: " />
+                            <p:inputText value="#{userDetailController.user.username}"/>
+                            <p:outputLabel for="@next" value="E-mail: " />
+                            <p:inputText value="#{userDetailController.user.email}"/>
+                            <h:outputText value="User permissions:" />
+                            <p:selectOneButton value="#{userDetailController.userRole}">
+                                <f:selectItem itemLabel="Admin" itemValue="ADMIN" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                                <f:selectItem itemLabel="Librarian" itemValue="LIBRARIAN" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                                <f:selectItem itemLabel="Customer" itemValue="CUSTOMER" />
+                            </p:selectOneButton>
 
-
-
-                        <p:separator />
-                        <h:panelGrid columns="2">
-                            <p:outputLabel for="enabled" value="Enabled: " />
-                            <p:selectBooleanCheckbox id="enabled" value="#{userDetailController.user.enabled}"/>
-                        </h:panelGrid>
-                        <p:separator />
-                        <h:panelGrid columns="3">
-                            <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update=":userForm:usersTable :headerForm:undoRedoGroup">
-                            </p:commandButton>
-                            <p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}" update=":userForm:userData"/>
-                            <p:commandButton value="Cancel" onclick="PF('userEditDialog').hide()"/>
+                            <p:outputLabel for="@next" value="Enabled: " />
+                            <p:selectBooleanCheckbox value="#{userDetailController.user.enabled}"/>
                         </h:panelGrid>
                     </p:outputPanel>
+                    <h:panelGrid columns="2">
+                        <p:commandButton
+                                value="Save" action="#{userDetailController.doSaveUser}" oncomplete="PF('userEditDialog').hide()"
+                                update=":userForm:usersTable :headerForm:undoRedoGroup" />
+                        <p:commandButton
+                                value="Cancel" action="#{userDetailController.reset()}" oncomplete="PF('userEditDialog').hide()"
+                                update=":userForm:userEditDialog" />
+                    </h:panelGrid>
                 </p:dialog>
-
-                <!-- delete Dialog-->
-                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
-                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-fw fa-check" />
-                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-fw fa-times" />
-                </p:confirmDialog>
 
                 <!-- New User Dialog -->
                 <p:dialog header="Create new user" id="userAddDialog" widgetVar="userAddDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
@@ -149,12 +137,18 @@
                     <h:panelGrid columns="2">
                         <p:commandButton
                                 value="Create user" action="#{createUserBean.saveUser()}" oncomplete="PF('userAddDialog').hide()"
-                                update="adminUserContent" />
+                                update=":adminUserContent :headerForm:undoRedoGroup" />
                         <p:commandButton
                                 value="Cancel" action="#{createUserBean.reset}" oncomplete="PF('userAddDialog').hide()"
                                 update=":userForm:userAddDialog" />
                     </h:panelGrid>
                 </p:dialog>
+
+                <!-- delete Dialog-->
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-fw fa-check" />
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-fw fa-times" />
+                </p:confirmDialog>
             </h:form>
         </h:panelGroup>
     </ui:define>
