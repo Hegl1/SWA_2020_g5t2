@@ -103,15 +103,18 @@ public class UserDetailController implements Serializable {
 	 * Action to save the currently displayed user.
 	 */
 	public void doSaveUser() {
-		this.undoRedoService.addAction(undoRedoService.createAction(userService.loadUser(this.user.getUsername()), user,
-				UndoRedoService.ActionType.EDIT_USER));
 		try {
+			User oldUser = userService.loadUser(this.user.getUsername());
+
 			this.user = this.userService.saveUser(this.user);
+
+			this.undoRedoService.addAction(undoRedoService.createAction(oldUser, user,
+					UndoRedoService.ActionType.EDIT_USER));
+
+			fms.info("Changes saved");
 		} catch (UnallowedInputException e) {
 			fms.warn(e.getMessage());
 		}
-
-		fms.info("Changes saved");
 	}
 
 	/**
@@ -124,13 +127,13 @@ public class UserDetailController implements Serializable {
 			fms.warn("This user has still borrowed: " + d1.size() + " article(s) and cannot be deleted yet.");
 		} else {
 			try {
-				fms.info("The user was deleted and all his bookmarks and reserved media has been deleted");
 				this.userService.deleteUser(this.user);
 				this.undoRedoService
 						.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.DELETE_USER));
+				fms.info("The user was deleted and all his bookmarks and reserved media has been deleted");
 
 			} catch (UserService.UnauthorizedActionException unauthorizedActionException) {
-				fms.warn("Cannot delete onw user.");
+				fms.warn("Cannot delete yourself");
 
 			}
 			this.user = null;

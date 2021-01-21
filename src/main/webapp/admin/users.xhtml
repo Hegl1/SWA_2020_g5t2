@@ -85,12 +85,12 @@
                 <p:dialog header="Edit user" id="userEditDialog" widgetVar="userEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
                     <p:outputPanel id="editUserData" rendered="#{not empty userDetailController.user}">
                         <h:panelGrid columns="2">
-                            <p:outputLabel for="@next" value="First name: " />
+                            <p:outputLabel for="@next" value="Username: " />
                             <p:inputText value="#{userDetailController.user.username}" disabled="true" />
+                            <p:outputLabel for="@next" value="First name: " />
+                            <p:inputText value="#{userDetailController.user.firstName}"/>
                             <p:outputLabel for="@next" value="Last name: " />
                             <p:inputText value="#{userDetailController.user.lastName}"/>
-                            <p:outputLabel for="@next" value="Username: " />
-                            <p:inputText value="#{userDetailController.user.username}"/>
                             <p:outputLabel for="@next" value="E-mail: " />
                             <p:inputText value="#{userDetailController.user.email}"/>
                             <h:outputText value="User permissions:" />
