@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import at.qe.skeleton.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,11 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.Bookmark;
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.Reserved;
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.repositories.BookmarkRepository;
 import at.qe.skeleton.repositories.BorrowedRepository;
 import at.qe.skeleton.repositories.ReservedRepository;
@@ -335,6 +331,26 @@ public class UserService {
 	 */
 	public Collection<User> filterUserByRole(final Collection<User> filteredUser, final String role) {
 		return filteredUser.stream().filter(x -> x.hasRole(role)).collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	/**
+	 * Refreshes the user with data from the database
+	 *
+	 * @param user the user to refresh
+	 */
+	public void refreshUser(final User user) {
+		if(user.isNew()) return;
+
+		User refresh = this.userRepository.findFirstByUsername(user.getUsername());
+
+		user.setFirstName(refresh.getFirstName());
+		user.setLastName(refresh.getLastName());
+		user.setCreateDate(refresh.getCreateDate());
+		user.setUpdateDate(refresh.getUpdateDate());
+		user.setEmail(refresh.getEmail());
+		user.setEnabled(refresh.isEnabled());
+		user.setPassword(refresh.getPassword());
+		user.setRoles(refresh.getRoles());
 	}
 
 	/**

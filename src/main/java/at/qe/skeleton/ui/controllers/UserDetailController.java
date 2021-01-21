@@ -1,9 +1,7 @@
 package at.qe.skeleton.ui.controllers;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -45,19 +43,16 @@ public class UserDetailController implements Serializable {
 	 */
 	private User user;
 
-	private List<String> newRolesString;
-
-	/**
-	 * Sets the currently displayed user and reloads it form db. This user is
-	 * targeted by any further calls of {@link #doReloadUser()},
-	 * {@link #doSaveUser()} and {@link #doDeleteUser()}.
-	 *
-	 * @param user the user to set
-	 */
-	public void setUser(final User user) {
-		this.user = user;
-		// this.doReloadUser();
-	}
+    /**
+     * Sets the currently displayed user and reloads it form db. This user is
+     * targeted by any further calls of {@link #doSaveUser()} and {@link #doDeleteUser()}.
+     *
+     * @param user the user to set
+     */
+    public void setUser(final User user) {
+        this.user = user;
+        this.userService.refreshUser(user);
+    }
 
 	/**
 	 * Returns the currently displayed user.
@@ -68,49 +63,58 @@ public class UserDetailController implements Serializable {
 		return this.user;
 	}
 
-	public void setNewRolesString(final List<String> roles) {
-		this.newRolesString = roles;
-	}
+    public String getUserRole(){
+        if(this.user == null) return null;
 
-	public List<String> getNewRolesString() {
-		return newRolesString;
-	}
+        Iterator<UserRole> rolesIterator = this.user.getRoles().iterator();
 
-	/**
-	 * Creates User.
-	 */
-	public void doCreateUser(final String username, final String password, final String firstName,
-			final String lastName, final Boolean enabled, final UserRole roles, final String email) {
+        if(!rolesIterator.hasNext()) return null;
 
-		try {
-			this.userService.createUser(username, password, firstName, lastName, enabled, roles, email);
-			this.undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.SAVE_USER));
-		} catch (UserService.UnauthorizedActionException | UnallowedInputException e) {
-			fms.warn(e.getMessage());
-		}
-		this.doReloadUser();
-	}
+        return rolesIterator.next().toString();
+    }
 
-	/**
-	 * Action to force a reload of the currently displayed user.
-	 */
-	public void doReloadUser() {
-		this.user = this.userService.loadUser(this.user.getUsername());
-	}
+    public void setUserRole(final String userRole){
+        if(userRole == null || this.user == null) return;
+
+        switch(userRole.toUpperCase()){
+            case "ADMIN":
+                setUserRole(UserRole.ADMIN);
+                break;
+            case "LIBRARIAN":
+                setUserRole(UserRole.LIBRARIAN);
+                break;
+            case "CUSTOMER":
+                setUserRole(UserRole.CUSTOMER);
+                break;
+        }
+    }
+
+    /**
+     * Sets the users role
+     * @param userRole
+     */
+    private void setUserRole(final UserRole userRole){
+        if(userRole == null || this.user == null) return;
+
+        this.user.setRoles(new HashSet<>(Collections.singletonList(userRole)));
+    }
 
 	/**
 	 * Action to save the currently displayed user.
 	 */
 	public void doSaveUser() {
-		this.undoRedoService.addAction(undoRedoService.createAction(userService.loadUser(this.user.getUsername()), user,
-				UndoRedoService.ActionType.EDIT_USER));
 		try {
+			User oldUser = userService.loadUser(this.user.getUsername());
+
 			this.user = this.userService.saveUser(this.user);
+
+			this.undoRedoService.addAction(undoRedoService.createAction(oldUser, user,
+					UndoRedoService.ActionType.EDIT_USER));
+
+			fms.info("Changes saved");
 		} catch (UnallowedInputException e) {
 			fms.warn(e.getMessage());
 		}
-
-		fms.info("Changes saved");
 	}
 
 	/**
@@ -123,13 +127,13 @@ public class UserDetailController implements Serializable {
 			fms.warn("This user has still borrowed: " + d1.size() + " article(s) and cannot be deleted yet.");
 		} else {
 			try {
-				fms.info("The user was deleted and all his bookmarks and reserved media has been deleted");
 				this.userService.deleteUser(this.user);
 				this.undoRedoService
 						.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.DELETE_USER));
+				fms.info("The user was deleted and all his bookmarks and reserved media has been deleted");
 
 			} catch (UserService.UnauthorizedActionException unauthorizedActionException) {
-				fms.warn("Cannot delete onw user.");
+				fms.warn("Cannot delete yourself");
 
 			}
 			this.user = null;
@@ -137,59 +141,7 @@ public class UserDetailController implements Serializable {
 
 	}
 
-	public void changeUserRoles() {
-		try {
-			userService.changeUserRoles(user, newRolesString);
-			this.newRolesString = null;
-			fms.info("Role edit done successfully.");
-
-		} catch (UnallowedInputException unauthorizedActionException) {
-			fms.warn("Multiple roles cannot be set.");
-		}
-	}
-
-	public void setAsAdmin() {
-		List<String> newRolesString2 = new ArrayList<>();
-		newRolesString2.add("admin");
-		try {
-			userService.changeUserRoles(user, newRolesString2);
-			this.newRolesString = null;
-			fms.info("Admin Role set successfully.");
-		} catch (UnallowedInputException unauthorizedActionException) {
-			fms.warn("Did not work.");
-		}
-
-	}
-
-	public void setAsLibrarian() {
-		List<String> newRolesString2 = new ArrayList<>();
-		newRolesString2.add("librarian");
-		try {
-			userService.changeUserRoles(user, newRolesString2);
-			this.newRolesString = null;
-			fms.info("Librarian Role set successfully.");
-		} catch (UnallowedInputException unauthorizedActionException) {
-			fms.warn("Did not work.");
-		}
-	}
-
-	public void setAsCustomer() {
-		List<String> newRolesString2 = new ArrayList<>();
-		newRolesString2.add("customer");
-		try {
-			userService.changeUserRoles(user, newRolesString2);
-			this.newRolesString = null;
-			fms.info("Customer Role set successfully.");
-		} catch (UnallowedInputException unauthorizedActionException) {
-			fms.warn("Did not work.");
-		}
-	}
-
-	public UserService getUserService() {
-		return userService;
-	}
-
-	public void setUserService(final UserService userService) {
-		this.userService = userService;
-	}
+    public void reset(){
+        this.user = null;
+    }
 }
