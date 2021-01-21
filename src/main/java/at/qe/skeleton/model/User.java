@@ -57,7 +57,7 @@ public class User implements Persistable<String>, Serializable {
 	private Set<UserRole> roles;
 
 	/**
-	 * Default construcotr. Initializes the set of user roles.
+	 * Default constructor. Initializes the set of user roles.
 	 */
 	public User() {
 		this.roles = new HashSet<UserRole>();
