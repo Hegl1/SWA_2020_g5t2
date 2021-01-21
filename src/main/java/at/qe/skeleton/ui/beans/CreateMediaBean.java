@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import at.qe.skeleton.model.Media;
 import at.qe.skeleton.services.MediaService;
+import at.qe.skeleton.services.MediaService.TotalAvailabilitySetTooLowException;
 import at.qe.skeleton.services.UndoRedoService;
 import at.qe.skeleton.ui.controllers.FMSpamController;
 import at.qe.skeleton.utils.UnallowedInputException;
@@ -85,7 +86,7 @@ public class CreateMediaBean implements Serializable {
 		// this.doReloadMedia();
 	}
 
-	public void doCreateMedia() throws MediaService.TotalAvailabilitySetTooLowException {
+	public void doCreateMedia() {
 
 		try {
 
@@ -115,6 +116,8 @@ public class CreateMediaBean implements Serializable {
 		} catch (IllegalStateException | IOException exception) {
 
 		} catch (UnallowedInputException e) {
+			fms.warn(e.getMessage());
+		} catch (TotalAvailabilitySetTooLowException e) {
 			fms.warn(e.getMessage());
 		}
 
