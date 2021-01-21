@@ -206,7 +206,7 @@ public class MediaService {
 			final int length) throws TotalAvailabilitySetTooLowException, UnallowedInputException {
 
 		if (length < 1) {
-			throw new TotalAvailabilitySetTooLowException("No empty fields allowed");
+			throw new UnallowedInputException("No empty fields allowed");
 		}
 		Media newVideo = new Video(title, publishingYear, language, totalAvail, length);
 		this.saveMedia(newVideo);
