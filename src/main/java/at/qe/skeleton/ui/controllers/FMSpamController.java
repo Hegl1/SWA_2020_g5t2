@@ -13,12 +13,10 @@ import java.io.Serializable;
  * Controller for sending faces messages
  */
 @Component
-@Scope("view")
+@Scope("session")
 public class FMSpamController implements Serializable {
-
     @Autowired
     SessionInfoBean sessionInfoBean;
-
 
     /**
      * send with severity "info (green)"

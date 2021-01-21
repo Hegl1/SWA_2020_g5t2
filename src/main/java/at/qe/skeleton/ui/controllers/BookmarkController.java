@@ -1,23 +1,17 @@
 package at.qe.skeleton.ui.controllers;
 
-import java.io.Serializable;
-
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.services.BookmarkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.Bookmark;
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.services.BookmarkService;
-import at.qe.skeleton.services.UndoRedoService;
+import java.io.Serializable;
 
 @Component
-@Scope("view")
+@Scope("session")
 
 public class BookmarkController implements Serializable {
-	@Autowired
-	private UndoRedoService undoRedoService;
-
 	@Autowired
 	private BookmarkService bookmarkService;
 
@@ -25,16 +19,7 @@ public class BookmarkController implements Serializable {
 	FMSpamController fms;
 
 	public void toggleBookmark(final Media media) {
-		UndoRedoService.ActionType action;
-		Bookmark target = bookmarkService.getBookmarkForAuthenticatedUserByMedia(media);
-
-		if (bookmarkService.toggleBookmark(media)) {
-			action = UndoRedoService.ActionType.SAVE_BOOKMARK;
-			target = bookmarkService.getBookmarkForAuthenticatedUserByMedia(media);
-		} else {
-			action = UndoRedoService.ActionType.DELETE_BOOKMARK;
-		}
-
+		bookmarkService.toggleBookmark(media);
 	}
 
 	public boolean isBookmarkedForAuthenticatedUser(final Media media) {

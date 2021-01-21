@@ -1,20 +1,19 @@
 package at.qe.skeleton.ui.controllers;
 
-import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import at.qe.skeleton.model.Borrowed;
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
 import at.qe.skeleton.services.BorrowService;
 import at.qe.skeleton.services.UndoRedoService;
 import at.qe.skeleton.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 
 /**
  * Controller for the borrowed list view.

@@ -14,9 +14,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("request")
 public class SecurityTestBean {
-
-    // TODO: probably delete Bean
-
     private boolean showOkDialog = false;
     private String performedAction = "NONE";
 

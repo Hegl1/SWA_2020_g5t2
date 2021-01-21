@@ -1,33 +1,16 @@
 package at.qe.skeleton.ui.controllers;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
+import at.qe.skeleton.model.*;
+import at.qe.skeleton.repositories.BookmarkRepository;
+import at.qe.skeleton.services.*;
+import at.qe.skeleton.utils.UnallowedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.qe.skeleton.model.AudioBook;
-import at.qe.skeleton.model.Book;
-import at.qe.skeleton.model.Bookmark;
-import at.qe.skeleton.model.Borrowed;
-import at.qe.skeleton.model.Magazine;
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.model.MediaType;
-import at.qe.skeleton.model.User;
-import at.qe.skeleton.model.Video;
-import at.qe.skeleton.repositories.BookmarkRepository;
-import at.qe.skeleton.services.BookmarkService;
-import at.qe.skeleton.services.BorrowService;
-import at.qe.skeleton.services.MailService;
-import at.qe.skeleton.services.MediaService;
-import at.qe.skeleton.services.UndoRedoService;
-import at.qe.skeleton.utils.UnallowedInputException;
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Controller for the media detail view.
@@ -35,7 +18,6 @@ import at.qe.skeleton.utils.UnallowedInputException;
 @Component
 @Scope("view")
 public class MediaDetailController implements Serializable {
-
 	@Autowired
 	private MediaService mediaService;
 
@@ -150,7 +132,7 @@ public class MediaDetailController implements Serializable {
 
 			doSafeDeleteMedia(media);
 		}
-		// optionally close the occuring loading message as the deleting and mail
+		// optionally close the occurring loading message as the deleting and mail
 		// sending process can take a while
 		// PrimeFaces.current().executeScript("PF('dataChangeDlg').hide()");
 	}
