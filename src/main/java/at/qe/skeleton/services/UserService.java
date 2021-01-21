@@ -26,6 +26,7 @@ import at.qe.skeleton.repositories.BookmarkRepository;
 import at.qe.skeleton.repositories.BorrowedRepository;
 import at.qe.skeleton.repositories.ReservedRepository;
 import at.qe.skeleton.repositories.UserRepository;
+import at.qe.skeleton.utils.UnallowedInputException;
 
 /**
  * Service for accessing and manipulating user data.
@@ -136,6 +137,10 @@ public class UserService {
 
 		if (!matcher.matches()) {
 			throw new UnallowedInputException("Unallowed input for Email!");
+		}
+
+		if (user.getUsername().length() < 1 || user.getFirstName().length() < 1 || user.getLastName().length() < 1) {
+			throw new UnallowedInputException("All fields need to be filled out.");
 		}
 
 		if (user.isNew()) {
@@ -340,14 +345,6 @@ public class UserService {
 		private static final long serialVersionUID = 1L;
 
 		public UnauthorizedActionException(final String message) {
-			super(message);
-		}
-	}
-
-	public static class UnallowedInputException extends Exception {
-		private static final long serialVersionUID = 1L;
-
-		public UnallowedInputException(final String message) {
 			super(message);
 		}
 	}

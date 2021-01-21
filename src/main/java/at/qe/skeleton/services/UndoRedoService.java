@@ -19,6 +19,7 @@ import at.qe.skeleton.model.User;
 import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
 import at.qe.skeleton.services.UserService.UnauthorizedActionException;
+import at.qe.skeleton.utils.UnallowedInputException;
 
 /**
  * Class that provides a Service to undo and redo certain actions. As the class
@@ -104,7 +105,8 @@ public class UndoRedoService {
 	 *
 	 * @return the undid action-type
 	 */
-	public ActionType undoLastAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
+	public ActionType undoLastAction()
+			throws MediaService.TotalAvailabilitySetTooLowException, UnallowedInputException {
 		ActionItem action = unDoQueue.pop();
 		if (action != null) {
 			action.performUndoAction();
@@ -124,7 +126,8 @@ public class UndoRedoService {
 	 *
 	 * @return the redid action-type
 	 */
-	public ActionType redoLastAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException {
+	public ActionType redoLastAction()
+			throws MediaService.TotalAvailabilitySetTooLowException, UnallowedInputException {
 		ActionItem action = reDoQueue.pop();
 		if (action != null) {
 			action.performRedoAction();
@@ -296,12 +299,14 @@ public class UndoRedoService {
 		/**
 		 * method that undoes the recent action.
 		 */
-		abstract void performUndoAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException;
+		abstract void performUndoAction()
+				throws MediaService.TotalAvailabilitySetTooLowException, UnallowedInputException;
 
 		/**
 		 * method that redoes the recent action.
 		 */
-		abstract void performRedoAction() throws MediaService.TotalAvailabilitySetTooLowException, UserService.UnallowedInputException;
+		abstract void performRedoAction()
+				throws MediaService.TotalAvailabilitySetTooLowException, UnallowedInputException;
 	}
 
 	/**
@@ -436,7 +441,7 @@ public class UndoRedoService {
 		}
 
 		@Override
-		void performUndoAction() throws UserService.UnallowedInputException {
+		void performUndoAction() throws UnallowedInputException {
 			if (type.equals(ActionType.SAVE_USER)) {
 				try {
 					userService.deleteUser(beforeEditUser);
@@ -454,7 +459,7 @@ public class UndoRedoService {
 		}
 
 		@Override
-		void performRedoAction() throws UserService.UnallowedInputException {
+		void performRedoAction() throws UnallowedInputException {
 			if (type.equals(ActionType.SAVE_USER)) {
 				userService.saveUser(beforeEditUser);
 			} else if (type.equals(ActionType.DELETE_USER)) {

@@ -2,13 +2,13 @@ package at.qe.skeleton.ui.controllers;
 
 import java.io.Serializable;
 
-import at.qe.skeleton.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import at.qe.skeleton.services.MediaService;
 import at.qe.skeleton.services.UndoRedoService;
+import at.qe.skeleton.utils.UnallowedInputException;
 
 @Component
 @Scope("view")
@@ -89,7 +89,7 @@ public class UndoRedoController implements Serializable {
 
 		} catch (MediaService.TotalAvailabilitySetTooLowException e) {
 			fms.warn("Availability cannot be set: Too many medias are borrowed at the moment.");
-		} catch (UserService.UnallowedInputException e) {
+		} catch (UnallowedInputException e) {
 			fms.warn(e.getMessage());
 		}
 	}
@@ -144,7 +144,7 @@ public class UndoRedoController implements Serializable {
 			fms.info(message);
 		} catch (MediaService.TotalAvailabilitySetTooLowException e) {
 			fms.warn("Availability cannot be set: Too many medias are borrowed at the moment.");
-		} catch (UserService.UnallowedInputException e) {
+		} catch (UnallowedInputException e) {
 			fms.warn(e.getMessage());
 		}
 	}

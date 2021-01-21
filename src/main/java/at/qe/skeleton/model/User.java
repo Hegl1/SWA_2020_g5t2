@@ -1,15 +1,26 @@
 package at.qe.skeleton.model;
 
-import org.springframework.data.domain.Persistable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.springframework.data.domain.Persistable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * Entity representing users. Very similar to the User class of the skeleton
@@ -91,17 +102,17 @@ public class User implements Persistable<String>, Serializable {
 	}
 
 	public void setPassword(final String password) {
-		if(password != this.password){
-			if(password != null && !password.equals("")){
+		if (password != this.password) {
+			if (password != null && !password.equals("")) {
 				// if password was changed, then encrypt it again
 				Pattern BCRYPT_PATTERN = Pattern.compile("^\\$2[ayb]\\$.{56}$");
 				if (!BCRYPT_PATTERN.matcher(password).matches()) {
 					BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(9);
 					this.password = passwordEncoder.encode(password);
-				}else{
+				} else {
 					this.password = password;
 				}
-			}else{
+			} else {
 				this.password = null;
 			}
 		}
@@ -135,11 +146,14 @@ public class User implements Persistable<String>, Serializable {
 		return this.roles;
 	}
 
-	public boolean hasRole(String role){
-		switch(role){
-			case "ADMIN": return getRoles().contains(UserRole.ADMIN);
-			case "CUSTOMER": return getRoles().contains(UserRole.CUSTOMER);
-			case "LIBRARIAN": return getRoles().contains(UserRole.LIBRARIAN);
+	public boolean hasRole(final String role) {
+		switch (role) {
+		case "ADMIN":
+			return getRoles().contains(UserRole.ADMIN);
+		case "CUSTOMER":
+			return getRoles().contains(UserRole.CUSTOMER);
+		case "LIBRARIAN":
+			return getRoles().contains(UserRole.LIBRARIAN);
 		}
 
 		return false;
