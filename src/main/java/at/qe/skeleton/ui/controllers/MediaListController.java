@@ -14,7 +14,7 @@ import java.util.Locale;
  * Controller for the Media list view.
  */
 @Component
-@Scope("view")
+@Scope("session")
 public class MediaListController implements Serializable {
     @Autowired
     MediaService mediaService;

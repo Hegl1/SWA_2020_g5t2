@@ -1,15 +1,14 @@
 package at.qe.skeleton.ui.controllers;
 
-import java.io.Serializable;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import at.qe.skeleton.model.User;
 import at.qe.skeleton.services.UndoRedoService;
 import at.qe.skeleton.services.UserService;
 import at.qe.skeleton.utils.UnallowedInputException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
 
 @Component
 @Scope("view")

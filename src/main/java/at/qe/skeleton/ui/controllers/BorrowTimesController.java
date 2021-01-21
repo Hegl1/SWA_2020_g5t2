@@ -1,16 +1,15 @@
 package at.qe.skeleton.ui.controllers;
 
-import java.io.Serializable;
-import java.util.Collection;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import at.qe.skeleton.model.MediaBorrowTime;
 import at.qe.skeleton.model.MediaType;
 import at.qe.skeleton.repositories.MediaBorrowTimeRepository;
 import at.qe.skeleton.services.UndoRedoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.io.Serializable;
+import java.util.Collection;
 
 @Component
 @Scope("view")

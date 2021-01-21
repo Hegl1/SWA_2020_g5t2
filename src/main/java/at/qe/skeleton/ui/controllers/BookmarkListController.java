@@ -16,7 +16,7 @@ import java.util.Collection;
  *
  */
 @Component
-@Scope("view")
+@Scope("session")
 
 public class BookmarkListController implements Serializable {
 
@@ -41,14 +41,4 @@ public class BookmarkListController implements Serializable {
 
 		return bookmarkService.getBookmarksByUser(currentUser);
 	}
-
-	/**
-	 * Action to delete the currently displayed bookmark.
-	 */
-	public void doDeleteBookmark() {
-
-		this.bookmarkService.deleteBookmark(bookmark);
-		bookmark = null;
-	}
-
 }

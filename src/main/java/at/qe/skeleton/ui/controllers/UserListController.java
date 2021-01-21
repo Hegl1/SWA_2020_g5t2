@@ -20,7 +20,7 @@ import java.util.Set;
  * University of Innsbruck.
  */
 @Component
-@Scope("view")
+@Scope("session")
 public class UserListController implements Serializable {
 
     @Autowired
