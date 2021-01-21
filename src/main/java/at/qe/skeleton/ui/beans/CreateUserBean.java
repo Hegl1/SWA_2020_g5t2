@@ -15,6 +15,7 @@ import at.qe.skeleton.services.MailService;
 import at.qe.skeleton.services.UndoRedoService;
 import at.qe.skeleton.services.UserService;
 import at.qe.skeleton.ui.controllers.FMSpamController;
+import at.qe.skeleton.utils.UnallowedInputException;
 import net.bytebuddy.utility.RandomString;
 
 @Component
@@ -67,7 +68,7 @@ public class CreateUserBean implements Serializable {
 			undoRedoService.addAction(undoRedoService.createAction(user, UndoRedoService.ActionType.SAVE_USER));
 			fms.info("A new user was created.");
 
-		} catch (UserService.UnallowedInputException e) {
+		} catch (UnallowedInputException e) {
 			fms.warn(e.getMessage());
 		}
 

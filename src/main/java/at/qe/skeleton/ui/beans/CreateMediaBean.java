@@ -1,17 +1,22 @@
 package at.qe.skeleton.ui.beans;
 
-import at.qe.skeleton.model.Media;
-import at.qe.skeleton.services.MediaService;
-import at.qe.skeleton.services.UndoRedoService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import java.io.IOException;
+import java.io.Serializable;
 
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.Serializable;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import at.qe.skeleton.model.Media;
+import at.qe.skeleton.services.MediaService;
+import at.qe.skeleton.services.MediaService.TotalAvailabilitySetTooLowException;
+import at.qe.skeleton.services.UndoRedoService;
+import at.qe.skeleton.ui.controllers.FMSpamController;
+import at.qe.skeleton.utils.UnallowedInputException;
 
 @Component
 @Scope("view")
@@ -27,6 +32,9 @@ public class CreateMediaBean implements Serializable {
 
 	@Autowired
 	private UndoRedoService undoRedoService;
+
+	@Autowired
+	private FMSpamController fms;
 
 	private String title;
 	private int publishingDate;
@@ -49,36 +57,38 @@ public class CreateMediaBean implements Serializable {
 
 	/**
 	 * Create different Medias.
+	 * 
+	 * @throws UnallowedInputException
 	 */
 
-	private void doCreateAudioBook() throws MediaService.TotalAvailabilitySetTooLowException {
-		Media media = this.mediaService.createAudioBook(title, publishingDate, language, totalAvail,
-				 speaker, length, author, ISBN);
+	private void doCreateAudioBook() throws MediaService.TotalAvailabilitySetTooLowException, UnallowedInputException {
+		Media media = this.mediaService.createAudioBook(title, publishingDate, language, totalAvail, speaker, length,
+				author, ISBN);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	private void doCreateBook() throws MediaService.TotalAvailabilitySetTooLowException {
+	private void doCreateBook() throws MediaService.TotalAvailabilitySetTooLowException, UnallowedInputException {
 		Media media = this.mediaService.createBook(title, publishingDate, language, totalAvail, author, ISBN);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	private void doCreateMagazine() throws MediaService.TotalAvailabilitySetTooLowException {
+	private void doCreateMagazine() throws MediaService.TotalAvailabilitySetTooLowException, UnallowedInputException {
 		Media media = this.mediaService.createMagazine(title, publishingDate, language, totalAvail, series);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	private void doCreateVideo() throws MediaService.TotalAvailabilitySetTooLowException {
+	private void doCreateVideo() throws MediaService.TotalAvailabilitySetTooLowException, UnallowedInputException {
 		Media media = this.mediaService.createVideo(title, publishingDate, language, totalAvail, length);
 		undoRedoService.addAction(undoRedoService.createAction(media, UndoRedoService.ActionType.SAVE_MEDIA));
 		// this.doReloadMedia();
 	}
 
-	public void doCreateMedia() throws MediaService.TotalAvailabilitySetTooLowException {
+	public void doCreateMedia() {
 
-		try{
+		try {
 
 			switch (mediaType) {
 			case "VIDEO":
@@ -104,6 +114,11 @@ public class CreateMediaBean implements Serializable {
 			reloadPage();
 
 		} catch (IllegalStateException | IOException exception) {
+
+		} catch (UnallowedInputException e) {
+			fms.warn(e.getMessage());
+		} catch (TotalAvailabilitySetTooLowException e) {
+			fms.warn(e.getMessage());
 		}
 
 	}

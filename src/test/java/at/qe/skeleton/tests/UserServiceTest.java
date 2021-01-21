@@ -24,6 +24,7 @@ import at.qe.skeleton.model.UserRole;
 import at.qe.skeleton.services.UserService;
 import at.qe.skeleton.services.UserService.UnauthorizedActionException;
 import at.qe.skeleton.ui.beans.ContextMocker;
+import at.qe.skeleton.utils.UnallowedInputException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -56,7 +57,7 @@ public class UserServiceTest {
 	@Test
 	@DirtiesContext
 	@WithMockUser(username = "admin", authorities = { "ADMIN" })
-	public void testSaveUser() throws UserService.UnallowedInputException {
+	public void testSaveUser() throws UnallowedInputException {
 
 		User newUser = new User("testUser", "passwd", "Max", "Mustermann", true, UserRole.ADMIN, "tester@email.com");
 		this.userService.saveUser(newUser);
@@ -120,7 +121,7 @@ public class UserServiceTest {
 	@Test
 	@DirtiesContext
 	@WithMockUser(username = "admin", authorities = { "ADMIN" })
-	public void testUserRoleChange() throws UserService.UnallowedInputException {
+	public void testUserRoleChange() throws UnallowedInputException {
 		User user = this.userService.loadUser("csauer");
 
 		List<String> roleList = new ArrayList<>();
@@ -288,8 +289,7 @@ public class UserServiceTest {
 	@Test
 	@DirtiesContext
 	@WithMockUser(username = "amuss", authorities = { "ADMIN" })
-	public void testAuthorizedCreateCorrectUser()
-			throws UserService.UnallowedInputException, UnauthorizedActionException {
+	public void testAuthorizedCreateCorrectUser() throws UnallowedInputException, UnauthorizedActionException {
 		this.userService.createUser("maxmuster", "passwd", "Max", "Mustermann", true, UserRole.CUSTOMER,
 				"m.mustermann@swa.at");
 
@@ -299,17 +299,15 @@ public class UserServiceTest {
 	@Test
 	@DirtiesContext
 	@WithMockUser(username = "amuss", authorities = { "ADMIN" })
-	public void testAuthorizedCreateIncorrectUser()
-			throws UserService.UnallowedInputException, UnauthorizedActionException {
-		Assertions.assertThrows(UserService.UnallowedInputException.class,
-				() -> this.userService.createUser("maxmuster", "passwd", "Max", "Mustermann", true, UserRole.CUSTOMER,
-						"m.mustermann_ät_swa.at"));
+	public void testAuthorizedCreateIncorrectUser() throws UnallowedInputException, UnauthorizedActionException {
+		Assertions.assertThrows(UnallowedInputException.class, () -> this.userService.createUser("maxmuster", "passwd",
+				"Max", "Mustermann", true, UserRole.CUSTOMER, "m.mustermann_ät_swa.at"));
 	}
 
 	@Test
 	@DirtiesContext
 	@WithMockUser(username = "customer", authorities = { "CUSTOMER" })
-	public void testUnauthorizedCreateUser() throws UserService.UnallowedInputException, UnauthorizedActionException {
+	public void testUnauthorizedCreateUser() throws UnallowedInputException, UnauthorizedActionException {
 		Assertions.assertThrows(AccessDeniedException.class, () -> this.userService.createUser("maxmuster", "passwd",
 				"Max", "Mustermann", true, UserRole.CUSTOMER, "m.mustermann@swa.at"));
 	}
@@ -317,8 +315,7 @@ public class UserServiceTest {
 	@Test
 	@DirtiesContext
 	@WithMockUser(username = "sprill", authorities = { "LIBRARIAN" })
-	public void testUnauthorizedLibrarianCreateUser()
-			throws UserService.UnallowedInputException, UnauthorizedActionException {
+	public void testUnauthorizedLibrarianCreateUser() throws UnallowedInputException, UnauthorizedActionException {
 		Assertions.assertThrows(UnauthorizedActionException.class, () -> this.userService.createUser("maxmuster",
 				"passwd", "Max", "Mustermann", true, UserRole.LIBRARIAN, "m.mustermann@swa.at"));
 	}
