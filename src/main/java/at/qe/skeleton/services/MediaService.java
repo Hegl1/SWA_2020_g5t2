@@ -57,7 +57,8 @@ public class MediaService {
 					"You cannot set less available items than are currently borrowed by persons");
 		}
 
-		if (media.getLanguage().length() < 1 || media.getTitle().length() < 1 || media.getTotalAvail() < 1) {
+		if (media.getLanguage() == null || media.getLanguage().length() < 1 || media.getTitle().length() < 1
+				|| media.getTotalAvail() < 1) {
 			throw new UnallowedInputException("No empty fields allowed");
 		}
 
