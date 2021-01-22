@@ -3,157 +3,153 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jstl/core"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
-        <h2>Admin users</h2>
+        <h:panelGroup layout="block" id="adminUserContent">
+            <h2>Admin users</h2>
 
-        <h:form id="filter" style="margin-bottom: 15px">
-            <p:accordionPanel activeIndex="-2">
-                <p:tab title="Search">
-                    <h:panelGrid columns="2" style="margin-bottom: 10px">
-                        <p:outputLabel for="@next" value="Search username:" />
-                        <p:inputText value="#{searchUserBean.filterUsername}" />
+            <c:set value="#{null}" target="#{searchUserBean}" property="init" />
 
-                        <p:outputLabel for="@next" value="Search email:" />
-                        <p:inputText value="#{searchUserBean.filterEmail}" />
+            <h:form id="filter" style="margin-bottom: 15px">
+                <p:accordionPanel activeIndex="-2">
+                    <p:tab title="Search">
+                        <h:panelGrid columns="2" style="margin-bottom: 10px">
+                            <p:outputLabel for="@next" value="Search username:" />
+                            <p:inputText value="#{searchUserBean.filterUsername}" />
 
-                        <p:outputLabel for="@next" value="Role:" />
-                        <p:selectOneMenu value="#{searchUserBean.filterRole}">
-                            <f:selectItem itemLabel="Any" itemValue="" />
-                            <f:selectItem itemLabel="Customer" itemValue="CUSTOMER" />
-                            <f:selectItem itemLabel="Librarian" itemValue="LIBRARIAN" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
-                            <f:selectItem itemLabel="Admin" itemValue="ADMIN" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
-                        </p:selectOneMenu>
-                    </h:panelGrid>
-                    <p:commandButton
-                            icon="fa fa-fw fa-search"
-                            value="Search"
-                            action="#{searchUserBean.doFilter}"
-                            update=":userForm" />
-                    <p:commandButton
-                            icon="fa fa-fw fa-times"
-                            value="Clear search"
-                            action="#{searchUserBean.doResetFilter}"
-                            update=":userForm @form" />
-                </p:tab>
-            </p:accordionPanel>
-        </h:form>
+                            <p:outputLabel for="@next" value="Search email:" />
+                            <p:inputText value="#{searchUserBean.filterEmail}" />
 
-        <h:form id="userForm">
-            <p:dataTable id="usersTable" var="user" value="#{searchUserBean.results}">
-                <f:facet name="header">
-                    <p:commandButton
-                            update=":userForm:userAddDialog" oncomplete="PF('userAddDialog').show()"
-                            icon="fa fa-fw fa-plus" title="Create new user" value="Create new user" />
-                </f:facet>
-                <p:column headerText="User name">
-                    <h:outputText value="#{user.username}"/>
-                </p:column>
-                <p:column headerText="First name">
-                    <h:outputText value="#{user.firstName}"/>
-                </p:column>
-                <p:column headerText="Last name">
-                    <h:outputText value="#{user.lastName}"/>
-                </p:column>
-                <p:column headerText="User permissions">
-                    <h:outputText value="#{user.roles}"/>
-                </p:column>
-                <p:column headerText="Enabled">
-                    <h:selectBooleanCheckbox value="#{user.enabled}" disabled="true"/>
-                </p:column>
-                <p:column style="width:100px;text-align: center">
-                    <p:commandButton update=":userForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="fa fa-fw fa-edit" title="Edit">
-                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
-                    </p:commandButton>
-                    <p:commandButton action="#{userDetailController.doDeleteUser}" icon="fa fa-fw fa-trash" title="Delete" update=":userForm:usersTable :headerForm:undoRedoGroup">
-                        <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
-                        <p:confirm header="Delete user" message="Are you sure? User gets deleted irreversible!" icon="ui-icon-alert" />
-                    </p:commandButton>
-                    <p:linkButton outcome="/admin/userBorrowings" icon="fa fa-fw fa-briefcase" title="Edit borrowings for user" rendered="#{user.hasRole('CUSTOMER')}">
-                        <f:param name="username" value="#{user.username}" />
-                    </p:linkButton>
-                </p:column>
-            </p:dataTable>
+                            <p:outputLabel for="@next" value="Role:" />
+                            <p:selectOneMenu value="#{searchUserBean.filterRole}">
+                                <f:selectItem itemLabel="Any" itemValue="" />
+                                <f:selectItem itemLabel="Customer" itemValue="CUSTOMER" />
+                                <f:selectItem itemLabel="Librarian" itemValue="LIBRARIAN" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                                <f:selectItem itemLabel="Admin" itemValue="ADMIN" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                            </p:selectOneMenu>
+                        </h:panelGrid>
+                        <p:commandButton
+                                icon="fa fa-fw fa-search"
+                                value="Search"
+                                action="#{searchUserBean.doFilter}"
+                                update=":userForm" />
+                        <p:commandButton
+                                icon="fa fa-fw fa-times"
+                                value="Clear search"
+                                action="#{searchUserBean.doResetFilter}"
+                                update=":userForm @form" />
+                    </p:tab>
+                </p:accordionPanel>
+            </h:form>
 
-
-
-            <!-- Edit User Dialog-->
-            <p:dialog header="Edit user" id="userEditDialog" widgetVar="userEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-                <p:outputPanel id="userData" rendered="#{not empty userDetailController.user}">
-                    <h:panelGrid columns="2">
-                        <p:outputLabel for="username" value="User name: " />
-                        <p:inputText id="username" value="#{userDetailController.user.username}" disabled="true"/>
-                    </h:panelGrid>
-                    <p:separator />
-                    <h:panelGrid columns="2">
-                        <p:outputLabel for="firstName" value="First name: " />
-                        <p:inputText id="firstName" value="#{userDetailController.user.firstName}"/>
-                        <p:outputLabel for="firstName" value="Last name: " />
-                        <p:inputText id="lastName" value="#{userDetailController.user.lastName}"/>
-                        <p:outputLabel for="email" value="E-mail: " />
-                        <p:inputText id="email" value="#{userDetailController.user.email}"/>
-
-                        <p:selectManyButton value="#{userDetailController.newRolesString}">
-                            <f:selectItem itemLabel="Librarian" itemValue="librarian" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
-                            <f:selectItem itemLabel="Admin" itemValue="admin" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
-                            <f:selectItem itemLabel="Customer" itemValue="customer" />
-                        </p:selectManyButton>
-
-
-
-
-                    </h:panelGrid>
-                    <p:separator />
-                    <h:panelGrid columns="2">
-                        <p:outputLabel for="enabled" value="Enabled: " />
-                        <p:selectBooleanCheckbox id="enabled" value="#{userDetailController.user.enabled}"/>
-                    </h:panelGrid>
-                    <p:separator />
-                    <h:panelGrid columns="3">
-                        <p:commandButton value="Save" action="#{userDetailController.doSaveUser()}" oncomplete="PF('userEditDialog').hide()" update=":userForm:usersTable :headerForm:undoRedoGroup">
-                            <f:actionListener binding="#{userDetailController.changeUserRoles()}" />
+            <h:form id="userForm">
+                <p:dataTable id="usersTable" var="user" value="#{searchUserBean.results}">
+                    <f:facet name="header">
+                        <p:commandButton
+                                update=":userForm:userAddDialog" oncomplete="PF('userAddDialog').show()"
+                                icon="fa fa-fw fa-plus" title="Create new user" value="Create new user" />
+                    </f:facet>
+                    <p:column headerText="Username">
+                        <h:outputText value="#{user.username}"/>
+                    </p:column>
+                    <p:column headerText="First name">
+                        <h:outputText value="#{user.firstName}"/>
+                    </p:column>
+                    <p:column headerText="Last name">
+                        <h:outputText value="#{user.lastName}"/>
+                    </p:column>
+                    <p:column headerText="User role">
+                        <h:outputText value="#{userListController.getUserRoleHuman(user.roles)}"/>
+                    </p:column>
+                    <p:column headerText="Enabled">
+                        <h:selectBooleanCheckbox value="#{user.enabled}" disabled="true"/>
+                    </p:column>
+                    <p:column style="width:100px;text-align: center">
+                        <p:commandButton update=":userForm:userEditDialog" oncomplete="PF('userEditDialog').show()" icon="fa fa-fw fa-edit" title="Edit">
+                            <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
                         </p:commandButton>
-                        <p:commandButton value="Reload" action="#{userDetailController.doReloadUser()}" update=":userForm:userData"/>
-                        <p:commandButton value="Cancel" onclick="PF('userEditDialog').hide()"/>
-                    </h:panelGrid>
-                </p:outputPanel>
-            </p:dialog>
+                        <p:commandButton action="#{userDetailController.doDeleteUser}" icon="fa fa-fw fa-trash" title="Delete" update=":userForm:usersTable :headerForm:undoRedoGroup">
+                            <f:setPropertyActionListener value="#{user}" target="#{userDetailController.user}" />
+                            <p:confirm header="Delete user" message="User will be deleted permanently" icon="fa fa-fw fa-warning" />
+                        </p:commandButton>
+                        <p:linkButton outcome="/admin/userBorrowings" icon="fa fa-fw fa-briefcase" title="Edit borrowings for user" rendered="#{user.hasRole('CUSTOMER')}">
+                            <f:param name="username" value="#{user.username}" />
+                        </p:linkButton>
+                    </p:column>
+                </p:dataTable>
 
-            <!-- delete Dialog-->
-            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
-                <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
-                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
-            </p:confirmDialog>
 
-            <!-- New User Dialog -->
-            <p:dialog header="Create new user" id="userAddDialog" widgetVar="userAddDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
-                <p:outputPanel id="regUserData" rendered="#{not empty createUserBean.user}">
+
+                <!-- Edit User Dialog-->
+                <p:dialog header="Edit user" id="userEditDialog" widgetVar="userEditDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                    <p:outputPanel id="editUserData" rendered="#{not empty userDetailController.user}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel for="@next" value="Username: " />
+                            <p:inputText value="#{userDetailController.user.username}" disabled="true" />
+                            <p:outputLabel for="@next" value="First name: " />
+                            <p:inputText value="#{userDetailController.user.firstName}"/>
+                            <p:outputLabel for="@next" value="Last name: " />
+                            <p:inputText value="#{userDetailController.user.lastName}"/>
+                            <p:outputLabel for="@next" value="E-mail: " />
+                            <p:inputText value="#{userDetailController.user.email}"/>
+                            <h:outputText value="User permissions:" />
+                            <p:selectOneButton value="#{userDetailController.userRole}">
+                                <f:selectItem itemLabel="Admin" itemValue="ADMIN" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                                <f:selectItem itemLabel="Librarian" itemValue="LIBRARIAN" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                                <f:selectItem itemLabel="Customer" itemValue="CUSTOMER" />
+                            </p:selectOneButton>
+
+                            <p:outputLabel for="@next" value="Enabled: " />
+                            <p:selectBooleanCheckbox value="#{userDetailController.user.enabled}"/>
+                        </h:panelGrid>
+                    </p:outputPanel>
                     <h:panelGrid columns="2">
-                        <p:outputLabel for="regFirstName" value="First name: " />
-                        <p:inputText id="regFirstName" value="#{createUserBean.user.firstName}"/>
-                        <p:outputLabel for="regLastName" value="Last name: " />
-                        <p:inputText id="regLastName" value="#{createUserBean.user.lastName}"/>
-                        <p:outputLabel for="regUsername" value="User name: " />
-                        <p:inputText id="regUsername" value="#{createUserBean.user.username}"/>
-                        <p:outputLabel for="regEmail" value="E-mail: " />
-                        <p:inputText id="regEmail" value="#{createUserBean.user.email}"/>
-                        <h:outputText value="User permissions:" />
-                        <p:selectManyButton value="#{createUserBean.selectedUserRoles}">
-                            <f:selectItem itemLabel="Librarian" itemValue="librarian" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
-                            <f:selectItem itemLabel="Admin" itemValue="admin" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
-                            <f:selectItem itemLabel="Customer" itemValue="customer" />
-                        </p:selectManyButton>
+                        <p:commandButton
+                                value="Save" action="#{userDetailController.doSaveUser}" oncomplete="PF('userEditDialog').hide()"
+                                update=":userForm:usersTable :headerForm:undoRedoGroup" />
+                        <p:commandButton
+                                value="Cancel" action="#{userDetailController.reset()}" oncomplete="PF('userEditDialog').hide()"
+                                update=":userForm:userEditDialog" />
                     </h:panelGrid>
-                </p:outputPanel>
-                <h:panelGrid columns="2">
-                    <p:commandButton
-                            value="Create user" action="#{createUserBean.saveUser()}" oncomplete="PF('userAddDialog').hide()"
-                            update=":userForm:usersTable :userForm:userAddDialog :headerForm:undoRedoGroup" />
-                    <p:commandButton
-                            value="Cancel" action="#{createUserBean.reset}" oncomplete="PF('userAddDialog').hide()"
-                            update=":userForm:userAddDialog" />
-                </h:panelGrid>
-            </p:dialog>
-        </h:form>
+                </p:dialog>
+
+                <!-- New User Dialog -->
+                <p:dialog header="Create new user" id="userAddDialog" widgetVar="userAddDialog" modal="true" showEffect="fade" hideEffect="fade" resizable="false">
+                    <p:outputPanel id="regUserData" rendered="#{not empty createUserBean.user}">
+                        <h:panelGrid columns="2">
+                            <p:outputLabel for="regFirstName" value="First name: " />
+                            <p:inputText id="regFirstName" value="#{createUserBean.user.firstName}"/>
+                            <p:outputLabel for="regLastName" value="Last name: " />
+                            <p:inputText id="regLastName" value="#{createUserBean.user.lastName}"/>
+                            <p:outputLabel for="regUsername" value="Username: " />
+                            <p:inputText id="regUsername" value="#{createUserBean.user.username}"/>
+                            <p:outputLabel for="regEmail" value="E-mail: " />
+                            <p:inputText id="regEmail" value="#{createUserBean.user.email}"/>
+                            <h:outputText value="User permissions:" />
+                            <p:selectOneButton value="#{createUserBean.selectedUserRoles}">
+                                <f:selectItem itemLabel="Admin" itemValue="admin" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                                <f:selectItem itemLabel="Librarian" itemValue="librarian" itemDisabled="#{!sessionInfoBean.hasRole('ADMIN')}" />
+                                <f:selectItem itemLabel="Customer" itemValue="customer" />
+                            </p:selectOneButton>
+                        </h:panelGrid>
+                    </p:outputPanel>
+                    <h:panelGrid columns="2">
+                        <p:commandButton
+                                value="Create user" action="#{createUserBean.saveUser()}" oncomplete="PF('userAddDialog').hide()"
+                                update=":adminUserContent :headerForm:undoRedoGroup" />
+                        <p:commandButton
+                                value="Cancel" action="#{createUserBean.reset}" oncomplete="PF('userAddDialog').hide()"
+                                update=":userForm:userAddDialog" />
+                    </h:panelGrid>
+                </p:dialog>
+
+                <!-- delete Dialog-->
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" width="300">
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="fa fa-fw fa-check" />
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="fa fa-fw fa-times" />
+                </p:confirmDialog>
+            </h:form>
+        </h:panelGroup>
     </ui:define>
 </ui:composition>

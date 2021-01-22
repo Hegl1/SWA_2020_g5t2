@@ -1,9 +1,8 @@
 <?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3c.org/1999/xhtml"
-                xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:ng="http://xmlns.jcp.org/jsf/passthrough"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/templates/main.xhtml">
     <ui:define name ="content">
@@ -22,8 +21,8 @@
                 <p>This panel allows to illustrate a vulnerability present in PrimeFaces until at least version 8.0 with a planned fix in version 9.0. <a href="https://github.com/primefaces/primefaces/issues/5869">Reported by TobiasDick as PrimeFaces issue #5869</a>. We would like to thank Tobias for pointing us towards this issue relevant for our project.</p>
                 <p>The text input field below is restricted to only accept text input with a maximum length of 10. Affected PrimeFaces versions do not check the input's maximum length server-side, allowing for a basic JS-based hack to override the client-side setting and thus submit longer strings.</p>
                 <p:inputText value="#{securityTestBean.testString}" maxlength="10" />
-                <p:commandButton type="submit" value="Submit" update="okDialog" />
-                <p:commandButton type="submit" value="Hack" update="okDialog" onclick="document.querySelector('input[maxlength=&quot;10&quot;]').value = 'CHANGED TEXT BEYOND THE INTENDED LENGTH OF 10 CHARACTERS!';" />
+                <p:commandButton type="submit" value="Submit" update="@all" />
+                <p:commandButton type="submit" value="Hack" update="@all" onclick="document.querySelector('input[maxlength=&quot;10&quot;]').value = 'CHANGED TEXT BEYOND THE INTENDED LENGTH OF 10 CHARACTERS!';" />
                 <p>This submitted String should never be longer than 10 characters: <h:outputText value="#{securityTestBean.testString}"/></p>
                 <p><h:outputText value="BUT IT IS NOW!!! And it has been set in the backing bean." style="color:red; font-weight: bold;" rendered="#{securityTestBean.testString.length() gt 10}"/></p>
             </p:panel>

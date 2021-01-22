@@ -135,20 +135,20 @@
                         <f:setPropertyActionListener value="#{media}"
                                                      target="#{mediaDetailController.media}" />
                     </p:commandButton>
-                    <p:commandButton id="mDelBut" onclick="PF('dataChangeDlg').show()" action="#{mediaDetailController.deleteMedia(media)}"
+                    <p:commandButton id="mDelBut" action="#{mediaDetailController.deleteMedia(media)}"
 
-                                     icon="fa fa-fw fa-eraser" title="Delete safely"
+                                     icon="fa fa-fw fa-trash" title="Delete safely"
                                      update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup">
                         <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
                         <p:confirm header="Delete media"
-                                   message="Do you want to delete the media?" icon="ui-icon-alert" />
+                                   message="Do you want to delete the media?" icon="fa fa-fw fa-warning" />
                     </p:commandButton>
                 </p:column>
 
                 <p:column
                         headerText="Borrow for user"
                         style="width: 7rem; text-align: center"
-                        rendered="#{(cc.attrs.context == 'list' or cc.attrs.context == 'mediaAdmin') and sessionInfoBean.currentUserRoles != 'CUSTOMER'}">
+                        rendered="#{(cc.attrs.context == 'list' or cc.attrs.context == 'mediaAdmin') and ['ADMIN', 'LIBRARIAN'].contains(sessionInfoBean.currentUserRoles)}">
                     <p:commandButton update="#{cc.id}:mediaBorrowForUserForm:borrowForUserDialog" oncomplete="PF('borrowForUserDialog').show()" icon="fa fa-fw fa-user-plus" title="Borrow for user" disabled="#{!media.available}">
                         <f:setPropertyActionListener value="#{media}" target="#{borrowForUserController.media}" />
                     </p:commandButton>
@@ -286,7 +286,7 @@
                             <c:when test="${mediaDetailController.media.mediaType == 'AUDIOBOOK'}">
                                 <p:outputLabel for="@next" value="Speaker: " />
                                 <p:inputText value="#{mediaDetailController.getMediaAudioBook().speaker}" />
-                                <p:outputLabel for="@next" value="Length: " />
+                                <p:outputLabel for="@next" value="Length [s]: " />
                                 <p:inputText value="#{mediaDetailController.getMediaAudioBook().length}" />
                                 <p:outputLabel for="@next" value="Author: " />
                                 <p:inputText value="#{mediaDetailController.getMediaAudioBook().author}" />
@@ -298,7 +298,7 @@
                                 <p:inputText value="#{mediaDetailController.getMediaMagazine().series}" />
                             </c:when>
                             <c:when test="${mediaDetailController.media.mediaType == 'VIDEO'}">
-                                <p:outputLabel for="@next" value="Length: " />
+                                <p:outputLabel for="@next" value="Length [s]: " />
                                 <p:inputText value="#{mediaDetailController.getMediaVideo().length}" />
                             </c:when>
                         </c:choose>
@@ -327,9 +327,9 @@
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade"
                              width="300">
                 <p:commandButton value="Yes" type="button"
-                                 styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                 styleClass="ui-confirmdialog-yes" icon="fa fa-fw fa-check" />
                 <p:commandButton value="No" type="button"
-                                 styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                 styleClass="ui-confirmdialog-no" icon="fa fa-fw fa-times" />
             </p:confirmDialog>
         </h:form>
 
