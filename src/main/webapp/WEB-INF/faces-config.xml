@@ -16,7 +16,7 @@
         <renderer>
             <component-family>org.primefaces.component</component-family>
             <renderer-type>org.primefaces.component.InputTextRenderer</renderer-type>
-            <renderer-class>at.qe.skeleton.primefaces.CustomInputTextRenderer</renderer-class>
+            <renderer-class>at.ac.uibk.library.primefaces.CustomInputTextRenderer</renderer-class>
         </renderer>
     </render-kit>
 
