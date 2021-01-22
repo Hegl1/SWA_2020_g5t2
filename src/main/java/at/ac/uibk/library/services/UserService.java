@@ -1,18 +1,11 @@
 package at.ac.uibk.library.services;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import at.ac.uibk.library.model.*;
+import at.ac.uibk.library.repositories.BookmarkRepository;
+import at.ac.uibk.library.repositories.BorrowedRepository;
+import at.ac.uibk.library.repositories.ReservedRepository;
+import at.ac.uibk.library.repositories.UserRepository;
 import at.ac.uibk.library.utils.UnallowedInputException;
-import at.qe.skeleton.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,10 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import at.ac.uibk.library.repositories.BookmarkRepository;
-import at.ac.uibk.library.repositories.BorrowedRepository;
-import at.ac.uibk.library.repositories.ReservedRepository;
-import at.ac.uibk.library.repositories.UserRepository;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Service for accessing and manipulating user data.

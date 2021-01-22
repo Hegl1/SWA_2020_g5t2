@@ -1,9 +1,5 @@
 package at.ac.uibk.library.ui.beans;
 
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-
 import at.ac.uibk.library.model.User;
 import at.ac.uibk.library.model.UserRole;
 import at.ac.uibk.library.services.MailService;
@@ -11,12 +7,15 @@ import at.ac.uibk.library.services.UndoRedoService;
 import at.ac.uibk.library.services.UserService;
 import at.ac.uibk.library.ui.controllers.FMSpamController;
 import at.ac.uibk.library.utils.UnallowedInputException;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import net.bytebuddy.utility.RandomString;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @Scope("view")

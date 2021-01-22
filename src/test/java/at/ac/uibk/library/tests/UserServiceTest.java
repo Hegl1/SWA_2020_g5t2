@@ -1,13 +1,9 @@
 package at.ac.uibk.library.tests;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.faces.context.FacesContext;
-
+import at.ac.uibk.library.model.User;
+import at.ac.uibk.library.model.UserRole;
+import at.ac.uibk.library.services.UserService;
+import at.ac.uibk.library.services.UserService.UnauthorizedActionException;
 import at.ac.uibk.library.ui.beans.ContextMocker;
 import at.ac.uibk.library.utils.UnallowedInputException;
 import org.junit.Test;
@@ -21,10 +17,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import at.ac.uibk.library.model.User;
-import at.ac.uibk.library.model.UserRole;
-import at.ac.uibk.library.services.UserService;
-import at.ac.uibk.library.services.UserService.UnauthorizedActionException;
+import javax.faces.context.FacesContext;
+import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest

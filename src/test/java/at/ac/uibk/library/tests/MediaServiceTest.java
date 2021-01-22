@@ -1,10 +1,9 @@
 package at.ac.uibk.library.tests;
 
-import java.util.Collection;
-
-import javax.faces.context.FacesContext;
-
+import at.ac.uibk.library.model.*;
+import at.ac.uibk.library.services.MediaService;
 import at.ac.uibk.library.ui.beans.ContextMocker;
+import at.ac.uibk.library.utils.UnallowedInputException;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -15,14 +14,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import at.ac.uibk.library.model.AudioBook;
-import at.ac.uibk.library.model.Book;
-import at.ac.uibk.library.model.Magazine;
-import at.ac.uibk.library.model.Media;
-import at.ac.uibk.library.model.MediaType;
-import at.ac.uibk.library.model.Video;
-import at.ac.uibk.library.services.MediaService;
-import at.ac.uibk.library.utils.UnallowedInputException;
+import javax.faces.context.FacesContext;
+import java.util.Collection;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest

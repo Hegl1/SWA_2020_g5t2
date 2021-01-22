@@ -1,25 +1,18 @@
 package at.ac.uibk.library.services;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Deque;
-
+import at.ac.uibk.library.model.*;
+import at.ac.uibk.library.repositories.MediaBorrowTimeRepository;
+import at.ac.uibk.library.services.UserService.UnauthorizedActionException;
+import at.ac.uibk.library.utils.UnallowedInputException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.ac.uibk.library.model.Bookmark;
-import at.ac.uibk.library.model.Borrowed;
-import at.ac.uibk.library.model.Media;
-import at.ac.uibk.library.model.MediaBorrowTime;
-import at.ac.uibk.library.model.Reserved;
-import at.ac.uibk.library.model.User;
-import at.ac.uibk.library.model.UserRole;
-import at.ac.uibk.library.repositories.MediaBorrowTimeRepository;
-import at.ac.uibk.library.services.UserService.UnauthorizedActionException;
-import at.ac.uibk.library.utils.UnallowedInputException;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Deque;
 
 /**
  * Class that provides a Service to undo and redo certain actions. As the class

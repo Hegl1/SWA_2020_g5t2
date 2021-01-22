@@ -1,12 +1,12 @@
 package at.ac.uibk.library.tests;
 
-import at.ac.uibk.library.model.User;
-import at.ac.uibk.library.services.MediaService;
-import at.ac.uibk.library.services.UserService;
 import at.ac.uibk.library.model.Borrowed;
 import at.ac.uibk.library.model.Media;
 import at.ac.uibk.library.model.Reserved;
+import at.ac.uibk.library.model.User;
 import at.ac.uibk.library.services.BorrowService;
+import at.ac.uibk.library.services.MediaService;
+import at.ac.uibk.library.services.UserService;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;

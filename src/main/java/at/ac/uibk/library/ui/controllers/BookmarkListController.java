@@ -1,8 +1,8 @@
 package at.ac.uibk.library.ui.controllers;
 
-import at.ac.uibk.library.services.BookmarkService;
 import at.ac.uibk.library.model.Bookmark;
 import at.ac.uibk.library.model.User;
+import at.ac.uibk.library.services.BookmarkService;
 import at.ac.uibk.library.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;

@@ -1,12 +1,12 @@
 package at.ac.uibk.library.tests;
 
 import at.ac.uibk.library.model.Bookmark;
+import at.ac.uibk.library.model.Media;
 import at.ac.uibk.library.model.User;
 import at.ac.uibk.library.services.BookmarkService;
 import at.ac.uibk.library.services.MediaService;
 import at.ac.uibk.library.services.UserService;
 import at.ac.uibk.library.ui.beans.ContextMocker;
-import at.ac.uibk.library.model.Media;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;

@@ -1,12 +1,10 @@
 package at.ac.uibk.library.services;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import at.ac.uibk.library.model.User;
+import at.ac.uibk.library.model.*;
+import at.ac.uibk.library.repositories.BorrowedRepository;
+import at.ac.uibk.library.repositories.MediaBorrowTimeRepository;
+import at.ac.uibk.library.repositories.MediaRepository;
+import at.ac.uibk.library.repositories.ReservedRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +14,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import at.ac.uibk.library.model.Borrowed;
-import at.ac.uibk.library.model.Media;
-import at.ac.uibk.library.model.MediaBorrowTime;
-import at.ac.uibk.library.model.MediaType;
-import at.ac.uibk.library.model.Reserved;
-import at.ac.uibk.library.repositories.BorrowedRepository;
-import at.ac.uibk.library.repositories.MediaBorrowTimeRepository;
-import at.ac.uibk.library.repositories.MediaRepository;
-import at.ac.uibk.library.repositories.ReservedRepository;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class that is used for the borrowing process, reservation process and

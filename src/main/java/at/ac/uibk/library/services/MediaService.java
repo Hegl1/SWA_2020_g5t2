@@ -1,22 +1,16 @@
 package at.ac.uibk.library.services;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Collectors;
-
+import at.ac.uibk.library.model.*;
+import at.ac.uibk.library.repositories.MediaRepository;
 import at.ac.uibk.library.utils.UnallowedInputException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import at.ac.uibk.library.model.AudioBook;
-import at.ac.uibk.library.model.Book;
-import at.ac.uibk.library.model.Magazine;
-import at.ac.uibk.library.model.Media;
-import at.ac.uibk.library.model.MediaType;
-import at.ac.uibk.library.model.Video;
-import at.ac.uibk.library.repositories.MediaRepository;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Service for accessing and manipulating media data.

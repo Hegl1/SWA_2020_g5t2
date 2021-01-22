@@ -1,9 +1,9 @@
 package at.ac.uibk.library.ui.controllers;
 
-import at.ac.uibk.library.services.UndoRedoService;
 import at.ac.uibk.library.model.MediaBorrowTime;
 import at.ac.uibk.library.model.MediaType;
 import at.ac.uibk.library.repositories.MediaBorrowTimeRepository;
+import at.ac.uibk.library.services.UndoRedoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

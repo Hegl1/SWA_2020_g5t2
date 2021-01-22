@@ -1,11 +1,9 @@
 package at.ac.uibk.library.ui.controllers;
 
 import at.ac.uibk.library.model.*;
+import at.ac.uibk.library.repositories.BookmarkRepository;
 import at.ac.uibk.library.services.*;
 import at.ac.uibk.library.utils.UnallowedInputException;
-import at.qe.skeleton.model.*;
-import at.ac.uibk.library.repositories.BookmarkRepository;
-import at.qe.skeleton.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -129,9 +127,8 @@ public class MediaDetailController implements Serializable {
 		// Step 1: Check if the media is still borrowed
 		Collection<Borrowed> a1 = borrowService.getAllBorrowsByMedia(media);
 		if (a1.size() > 0) {
-			fms.warn("This media is still borrowed Users and cannot be deleted.");
+			fms.warn("This media is still borrowed by someone and therefore cannot be deleted.");
 		} else {
-
 			doSafeDeleteMedia(media);
 		}
 		// optionally close the occurring loading message as the deleting and mail
@@ -170,11 +167,9 @@ public class MediaDetailController implements Serializable {
 				}
 				for (User u : a2_s) {
 
-					// TODO: refactor email contents
-					mailservice.sendMail(u.getEmail(), "> The Media of your Bookmark was deleted",
-							"The following Media is not available anymore: Title: " + media.getTitle() + ", Type: "
-									+ media.getMediaType() + ", Language: " + media.getLanguage()
-									+ ", Publishing Year: " + media.getPublishingYear());
+					mailservice.sendMail(u.getEmail(), "The media of your bookmark was deleted",
+							"Dear customer,\nthe " + media.getMediaType().toString().toLowerCase() + " \"" + media.getTitle() + "\"" +
+									"you've recently bookmarked was deleted and is not available anymore.\n\nYours sincerely,\nthe library team");
 				}
 				// last but not least: remove reservations
 				if (reservedController.getReservationCountForMedia(media) > 0) {

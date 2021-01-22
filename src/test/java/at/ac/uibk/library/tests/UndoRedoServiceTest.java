@@ -1,12 +1,8 @@
 package at.ac.uibk.library.tests;
 
-import java.util.Collection;
-
-import javax.faces.context.FacesContext;
-
-import at.ac.uibk.library.model.Bookmark;
-import at.ac.uibk.library.model.User;
-import at.ac.uibk.library.model.UserRole;
+import at.ac.uibk.library.model.*;
+import at.ac.uibk.library.repositories.MediaBorrowTimeRepository;
+import at.ac.uibk.library.services.*;
 import at.ac.uibk.library.ui.beans.ContextMocker;
 import at.ac.uibk.library.utils.UnallowedInputException;
 import org.junit.Test;
@@ -19,16 +15,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import at.ac.uibk.library.model.Borrowed;
-import at.ac.uibk.library.model.Media;
-import at.ac.uibk.library.model.MediaBorrowTime;
-import at.ac.uibk.library.model.Video;
-import at.ac.uibk.library.repositories.MediaBorrowTimeRepository;
-import at.ac.uibk.library.services.BookmarkService;
-import at.ac.uibk.library.services.BorrowService;
-import at.ac.uibk.library.services.MediaService;
-import at.ac.uibk.library.services.UndoRedoService;
-import at.ac.uibk.library.services.UserService;
+import javax.faces.context.FacesContext;
+import java.util.Collection;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest

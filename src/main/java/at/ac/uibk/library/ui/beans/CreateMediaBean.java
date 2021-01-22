@@ -1,22 +1,20 @@
 package at.ac.uibk.library.ui.beans;
 
-import java.io.IOException;
-import java.io.Serializable;
-
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import at.ac.uibk.library.model.Media;
 import at.ac.uibk.library.services.MediaService;
 import at.ac.uibk.library.services.MediaService.TotalAvailabilitySetTooLowException;
 import at.ac.uibk.library.services.UndoRedoService;
 import at.ac.uibk.library.ui.controllers.FMSpamController;
 import at.ac.uibk.library.utils.UnallowedInputException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.Serializable;
 
 @Component
 @Scope("view")
