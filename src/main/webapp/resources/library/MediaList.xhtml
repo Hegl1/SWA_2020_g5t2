@@ -137,7 +137,7 @@
                     </p:commandButton>
                     <p:commandButton id="mDelBut" action="#{mediaDetailController.deleteMedia(media)}"
 
-                                     icon="fa fa-fw fa-eraser" title="Delete safely"
+                                     icon="fa fa-fw fa-trash" title="Delete safely"
                                      update="#{cc.id}:mediaListForm:mediaTable :headerForm:undoRedoGroup">
                         <f:setPropertyActionListener value="#{media}" target="#{mediaDetailController.media}" />
                         <p:confirm header="Delete media"
@@ -148,7 +148,7 @@
                 <p:column
                         headerText="Borrow for user"
                         style="width: 7rem; text-align: center"
-                        rendered="#{(cc.attrs.context == 'list' or cc.attrs.context == 'mediaAdmin') and sessionInfoBean.currentUserRoles != 'CUSTOMER'}">
+                        rendered="#{(cc.attrs.context == 'list' or cc.attrs.context == 'mediaAdmin') and ['ADMIN', 'LIBRARIAN'].contains(sessionInfoBean.currentUserRoles)}">
                     <p:commandButton update="#{cc.id}:mediaBorrowForUserForm:borrowForUserDialog" oncomplete="PF('borrowForUserDialog').show()" icon="fa fa-fw fa-user-plus" title="Borrow for user" disabled="#{!media.available}">
                         <f:setPropertyActionListener value="#{media}" target="#{borrowForUserController.media}" />
                     </p:commandButton>

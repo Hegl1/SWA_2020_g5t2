@@ -14,9 +14,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("request")
 public class SecurityTestBean {
+
     private boolean showOkDialog = false;
     private String performedAction = "NONE";
-
 
     private String testString = "CHANGE ME";
 
@@ -25,13 +25,7 @@ public class SecurityTestBean {
     }
 
     public void setTestString(String testString) {
-        // this should fix the corresponding vulnerability , cf. http://localhost:8080/secured/test.xhtml
-        if(testString.length() <= 10) {
-            this.testString = testString;
-        } else {
-
-            this.testString = testString.substring(0,9);
-        }
+        this.testString = testString;
     }
 
     public boolean isShowOkDialog() {
