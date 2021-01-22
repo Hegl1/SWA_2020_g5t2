@@ -72,10 +72,10 @@
 							<f:selectItem itemLabel="-- select language --" itemValue="" />
 							<f:selectItems value="#{mediaDetailController.allLanguages}" var="lang" itemValue="#{lang}" itemLabel="#{mediaListController.convertLanguageHuman(lang)}" />
 						</p:selectOneMenu>
-						<p:outputLabel for="@next" value="totalAvail: " />
+						<p:outputLabel for="@next" value="Total Available: " />
 						<p:inputText
 							value="#{createMediaBean.totalAvail}" />
-						<p:outputLabel for="@next" value="mediaType: " />
+						<p:outputLabel for="@next" value="Type: " />
 						<p:inputText disabled="true" value="#{createMediaBean.mediaType}" />
 
 
@@ -89,7 +89,7 @@
 							<c:when test="${createMediaBean.mediaType == 'AUDIOBOOK'}">
 								<p:outputLabel for="@next" value="Speaker: " />
 								<p:inputText value="#{createMediaBean.speaker}" />
-								<p:outputLabel for="@next" value="Length: " />
+								<p:outputLabel for="@next" value="Length [s]: " />
 								<p:inputText value="#{createMediaBean.length}" />
 								<p:outputLabel for="@next" value="Author: " />
 								<p:inputText value="#{createMediaBean.author}" />
@@ -101,7 +101,7 @@
 								<p:inputText value="#{createMediaBean.series}" />
 							</c:when>
 							<c:when test="${createMediaBean.mediaType == 'VIDEO'}">
-								<p:outputLabel for="@next" value="Length: " />
+								<p:outputLabel for="@next" value="Length [s]: " />
 								<p:inputText value="#{createMediaBean.length}" />
 							</c:when>
 						</c:choose>

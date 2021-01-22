@@ -286,7 +286,7 @@
                             <c:when test="${mediaDetailController.media.mediaType == 'AUDIOBOOK'}">
                                 <p:outputLabel for="@next" value="Speaker: " />
                                 <p:inputText value="#{mediaDetailController.getMediaAudioBook().speaker}" />
-                                <p:outputLabel for="@next" value="Length: " />
+                                <p:outputLabel for="@next" value="Length [s]: " />
                                 <p:inputText value="#{mediaDetailController.getMediaAudioBook().length}" />
                                 <p:outputLabel for="@next" value="Author: " />
                                 <p:inputText value="#{mediaDetailController.getMediaAudioBook().author}" />
@@ -298,7 +298,7 @@
                                 <p:inputText value="#{mediaDetailController.getMediaMagazine().series}" />
                             </c:when>
                             <c:when test="${mediaDetailController.media.mediaType == 'VIDEO'}">
-                                <p:outputLabel for="@next" value="Length: " />
+                                <p:outputLabel for="@next" value="Length [s]: " />
                                 <p:inputText value="#{mediaDetailController.getMediaVideo().length}" />
                             </c:when>
                         </c:choose>
